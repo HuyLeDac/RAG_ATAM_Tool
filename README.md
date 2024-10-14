@@ -16,7 +16,7 @@ A lot.
 
 1. Create a virtual environment with the following [instructions](https://3.basecamp.com/4433092/buckets/35597770/documents/7773388048)
 
-2. Install all necessary pip packages (TODO)
+2. Install all necessary pip packages *(TODO)*
 
 **For local PCs:**
 
@@ -28,9 +28,10 @@ source (name)/bin/activate
 deactivate // Only when you want to leave the virtual environment
 ```
 
-2. Install all necessary pip packages (TODO)
+2. Install all necessary pip packages *(TODO)*
 
 ## Usage
+
 (TODO)
 
 ## License
