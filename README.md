@@ -2,6 +2,7 @@
 
 An ATAM framework which semi-automatically analyses tradeoffs, risks and sensitivity points using Retrival Augmented Generation (RAG).
 
+
 ## TODOs/Tasks
 
 ### Requirements:
@@ -36,6 +37,8 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
 - **What is the role of the LLM in analyzing architectural decisions?** <br>
 
 ### Concept Design
+
+![RAG Figure](figures/RAG_sketch.png)
 
 ## Installation (Only compatible with Linux Distros)
 
