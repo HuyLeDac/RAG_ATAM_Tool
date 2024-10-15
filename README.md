@@ -21,24 +21,47 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
 - **What types of scenarios will the prototype analyze?** <br>
     According ATAM paper (Use Case, Growth, Exploratory)
 - **How will they be generated?** <br>
-    Manual or automatic? *TODO*
+    Manual or automatic? Use LLMs to generate scenarios? Or predefine it? *TODO*
 - **How do you envision RAG (Retrieval Augmented Generation) being used in this analysis?** <br>
     Fetch documents, past cases, or architectural frameworks during analysis? *TODO*
 
 #### Data Input
 
 - **What data will the prototype require?** <br>
-    Scenarios and their respective quality attribute, architecture description, quality criteria, architectural approaches, quality criteria
+    1. *Scenarios and their respective quality attribute* <br>
+    1. *Architecture description* <br>
+    1. *Quality criteria* <br>
+    1. *Architectural approaches* 
 - **How will this data be structured (Format)?** <br>
-    All textual, since Llama only can recieve textual input. 
+    1. *Architectural description:* Use PlantUML Syntax (UML fulfills IEEE P1471 standard)<br>
+    1. *Architectural approaches:* List? <br>
+    1. *Scenarios:* For each scenario we need a list (Scenario, Attribute, Environment, Stimulus, Response, Architectural)
+    1. *Quality criteria:* Text
 
 #### Decision Analysis
 
 - **What is the role of the LLM in analyzing architectural decisions?** <br>
+    Find trade-offs, risks and sensitivity points given
+- **How to evision the prototype?** <br>
+    There should be a GUI where a user can put all necessary inputs in different text fields, the LLM should then list risks, trade-offs and sensitivity points in an output field
+
+#### System components & architecture
+*TODO*
+
+#### Functional requirements
+*TODO*
+
+#### Non-functional Requirements
+*TODO*
+
+#### Output and Reporting
+*TODO*
 
 ### Concept Design
 
+![General Idea](figures/general_idea.png)
 ![RAG Figure](figures/RAG_sketch.png)
+
 
 ## Installation (Only compatible with Linux Distros)
 
