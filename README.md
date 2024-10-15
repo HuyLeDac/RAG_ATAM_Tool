@@ -2,8 +2,40 @@
 
 An ATAM framework which semi-automatically analyses tradeoffs, risks and sensitivity points using Retrival Augmented Generation (RAG).
 
-## TODOs
-A lot.
+## TODOs/Tasks
+
+### Requirements:
+
+#### Objectives
+
+- **Main goal:** <br> 
+    Find risks, tradeoffs and sensittivity points of architectural decisions though given scenarios and an initial architecture.
+- **Who will use this prototype?** <br>
+    Software architects/engineers, need proper knowledge about ATAM and Software Architecture. 
+- **What kind of architectural decisions/layouts are you focusing on?** <br>
+    *TODO*
+
+#### Context and Scenarios
+
+- **What types of scenarios will the prototype analyze?** <br>
+    According ATAM paper (Use Case, Growth, Exploratory)
+- **How will they be generated?** <br>
+    Manual or automatic? *TODO*
+- **How do you envision RAG (Retrieval Augmented Generation) being used in this analysis?** <br>
+    Fetch documents, past cases, or architectural frameworks during analysis? *TODO*
+
+#### Data Input
+
+- **What data will the prototype require?** <br>
+    Scenarios and their respective quality attribute, architecture description, quality criteria, architectural approaches, quality criteria
+- **How will this data be structured (Format)?** <br>
+    All textual, since Llama only can recieve textual input. 
+
+#### Decision Analysis
+
+- **What is the role of the LLM in analyzing architectural decisions?** <br>
+
+### Concept Design
 
 ## Installation (Only compatible with Linux Distros)
 
