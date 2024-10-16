@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATAM RAG Tool</title>
+    <script>
+        async function sendInput() {
+            const inputText = document.getElementById('inputText').value;  // Get input text
+            const response = await fetch('http://127.0.0.1:5000/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: inputText }),  // Send input as JSON
+            });
+            const data = await response.json();  // Get the response data
+            document.getElementById('output').innerText = data.output;  // Display output
+        }
+    </script>
+</head>
+<body>
+    <h1>ATAM RAG Tool</h1>
+    <textarea id="inputText" placeholder="Type your input here..." rows="4" cols="50"></textarea><br>
+    <button onclick="sendInput()">Submit</button>
+    <h2>Output:</h2>
+    <div id="output"></div>
+</body>
+</html>

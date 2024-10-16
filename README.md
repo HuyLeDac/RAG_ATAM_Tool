@@ -1,6 +1,6 @@
 # RAG_ATAM_Tool
 
-An ATAM framework which semi-automatically analyses tradeoffs, risks and sensitivity points using Retrival Augmented Generation (RAG).
+An ATAM framework which semi-automatically analyses tradeoffs, risks and sensitivity points using Retrival Augmented Generation (RAG), focusing on qualitative analyses.
 
 
 ## TODOs/Tasks
@@ -33,7 +33,7 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
     1. *Quality criteria* <br>
     1. *Architectural approaches* 
 - **How will this data be structured (Format)?** <br>
-    1. *Architectural description:* Use PlantUML Syntax (UML fulfills IEEE P1471 standard)<br>
+    1. *Architectural description:* Use PlantUML Syntax (UML fulfills IEEE P1471 standard), maybe add extra custom annotations into the syntax<br>
     1. *Architectural approaches:* List? <br>
     1. *Scenarios:* For each scenario we need a list (Scenario, Attribute, Environment, Stimulus, Response, Architectural)
     1. *Quality criteria:* Text
@@ -41,27 +41,36 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
 #### Decision Analysis
 
 - **What is the role of the LLM in analyzing architectural decisions?** <br>
-    Find trade-offs, risks and sensitivity points given
+    Find trade-offs, risks and sensitivity points given the input
 - **How to evision the prototype?** <br>
-    There should be a GUI where a user can put all necessary inputs in different text fields, the LLM should then list risks, trade-offs and sensitivity points in an output field
+    There should be a GUI where a user can put all necessary inputs (mentioned above) in different text fields, the LLM should then list risks, trade-offs and sensitivity points in an output field
 
 #### System components & architecture
-*TODO*
+
+- **What are the major components of the prototype?** <br>
+    Frontend: React or Vue.js for input<br>
+    Backend: python server using flask? LLM processing using ollama library, <br>
 
 #### Functional requirements
+
 *TODO*
 
 #### Non-functional Requirements
+
 *TODO*
 
 #### Output and Reporting
+
 *TODO*
+
+#### Success  Metrics
+
+- **How do we measure the quality of the solutions?**
 
 ### Concept Design
 
 ![General Idea](figures/general_idea.png)
 ![RAG Figure](figures/RAG_sketch.png)
-
 
 ## Installation (Only compatible with Linux Distros)
 
@@ -74,7 +83,14 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
 
 1. Create a virtual environment with the following [instructions](https://3.basecamp.com/4433092/buckets/35597770/documents/7773388048)
 
-2. Install all necessary pip packages *(TODO)*
+1. Activate virtual environment 
+
+```bash
+source (name)/bin/activate
+deactivate // Only when you want to leave the virtual environment
+```
+
+3. Install all necessary pip packages *(TODO)*
 
 **For local PCs:**
 
