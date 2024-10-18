@@ -33,10 +33,43 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
     1. *Quality criteria* <br>
     1. *Architectural approaches* 
 - **How will this data be structured (Format)?** <br>
+    JSON Format<br>
     1. *Architectural description:* Use PlantUML Syntax (UML fulfills IEEE P1471 standard), maybe add extra custom annotations into the syntax<br>
-    1. *Architectural approaches:* List? <br>
-    1. *Scenarios:* For each scenario we need a list (Scenario, Attribute, Environment, Stimulus, Response, Architectural)
-    1. *Quality criteria:* Text
+    ```json
+    ```
+    2. *Architectural approaches:* List? <br>
+    ```json
+    ```
+    3. *Scenarios:* For each scenario we need a list (Scenario, Attribute, Environment, Stimulus, Response, Architectural decisions) <br>
+    ```json
+    
+    ```
+    4. *Quality criteria:* JSON <br>
+    ```json
+    {
+        "quality_criteria": [
+            {
+            "attribute": "Modifiability",
+            "questions": [
+                {
+                "question": "If this architecture includes layers/facades are there any places where the layers/facades are circumvented?"
+                },
+                {
+                "question": "If a shared data type changes, how many parts of the architecture are affected?"
+                }
+            ]
+            },
+            {
+            "attribute": "Performance",
+            "questions": [
+                {
+                "question": "If there are multiple processes competing for a shared resource, how are priorities assigned to these processes?"
+                }
+            ]
+            }
+        ]
+    }
+    ```
 
 #### Decision Analysis
 
@@ -69,8 +102,8 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
 
 ### Concept Design
 
-![General Idea](figures/general_idea.png)
-![RAG Figure](figures/RAG_sketch.png)
+![General Idea](readme_figures/general_idea.png)
+![RAG Figure](readme_figures/RAG_sketch.png)
 
 ## Installation (Only compatible with Linux Distros)
 
