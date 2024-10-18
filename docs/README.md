@@ -35,16 +35,25 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
 - **How will this data be structured (Format)?** <br>
     JSON Format<br>
     1. *Architectural description:* Use PlantUML Syntax (UML fulfills IEEE P1471 standard), maybe add extra custom annotations into the syntax<br>
-    ```json
-    ```
-    2. *Architectural approaches:* List? <br>
-    ```json
-    ```
-    3. *Scenarios:* For each scenario we need a list (Scenario, Attribute, Environment, Stimulus, Response, Architectural decisions) <br>
+
     ```json
     
     ```
+
+    2. *Architectural approaches:* List? <br>
+
+    ```json
+    
+    ```
+
+    3. *Scenarios:* For each scenario we need a list (Scenario, Attribute, Environment, Stimulus, Response, Architectural decisions) <br>
+
+    ```json
+    
+    ```
+
     4. *Quality criteria:* JSON <br>
+
     ```json
     {
         "quality_criteria": [
@@ -83,6 +92,21 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
 - **What are the major components of the prototype?** <br>
     Frontend: React or Vue.js for input<br>
     Backend: python server using flask? LLM processing using ollama library, <br>
+  - RAG database 
+  - LLM (Llama 3.1:70b or 8b)
+  - (input parser?)
+  - information retriver 
+  - utils for (error handling, logging, etc.)
+  - an app handling http requests
+- **What kind of information should the database contain?**
+    homogeneous/heterogeneous? In JSON format <br>
+    Architecture Patterns and Styles <br>
+    Quality Attributes and Impact <br>
+    Tradeoff Points <br>
+    Risk Catalog <br>
+    Sensitivity Points <br>
+    Architectural Decisions Repository <br>
+    Real-World Case Studies  
 
 #### Functional requirements
 

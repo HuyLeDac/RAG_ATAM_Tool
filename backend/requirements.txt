@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+sqlalchemy
+pymongo
+langchain
+transformers
+sentence-transformers
+ollama
+faiss-cpu
+plantuml
+python-dotenv
+pydantic
+tiktoken
+openai
+gunicorn
