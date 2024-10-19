@@ -99,7 +99,7 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
   - utils for (error handling, logging, etc.)
   - an app handling http requests
 - **What kind of information should the database contain?**
-    homogeneous/heterogeneous? In JSON format <br>
+    homogeneous/heterogeneous? <br>
     Architecture Patterns and Styles <br>
     Quality Attributes and Impact <br>
     Tradeoff Points <br>
