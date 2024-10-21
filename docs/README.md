@@ -35,10 +35,26 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
 - **How will this data be structured (Format)?**
 
     1. *Architectural description:* Use PlantUML Syntax (UML fulfills IEEE P1471 standard), maybe add extra custom annotations into the syntax<br>
-    It should describe as many views as possible! Consider to add multiple different UML diagrams *TODO*
+    It should describe as many views as possible! Consider to add multiple different UML diagrams *TODO* <br>
+    Eventually 
 
     ```json
-    
+    {
+        "architecturalViews": {
+            "logicalView": {
+            "description": "Logical view description here.",
+            "umlClassDiagram": "@startuml\nclass ClassA {\n  +method1()\n}\n@enduml"
+            },
+            "deploymentView": {
+            "description": "Deployment view description here.",
+            "umlComponentDiagram": "@startuml\npackage \"MyPackage\" {\n  [ComponentA]\n}\n@enduml"
+            },
+            "processView": {
+            "description": "Process view description here.",
+            "umlSequenceDiagram": "@startuml\nactor User\nUser -> ComponentA: Request\n@enduml"
+            }
+        }
+    }
     ```
 
     2. *Architectural approaches:* List?
