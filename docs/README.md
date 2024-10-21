@@ -28,15 +28,17 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
 #### Data Input
 
 - **What data will the prototype require?** <br>
+    1. Business drivers and goals
     1. *Scenarios and their respective quality attribute*
     1. *Architecture description*
     1. *Quality criteria*
     1. *Architectural approaches*
 - **How will this data be structured (Format)?**
 
+    1. Business drivers and goals: *TODO*
+
     1. *Architectural description:* Use PlantUML Syntax (UML fulfills IEEE P1471 standard), maybe add extra custom annotations into the syntax<br>
     It should describe as many views as possible! Consider to add multiple different UML diagrams *TODO* <br>
-    Eventually 
 
     ```json
     {
