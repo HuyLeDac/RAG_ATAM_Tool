@@ -1,0 +1,17 @@
+{
+    "architecturalViews": {
+      "logicalView": {
+        "description": "Logical view description here.",
+        "umlClassDiagram": "@startuml\nclass ClassA {\n  +method1()\n}\n@enduml"
+      },
+      "deploymentView": {
+        "description": "Deployment view description here.",
+        "umlComponentDiagram": "@startuml\npackage \"MyPackage\" {\n  [ComponentA]\n}\n@enduml"
+      },
+      "processView": {
+        "description": "Process view description here.",
+        "umlSequenceDiagram": "@startuml\nactor User\nUser -> ComponentA: Request\n@enduml"
+      }
+    }
+  }
+  

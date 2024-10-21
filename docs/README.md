@@ -5,14 +5,14 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
 
 ## TODOs/Tasks
 
-### Requirements:
+### Requirements
 
 #### Objectives
 
 - **Main goal:** <br> 
     Find risks, tradeoffs and sensittivity points of architectural decisions though given scenarios and an initial architecture.
 - **Who will use this prototype?** <br>
-    Software architects/engineers, need proper knowledge about ATAM and Software Architecture. 
+    Software architects/engineers, need proper knowledge about ATAM and Software Architecture.
 - **What kind of architectural decisions/layouts are you focusing on?** <br>
     *TODO*
 
@@ -28,31 +28,79 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
 #### Data Input
 
 - **What data will the prototype require?** <br>
-    1. *Scenarios and their respective quality attribute* <br>
-    1. *Architecture description* <br>
-    1. *Quality criteria* <br>
-    1. *Architectural approaches* 
-- **How will this data be structured (Format)?** <br>
-    JSON Format<br>
+    1. *Scenarios and their respective quality attribute*
+    1. *Architecture description*
+    1. *Quality criteria*
+    1. *Architectural approaches*
+- **How will this data be structured (Format)?**
+
     1. *Architectural description:* Use PlantUML Syntax (UML fulfills IEEE P1471 standard), maybe add extra custom annotations into the syntax<br>
+    It should describe as many views as possible! Consider to add multiple different UML diagrams *TODO*
 
     ```json
     
     ```
 
-    2. *Architectural approaches:* List? <br>
+    2. *Architectural approaches:* List?
 
     ```json
     
     ```
 
-    3. *Scenarios:* For each scenario we need a list (Scenario, Attribute, Environment, Stimulus, Response, Architectural decisions) <br>
+    3. *Scenarios:* For each scenario we need a list (Scenario, Attribute, Environment, Stimulus, Response, Architectural decisions)
 
     ```json
-    
+    {
+        "scenarios": [
+            {
+                "scenario": "User Authentication",
+                "attribute": "Security",
+                "environment": "Web Application",
+                "stimulus": "User enters valid credentials.",
+                "response": "User is granted access to the system.",
+                "architectural_decisions": [
+                    "Use of JWT for session management",
+                    "Implement HTTPS for secure data transmission"
+                ]
+            },
+            {
+                "scenario": "Data Retrieval",
+                "attribute": "Performance",
+                "environment": "Mobile Application",
+                "stimulus": "User requests data while offline.",
+                "response": "Cached data is displayed to the user.",
+                "architectural_decisions": [
+                    "Implement local data caching",
+                    "Use of a service worker for offline support"
+                ]
+            },
+            {
+                "scenario": "Profile Update",
+                "attribute": "Modifiability",
+                "environment": "Web Application",
+                "stimulus": "User updates profile information.",
+                "response": "Profile is updated, and a confirmation message is shown.",
+                "architectural_decisions": [
+                    "Use of microservices for user profile management",
+                    "Separate frontend and backend for modular updates"
+                ]
+            },
+            {
+                "scenario": "System Load Handling",
+                "attribute": "Scalability",
+                "environment": "Cloud Infrastructure",
+                "stimulus": "High volume of concurrent users accessing the application.",
+                "response": "System scales horizontally to manage the load.",
+                "architectural_decisions": [
+                    "Implement load balancers",
+                    "Use of container orchestration (e.g., Kubernetes)"
+                ]
+            }
+        ]
+    }
     ```
 
-    4. *Quality criteria:* JSON <br>
+    4. *Quality criteria:* JSON
 
     ```json
     {
@@ -79,6 +127,8 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
         ]
     }
     ```
+- **How will the input prompt look like (for information retriever and LLM)?**
+    *TODO*
 
 #### Decision Analysis
 
@@ -94,7 +144,7 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
     Backend: python server using flask? LLM processing using ollama library, <br>
   - RAG database 
   - LLM (Llama 3.1:70b or 8b)
-  - (input parser?)
+  - temporary input folder while there aren't any existing frontend applications 
   - information retriver 
   - utils for (error handling, logging, etc.)
   - an app handling http requests

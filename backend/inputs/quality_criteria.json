@@ -1,0 +1,23 @@
+{
+    "quality_criteria": [
+        {
+            "attribute": "Modifiability",
+            "questions": [
+                {
+                    "question": "If this architecture includes layers/facades, are there any places where the layers/facades are circumvented?"
+                },
+                {
+                    "question": "If a shared data type changes, how many parts of the architecture are affected?"
+                }
+            ]
+        },
+        {
+            "attribute": "Performance",
+            "questions": [
+                {
+                    "question": "If there are multiple processes competing for a shared resource, how are priorities assigned to these processes?"
+                }
+            ]
+        }
+    ]
+}

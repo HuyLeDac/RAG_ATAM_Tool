@@ -1,0 +1,48 @@
+{
+    "scenarios": [
+        {
+            "scenario": "User Authentication",
+            "attribute": "Security",
+            "environment": "Web Application",
+            "stimulus": "User enters valid credentials.",
+            "response": "User is granted access to the system.",
+            "architectural_decisions": [
+                "Use of JWT for session management",
+                "Implement HTTPS for secure data transmission"
+            ]
+        },
+        {
+            "scenario": "Data Retrieval",
+            "attribute": "Performance",
+            "environment": "Mobile Application",
+            "stimulus": "User requests data while offline.",
+            "response": "Cached data is displayed to the user.",
+            "architectural_decisions": [
+                "Implement local data caching",
+                "Use of a service worker for offline support"
+            ]
+        },
+        {
+            "scenario": "Profile Update",
+            "attribute": "Modifiability",
+            "environment": "Web Application",
+            "stimulus": "User updates profile information.",
+            "response": "Profile is updated, and a confirmation message is shown.",
+            "architectural_decisions": [
+                "Use of microservices for user profile management",
+                "Separate frontend and backend for modular updates"
+            ]
+        },
+        {
+            "scenario": "System Load Handling",
+            "attribute": "Scalability",
+            "environment": "Cloud Infrastructure",
+            "stimulus": "High volume of concurrent users accessing the application.",
+            "response": "System scales horizontally to manage the load.",
+            "architectural_decisions": [
+                "Implement load balancers",
+                "Use of container orchestration (e.g., Kubernetes)"
+            ]
+        }
+    ]
+}
