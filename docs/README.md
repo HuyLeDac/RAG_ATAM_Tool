@@ -2,7 +2,6 @@
 
 An ATAM framework which semi-automatically analyses tradeoffs, risks and sensitivity points using Retrival Augmented Generation (RAG), focusing on qualitative analyses.
 
-
 ## TODOs/Tasks
 
 ### Requirements
@@ -62,7 +61,30 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
     2. *Architectural approaches:* List?
 
     ```json
-    
+    {
+        "architecturalApproaches": [
+            {
+                "approach": "Microservices Architecture",
+                "description": "Decompose the application into loosely coupled services, each with its own responsibility and database."
+            },
+            {
+                "approach": "Layered Architecture",
+                "description": "Separate the system into layers, each responsible for a specific set of functionalities, promoting separation of concerns."
+            },
+            {
+                "approach": "Event-Driven Architecture",
+                "description": "Use events to trigger and communicate between decoupled services to improve scalability and responsiveness."
+            },
+            {
+                "approach": "Service-Oriented Architecture (SOA)",
+                "description": "Organize services around business functions, enabling reuse and flexibility by allowing each service to evolve independently."
+            },
+            {
+                "approach": "Monolithic Architecture",
+                "description": "A single-tiered software application where different components are combined into a single program from a single platform."
+            }
+        ]
+    }
     ```
 
     3. *Scenarios:* For each scenario we need a list (Scenario, Attribute, Environment, Stimulus, Response, Architectural decisions)
@@ -145,6 +167,7 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
         ]
     }
     ```
+
 - **How will the input prompt look like (for information retriever and LLM)?**
     *TODO*
 
@@ -215,7 +238,11 @@ source (name)/bin/activate
 deactivate // Only when you want to leave the virtual environment
 ```
 
-3. Install all necessary pip packages *(TODO)*
+3. Install all necessary pip packages
+
+```bash
+pip install -r backend\requirements.txt
+```
 
 **For local PCs:**
 
@@ -227,7 +254,11 @@ source (name)/bin/activate
 deactivate // Only when you want to leave the virtual environment
 ```
 
-2. Install all necessary pip packages *(TODO)*
+2. Install all necessary pip packages
+
+```bash
+pip install -r backend\requirements.txt
+```
 
 ## Usage
 
