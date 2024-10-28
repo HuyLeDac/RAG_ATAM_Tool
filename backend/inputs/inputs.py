@@ -1,6 +1,6 @@
 import json
 import os
-import subprocess
+import ollama 
 
 # Define the base directory path based on the script's location
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -46,29 +46,26 @@ def load_inputs():
 
 def send_to_llama(inputs):
     # Format inputs for the model
+    prompt = "We are conducting a qualitative analysis of the architecture of a software system. \
+          For that we want to use ATAM. That means, for every scenario given, I want you to analyse the risks, tradeoffs, and sensitivity points for every architectural approach. \
+            Only display the scenarios with the mentioned risks, tradeoffs, and sensitivity points. \
+                Also consider the hardware constraints " 
+    
+    # Creating the message to send to the model
     formatted_input = {
-        "prompt": "Evaluate every scenario for risks, tradeoffs and sensitivity points",
-        "architecture_description": inputs.architecture_description,
-        "architectural_approaches": inputs.architectural_approaches,
-        "quality_criteria": inputs.quality_criteria,
-        "scenarios": inputs.scenarios
+        "role": "user",
+        "content": f"{prompt}\n\nArchitecture Description: {json.dumps(inputs.architecture_description)}\n\n"
+                   f"Architectural Approaches: {json.dumps(inputs.architectural_approaches)}\n\n"
+                   f"Quality Criteria: {json.dumps(inputs.quality_criteria)}\n\n"
+                   f"Scenarios: {json.dumps(inputs.scenarios)}"
     }
     
-    # Convert to JSON string for sending
-    input_json = json.dumps(formatted_input)
+    # Send the message to the model
+    response = ollama.chat(model='llama3.1:70b', messages=[formatted_input])
     
-    # Use Ollama to send the input to the model
-    result = subprocess.run(
-        ['ollama', 'run', 'llama3.1:70'], 
-        input=input_json, 
-        text=True, 
-        capture_output=True
-    )
-    
-    # Check for errors and return output
-    if result.returncode != 0:
-        print("Error:", result.stderr)
-    return result.stdout
+    # Return the output from the model
+    return response['message']['content']
+
 
 def main():
     inputs = load_inputs()
