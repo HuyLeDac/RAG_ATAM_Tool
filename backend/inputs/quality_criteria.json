@@ -8,6 +8,9 @@
                 },
                 {
                     "question": "If a shared data type changes, how many parts of the architecture are affected?"
+                },
+                {
+                    "question": "How easy is it to add new authentication methods to the system?"
                 }
             ]
         },
@@ -16,6 +19,42 @@
             "questions": [
                 {
                     "question": "If there are multiple processes competing for a shared resource, how are priorities assigned to these processes?"
+                },
+                {
+                    "question": "What measures are in place to optimize response time for user authentication?"
+                }
+            ]
+        },
+        {
+            "attribute": "Security",
+            "questions": [
+                {
+                    "question": "What mechanisms are in place to prevent unauthorized access to sensitive data?"
+                },
+                {
+                    "question": "How does the architecture handle secure communication between components?"
+                }
+            ]
+        },
+        {
+            "attribute": "Scalability",
+            "questions": [
+                {
+                    "question": "How well can the system handle increased user loads without performance degradation?"
+                },
+                {
+                    "question": "What are the strategies for scaling the authentication service as user demand grows?"
+                }
+            ]
+        },
+        {
+            "attribute": "Usability",
+            "questions": [
+                {
+                    "question": "How intuitive is the user interface for logging in and managing accounts?"
+                },
+                {
+                    "question": "What feedback mechanisms are provided to users during the authentication process?"
                 }
             ]
         }
