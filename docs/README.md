@@ -40,6 +40,23 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
         - other systems with which the system must interact
         - architectural approaches used to meet quality attribute requirements
 
+        ```json
+        {
+            "architectureDescription": {
+                "technicalConstraints": [
+                    "Operating System: Linux-based servers for backend, iOS/Android compatibility for frontend.",
+                    "Middleware: NGINX as the API gateway and Redis for session management.",
+                    "Hardware: Deployed on cloud infrastructure with minimum 4 cores and 16 GB RAM per server instance."
+                ],
+                "systemInteractions": [
+                    "Integrates with external Identity Providers (IDPs) for OAuth2-based authentication.",
+                    "Communicates with a centralized logging service for auditing and monitoring.",
+                    "Interacts with a customer data service for personalized user experience."
+                ],
+            }
+        }
+        ```
+
 
     2. *Architectural approaches:* Approach, Description, Architectural Decisions, Architectural Views (Physical, Process, Deployment)
 
