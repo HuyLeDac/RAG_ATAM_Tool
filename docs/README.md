@@ -34,230 +34,322 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
     1. *Architectural approaches*
 - **How will this data be structured (Format)?**
 
-    1. *Architecture description:* PlantUML Syntax (UML fulfills IEEE P1471 standard)<br>
-    *Stand 23.10.24:* **Process View, Deployment View, Physical View (4+1 model) and probably other format than json** <br>
-    Suggestion: Add extra annotations about constraints
+    1. *Architecture description:*
 
-    ```plantuml
-    UML Sequence Diagram as Process View:
-    @startuml
-    actor User
-    participant "Web Server" as WS
-    participant "Application Server" as AS
-    participant "Database" as DB
-
-    User -> WS: Request Login
-    WS -> AS: Forward Login Request
-    AS -> DB: Validate Credentials
-    DB --> AS: Credentials Valid/Invalid
-    AS --> WS: Login Success/Failure
-    WS --> User: Show Login Status
-    @enduml
-    ----------------------------------------
-
-    UML Deployment Diagram as Physical View
-    @startuml
-    node "Client" as Client
-
-    node "Web Server" as Web {
-        [Web Application]
-        note right of Web
-            CPU: 4 cores
-            RAM: 8 GB
-            Network: 1 Gbps
-        end note
-    }
-
-    node "Application Server" as App {
-        [Business Logic Service]
-        note right of App
-            CPU: 8 cores
-            RAM: 16 GB
-            Network: 1 Gbps
-        end note
-    }
-
-    node "Database Server" as DBServer {
-        [Database]
-        note right of DBServer
-            CPU: 8 cores
-            RAM: 32 GB
-            Disk: 1 TB SSD
-        end note
-    }
-
-    Client --> Web : HTTP Request
-    Web --> App : HTTP Request
-    App --> DBServer : SQL Query
-    @enduml
-    ----------------------------------------
-
-    UML Component Diagram as Deployment View
-    @startuml
-    package "Web Application" {
-        component "User Interface" as UI
-        component "Business Logic" as BL
-        component "Data Access Layer" as DAL
-
-        UI --> BL: Uses
-        BL --> DAL: Uses
-    }
-
-    note top of BL : Handles login and data processing
-    note top of DAL : Interacts with database
-    @enduml
-    ```
+        - technical constraints such as an OS, hardware, or middleware prescribed for use
+        - other systems with which the system must interact
+        - architectural approaches used to meet quality attribute requirements
 
 
-    2. *Architectural approaches:* List?
+    2. *Architectural approaches:* Approach, Description, Architectural Decisions, Architectural Views (Physical, Process, Deployment)
 
-    ```json
-    {
-        "architecturalApproaches": [
-            {
-                "approach": "Microservices Architecture",
-                "description": "Decompose the SecureLoginApp into distinct services, such as Authentication, User Management, and Logging, with each service having its own database. This approach isolates components, enhances scalability, and enables independent deployment."
-            },
-            {
-                "approach": "Layered Architecture",
-                "description": "Separate SecureLoginApp into layers, including Presentation, Business Logic, and Data Access. This structure promotes separation of concerns, making it easier to manage, test, and modify each layer individually."
-            },
-            {
-                "approach": "Event-Driven Architecture",
-                "description": "Implement an event-driven system where actions, such as a successful login, trigger notifications and auditing events. This architecture helps decouple components and ensures that they can respond to events asynchronously, improving the app's responsiveness."
-            },
-            {
-                "approach": "Service-Oriented Architecture (SOA)",
-                "description": "Organize SecureLoginApp services around business functions, like Authentication and User Profile Management. Each service communicates over standardized protocols, promoting reusability and allowing flexible, independent scaling and updating of services."
-            },
-            {
-                "approach": "Monolithic Architecture",
-                "description": "Build SecureLoginApp as a single-tiered application where all components, including UI, business logic, and data handling, are contained within a single platform. This approach simplifies deployment and debugging but may impact scalability as the application grows."
-            }
-        ]
-    }
-    ```
+        ```json
+        {
+            "architecturalApproaches": [
+                {
+                    "approach": "Microservices Architecture",
+                    "description": "Decompose the SecureLoginApp into distinct services, such as Authentication, User Management, and Logging, with each service having its own database. This approach isolates components, enhances scalability, and enables independent deployment.",
+                    "architectural decisions": [
+                        "Use API Gateway for routing requests to microservices.",
+                        "Implement service discovery for dynamic service registration."
+                    ],
+                    "architectural views": [
+                        {
+                            "view": "Deployment View",
+                            "description": "Illustrates how microservices are deployed and interact with each other, including load balancing and service discovery mechanisms.",
+                            "diagram": "TODO: Add diagram here"
+                        },
+                        {
+                            "view": "Process View",
+                            "description": "Shows the flow of data between microservices, including request and response messages, data transformations, and error handling.",
+                            "diagram": "TODO: Add diagram here"
+                        },
+                        {
+                            "view": "Physical View",
+                            "description": "Defines the data models used by each microservice, including database schemas, data formats, and data access patterns.",
+                            "diagram": "TODO: Add diagram here"
+                        }
+                    ]
+                },
+                {
+                    "approach": "Layered Architecture",
+                    "description": "Separate SecureLoginApp into layers, including Presentation, Business Logic, and Data Access. This structure promotes separation of concerns, making it easier to manage, test, and modify each layer individually.",
+                    "architectural decisions": [
+                        "Use Dependency Injection to manage component dependencies.",
+                        "Implement a Repository pattern for data access."
+                    ],
+                    "architectural views": [
+                        {
+                            "view": "Deployment View",
+                            "description": "Illustrates how layers are deployed and their interactions, focusing on the separation of concerns.",
+                            "diagram": "TODO: Add diagram here"
+                        },
+                        {
+                            "view": "Process View",
+                            "description": "Shows the flow of data within the application layers, detailing interactions between layers.",
+                            "diagram": "TODO: Add diagram here"
+                        },
+                        {
+                            "view": "Physical View",
+                            "description": "Defines the internal structures of each layer, including class diagrams and data models.",
+                            "diagram": "TODO: Add diagram here"
+                        }
+                    ]
+                },
+                {
+                    "approach": "Event-Driven Architecture",
+                    "description": "Implement an event-driven system where actions, such as a successful login, trigger notifications and auditing events. This architecture helps decouple components and ensures that they can respond to events asynchronously, improving the app's responsiveness.",
+                    "architectural decisions": [
+                        "Use an event bus for communication between components.",
+                        "Implement a listener pattern to handle events."
+                    ],
+                    "architectural views": [
+                        {
+                            "view": "Deployment View",
+                            "description": "Illustrates how event-driven components are deployed and interact with each other.",
+                            "diagram": "TODO: Add diagram here"
+                        },
+                        {
+                            "view": "Process View",
+                            "description": "Shows the flow of events and data through the system, detailing event triggers and responses.",
+                            "diagram": "TODO: Add diagram here"
+                        },
+                        {
+                            "view": "Physical View",
+                            "description": "Defines the data structures used in events, including payloads and schemas.",
+                            "diagram": "TODO: Add diagram here"
+                        }
+                    ]
+                },
+                {
+                    "approach": "Service-Oriented Architecture (SOA)",
+                    "description": "Organize SecureLoginApp services around business functions, like Authentication and User Profile Management. Each service communicates over standardized protocols, promoting reusability and allowing flexible, independent scaling and updating of services.",
+                    "architectural decisions": [
+                        "Use API Gateway for routing requests to services.",
+                        "Standardize communication protocols (e.g., REST, SOAP)."
+                    ],
+                    "architectural views": [
+                        {
+                            "view": "Deployment View",
+                            "description": "Illustrates how services are deployed and interact with each other, including routing and load balancing.",
+                            "diagram": "TODO: Add diagram here"
+                        },
+                        {
+                            "view": "Process View",
+                            "description": "Shows the interactions between services, including service calls and data exchanges.",
+                            "diagram": "TODO: Add diagram here"
+                        },
+                        {
+                            "view": "Physical View",
+                            "description": "Defines the data models and formats used by each service, including APIs and data storage.",
+                            "diagram": "TODO: Add diagram here"
+                        }
+                    ]
+                },
+                {
+                    "approach": "Monolithic Architecture",
+                    "description": "Build SecureLoginApp as a single-tiered application where all components, including UI, business logic, and data handling, are contained within a single platform. This approach simplifies deployment and debugging but may impact scalability as the application grows.",
+                    "architectural decisions": [
+                        "Use a single database for all components.",
+                        "Employ a cohesive framework for development."
+                    ],
+                    "architectural views": [
+                        {
+                            "view": "Deployment View",
+                            "description": "Illustrates how the entire application is deployed as a single unit.",
+                            "diagram": "TODO: Add diagram here"
+                        },
+                        {
+                            "view": "Process View",
+                            "description": "Shows the internal flow of data within the monolithic application, detailing request handling.",
+                            "diagram": "TODO: Add diagram here"
+                        },
+                        {
+                            "view": "Physical View",
+                            "description": "Defines the internal structure of the application, including modules, components, and data storage.",
+                            "diagram": "TODO: Add diagram here"
+                        }
+                    ]
+                }
+            ]
+        }
+        ```
 
-    3. *Scenarios:* For each scenario we need a list (Scenario, Attribute, Environment, Stimulus, Response, Architectural decisions)
+        PlantUML Diagrams for Architectural Views:
 
-    ```json
-    {
-        "scenarios": [
-            {
-                "scenario": "User Authentication",
-                "attribute": "Security",
-                "environment": "Web Application",
-                "stimulus": "User enters valid login credentials.",
-                "response": "User is authenticated and granted access to the system.",
-                "architectural_decisions": [
-                    "Implement OAuth2 for authentication",
-                    "Use HTTPS for secure data transmission"
-                ]
-            },
-            {
-                "scenario": "Data Retrieval",
-                "attribute": "Performance",
-                "environment": "Mobile Application",
-                "stimulus": "User requests data from the server.",
-                "response": "Data is retrieved and displayed within an acceptable response time.",
-                "architectural_decisions": [
-                    "Use caching for frequently accessed data",
-                    "Optimize API response times"
-                ]
-            },
-            {
-                "scenario": "Password Reset",
-                "attribute": "Modifiability",
-                "environment": "Web Application",
-                "stimulus": "User requests a password reset.",
-                "response": "User receives a reset link via email and can update their password.",
-                "architectural_decisions": [
-                    "Microservice for handling authentication and password resets",
-                    "Separate frontend and backend modules for modular updates"
-                ]
-            },
-            {
-                "scenario": "High Traffic Management",
-                "attribute": "Scalability",
-                "environment": "Cloud Infrastructure",
-                "stimulus": "High number of concurrent login attempts.",
-                "response": "System scales to handle the increased load without degradation in performance.",
-                "architectural_decisions": [
-                    "Implement load balancing",
-                    "Use containerized microservices with autoscaling"
-                ]
-            }
-        ]
-    }
+        ```plantuml
+        UML Sequence Diagram as Process View:
+        @startuml
+        actor User
+        participant "Web Server" as WS
+        participant "Application Server" as AS
+        participant "Database" as DB
 
-    ```
+        User -> WS: Request Login
+        WS -> AS: Forward Login Request
+        AS -> DB: Validate Credentials
+        DB --> AS: Credentials Valid/Invalid
+        AS --> WS: Login Success/Failure
+        WS --> User: Show Login Status
+        @enduml
+        ----------------------------------------
 
-    4. *Quality criteria:* JSON
+        UML Deployment Diagram as Physical View
+        @startuml
+        node "Client" as Client
 
-    ```json
-    {
-        "quality_criteria": [
-            {
-                "attribute": "Modifiability",
-                "questions": [
-                    {
-                        "question": "If this architecture includes layers/facades, are there any places where the layers/facades are circumvented?"
-                    },
-                    {
-                        "question": "If a shared data type changes, how many parts of the architecture are affected?"
-                    },
-                    {
-                        "question": "How easy is it to add new authentication methods to the system?"
-                    }
-                ]
-            },
-            {
-                "attribute": "Performance",
-                "questions": [
-                    {
-                        "question": "If there are multiple processes competing for a shared resource, how are priorities assigned to these processes?"
-                    },
-                    {
-                        "question": "What measures are in place to optimize response time for user authentication?"
-                    }
-                ]
-            },
-            {
-                "attribute": "Security",
-                "questions": [
-                    {
-                        "question": "What mechanisms are in place to prevent unauthorized access to sensitive data?"
-                    },
-                    {
-                        "question": "How does the architecture handle secure communication between components?"
-                    }
-                ]
-            },
-            {
-                "attribute": "Scalability",
-                "questions": [
-                    {
-                        "question": "How well can the system handle increased user loads without performance degradation?"
-                    },
-                    {
-                        "question": "What are the strategies for scaling the authentication service as user demand grows?"
-                    }
-                ]
-            },
-            {
-                "attribute": "Usability",
-                "questions": [
-                    {
-                        "question": "How intuitive is the user interface for logging in and managing accounts?"
-                    },
-                    {
-                        "question": "What feedback mechanisms are provided to users during the authentication process?"
-                    }
-                ]
-            }
-        ]
-    }
-    ```
+        node "Web Server" as Web {
+            [Web Application]
+            note right of Web
+                CPU: 4 cores
+                RAM: 8 GB
+                Network: 1 Gbps
+            end note
+        }
+
+        node "Application Server" as App {
+            [Business Logic Service]
+            note right of App
+                CPU: 8 cores
+                RAM: 16 GB
+                Network: 1 Gbps
+            end note
+        }
+
+        node "Database Server" as DBServer {
+            [Database]
+            note right of DBServer
+                CPU: 8 cores
+                RAM: 32 GB
+                Disk: 1 TB SSD
+            end note
+        }
+
+        Client --> Web : HTTP Request
+        Web --> App : HTTP Request
+        App --> DBServer : SQL Query
+        @enduml
+        ----------------------------------------
+
+        UML Component Diagram as Deployment View
+        @startuml
+        package "Web Application" {
+            component "User Interface" as UI
+            component "Business Logic" as BL
+            component "Data Access Layer" as DAL
+
+            UI --> BL: Uses
+            BL --> DAL: Uses
+        }
+
+        note top of BL : Handles login and data processing
+        note top of DAL : Interacts with database
+        @enduml
+        ```
+
+    3. *Scenarios:* For each scenario we need a list (Scenario, Attribute, Environment, Stimulus, Response)
+
+        ```json
+        {
+            "scenarios": [
+                {
+                    "scenario": "User Authentication",
+                    "attribute": "Security",
+                    "environment": "Web Application",
+                    "stimulus": "User enters valid login credentials.",
+                    "response": "User is authenticated and granted access to the system."
+                },
+                {
+                    "scenario": "Data Retrieval",
+                    "attribute": "Performance",
+                    "environment": "Mobile Application",
+                    "stimulus": "User requests data from the server.",
+                    "response": "Data is retrieved and displayed within an acceptable response time."
+                },
+                {
+                    "scenario": "Password Reset",
+                    "attribute": "Modifiability",
+                    "environment": "Web Application",
+                    "stimulus": "User requests a password reset.",
+                    "response": "User receives a reset link via email and can update their password."
+                },
+                {
+                    "scenario": "High Traffic Management",
+                    "attribute": "Scalability",
+                    "environment": "Cloud Infrastructure",
+                    "stimulus": "High number of concurrent login attempts.",
+                    "response": "System scales to handle the increased load without degradation in performance."
+                }
+            ]
+        }
+        ```
+
+    4. *Quality criteria:* 
+
+        ```json
+        {
+            "quality_criteria": [
+                {
+                    "attribute": "Modifiability",
+                    "questions": [
+                        {
+                            "question": "If this architecture includes layers/facades, are there any places where the layers/facades are circumvented?"
+                        },
+                        {
+                            "question": "If a shared data type changes, how many parts of the architecture are affected?"
+                        },
+                        {
+                            "question": "How easy is it to add new authentication methods to the system?"
+                        }
+                    ]
+                },
+                {
+                    "attribute": "Performance",
+                    "questions": [
+                        {
+                            "question": "If there are multiple processes competing for a shared resource, how are priorities assigned to these processes?"
+                        },
+                        {
+                            "question": "What measures are in place to optimize response time for user authentication?"
+                        }
+                    ]
+                },
+                {
+                    "attribute": "Security",
+                    "questions": [
+                        {
+                            "question": "What mechanisms are in place to prevent unauthorized access to sensitive data?"
+                        },
+                        {
+                            "question": "How does the architecture handle secure communication between components?"
+                        }
+                    ]
+                },
+                {
+                    "attribute": "Scalability",
+                    "questions": [
+                        {
+                            "question": "How well can the system handle increased user loads without performance degradation?"
+                        },
+                        {
+                            "question": "What are the strategies for scaling the authentication service as user demand grows?"
+                        }
+                    ]
+                },
+                {
+                    "attribute": "Usability",
+                    "questions": [
+                        {
+                            "question": "How intuitive is the user interface for logging in and managing accounts?"
+                        },
+                        {
+                            "question": "What feedback mechanisms are provided to users during the authentication process?"
+                        }
+                    ]
+                }
+            ]
+        }
+        ```
 
 - **How will the input prompt look like (for information retriever and LLM)?**
     *TODO*

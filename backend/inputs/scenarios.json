@@ -5,44 +5,28 @@
             "attribute": "Security",
             "environment": "Web Application",
             "stimulus": "User enters valid login credentials.",
-            "response": "User is authenticated and granted access to the system.",
-            "architectural_decisions": [
-                "Implement OAuth2 for authentication",
-                "Use HTTPS for secure data transmission"
-            ]
+            "response": "User is authenticated and granted access to the system."
         },
         {
             "scenario": "Data Retrieval",
             "attribute": "Performance",
             "environment": "Mobile Application",
             "stimulus": "User requests data from the server.",
-            "response": "Data is retrieved and displayed within an acceptable response time.",
-            "architectural_decisions": [
-                "Use caching for frequently accessed data",
-                "Optimize API response times"
-            ]
+            "response": "Data is retrieved and displayed within an acceptable response time."
         },
         {
             "scenario": "Password Reset",
             "attribute": "Modifiability",
             "environment": "Web Application",
             "stimulus": "User requests a password reset.",
-            "response": "User receives a reset link via email and can update their password.",
-            "architectural_decisions": [
-                "Microservice for handling authentication and password resets",
-                "Separate frontend and backend modules for modular updates"
-            ]
+            "response": "User receives a reset link via email and can update their password."
         },
         {
             "scenario": "High Traffic Management",
             "attribute": "Scalability",
             "environment": "Cloud Infrastructure",
             "stimulus": "High number of concurrent login attempts.",
-            "response": "System scales to handle the increased load without degradation in performance.",
-            "architectural_decisions": [
-                "Implement load balancing",
-                "Use containerized microservices with autoscaling"
-            ]
+            "response": "System scales to handle the increased load without degradation in performance."
         }
     ]
 }
