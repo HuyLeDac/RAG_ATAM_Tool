@@ -11,117 +11,17 @@
                 {
                     "view": "Deployment View",
                     "description": "Illustrates how microservices are deployed and interact with each other, including load balancing and service discovery mechanisms.",
-                    "diagram": "TODO: Add diagram here"
+                    "diagram": "@startuml\nnode API_Gateway\nnode Authentication_Service\nnode User_Management_Service\nnode Logging_Service\nAPI_Gateway --> Authentication_Service : route requests\nAPI_Gateway --> User_Management_Service : route requests\nAPI_Gateway --> Logging_Service : route logs\n@enduml"
                 },
                 {
                     "view": "Process View",
                     "description": "Shows the flow of data between microservices, including request and response messages, data transformations, and error handling.",
-                    "diagram": "TODO: Add diagram here"
+                    "diagram": "@startuml\nparticipant Client\nparticipant API_Gateway\nparticipant Authentication_Service\nClient -> API_Gateway : login request\nAPI_Gateway -> Authentication_Service : authenticate user\nAuthentication_Service --> API_Gateway : auth response\nAPI_Gateway --> Client : access granted\n@enduml"
                 },
                 {
                     "view": "Physical View",
                     "description": "Defines the data models used by each microservice, including database schemas, data formats, and data access patterns.",
-                    "diagram": "TODO: Add diagram here"
-                }
-            ]
-        },
-        {
-            "approach": "Layered Architecture",
-            "description": "Separate SecureLoginApp into layers, including Presentation, Business Logic, and Data Access. This structure promotes separation of concerns, making it easier to manage, test, and modify each layer individually.",
-            "architectural decisions": [
-                "Use Dependency Injection to manage component dependencies.",
-                "Implement a Repository pattern for data access."
-            ],
-            "architectural views": [
-                {
-                    "view": "Deployment View",
-                    "description": "Illustrates how layers are deployed and their interactions, focusing on the separation of concerns.",
-                    "diagram": "TODO: Add diagram here"
-                },
-                {
-                    "view": "Process View",
-                    "description": "Shows the flow of data within the application layers, detailing interactions between layers.",
-                    "diagram": "TODO: Add diagram here"
-                },
-                {
-                    "view": "Physical View",
-                    "description": "Defines the internal structures of each layer, including class diagrams and data models.",
-                    "diagram": "TODO: Add diagram here"
-                }
-            ]
-        },
-        {
-            "approach": "Event-Driven Architecture",
-            "description": "Implement an event-driven system where actions, such as a successful login, trigger notifications and auditing events. This architecture helps decouple components and ensures that they can respond to events asynchronously, improving the app's responsiveness.",
-            "architectural decisions": [
-                "Use an event bus for communication between components.",
-                "Implement a listener pattern to handle events."
-            ],
-            "architectural views": [
-                {
-                    "view": "Deployment View",
-                    "description": "Illustrates how event-driven components are deployed and interact with each other.",
-                    "diagram": "TODO: Add diagram here"
-                },
-                {
-                    "view": "Process View",
-                    "description": "Shows the flow of events and data through the system, detailing event triggers and responses.",
-                    "diagram": "TODO: Add diagram here"
-                },
-                {
-                    "view": "Physical View",
-                    "description": "Defines the data structures used in events, including payloads and schemas.",
-                    "diagram": "TODO: Add diagram here"
-                }
-            ]
-        },
-        {
-            "approach": "Service-Oriented Architecture (SOA)",
-            "description": "Organize SecureLoginApp services around business functions, like Authentication and User Profile Management. Each service communicates over standardized protocols, promoting reusability and allowing flexible, independent scaling and updating of services.",
-            "architectural decisions": [
-                "Use API Gateway for routing requests to services.",
-                "Standardize communication protocols (e.g., REST, SOAP)."
-            ],
-            "architectural views": [
-                {
-                    "view": "Deployment View",
-                    "description": "Illustrates how services are deployed and interact with each other, including routing and load balancing.",
-                    "diagram": "TODO: Add diagram here"
-                },
-                {
-                    "view": "Process View",
-                    "description": "Shows the interactions between services, including service calls and data exchanges.",
-                    "diagram": "TODO: Add diagram here"
-                },
-                {
-                    "view": "Physical View",
-                    "description": "Defines the data models and formats used by each service, including APIs and data storage.",
-                    "diagram": "TODO: Add diagram here"
-                }
-            ]
-        },
-        {
-            "approach": "Monolithic Architecture",
-            "description": "Build SecureLoginApp as a single-tiered application where all components, including UI, business logic, and data handling, are contained within a single platform. This approach simplifies deployment and debugging but may impact scalability as the application grows.",
-            "architectural decisions": [
-                "Use a single database for all components.",
-                "Employ a cohesive framework for development."
-            ],
-            "architectural views": [
-                {
-                    "view": "Deployment View",
-                    "description": "Illustrates how the entire application is deployed as a single unit.",
-                    "diagram": "TODO: Add diagram here"
-                },
-                {
-                    "view": "Process View",
-                    "description": "Shows the internal flow of data within the monolithic application, detailing request handling.",
-                    "diagram": "TODO: Add diagram here"
-                },
-                {
-                    "view": "Physical View",
-                    "description": "Defines the internal structure of the application, including modules, components, and data storage.",
-                    "diagram": "TODO: Add diagram here"
+                    "diagram": "@startuml\nentity Authentication_DB {\n  * user_id : int\n  * username : string\n  * password_hash : string\n}\nentity User_Management_DB {\n  * user_id : int\n  * user_profile : json\n}\nAuthentication_Service --> Authentication_DB : manages\nUser_Management_Service --> User_Management_DB : manages\n@enduml"
                 }
             ]
         }

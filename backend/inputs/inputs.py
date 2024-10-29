@@ -6,7 +6,7 @@ import ollama
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Define the paths to the input files
-ARCHITECTURE_VIEWS_PATH = os.path.join(BASE_DIR, "architectural_views")
+ARCHITECTURE_DESCRIPTION_PATH = os.path.join(BASE_DIR, "architecture_description.json")
 ARCHITECTURAL_APPROACHES_PATH = os.path.join(BASE_DIR, "architectural_approaches.json")
 QUALITY_CRITERIA_PATH = os.path.join(BASE_DIR, "quality_criteria.json")
 SCENARIOS_PATH = os.path.join(BASE_DIR, "scenarios.json")
@@ -19,15 +19,9 @@ class Inputs:
         self.scenarios = scenarios
 
 def load_inputs():
-    # Load architecture views
-    architecture_description = {}
-    for file_name in os.listdir(ARCHITECTURE_VIEWS_PATH):
-        file_path = os.path.join(ARCHITECTURE_VIEWS_PATH, file_name)
-        with open(file_path, 'r') as file:
-            view_name = os.path.splitext(file_name)[0]
-            architecture_description[view_name] = file.read()
-    
-    # Load other inputs
+    with open(ARCHITECTURE_DESCRIPTION_PATH, 'r') as file:
+        architecture_description = json.load(file)
+
     with open(ARCHITECTURAL_APPROACHES_PATH, 'r') as file:
         architectural_approaches = json.load(file)
     
@@ -46,18 +40,34 @@ def load_inputs():
 
 def send_to_llama(inputs):
     # Format inputs for the model
-    prompt = "We are conducting a qualitative analysis of the architecture of a software system. \
-          For that we want to use ATAM. That means, for every scenario given, I want you to analyse the risks, tradeoffs, and sensitivity points for every architectural approach. \
-            Only display the scenarios with the mentioned risks, tradeoffs, and sensitivity points. \
-                Also consider the hardware constraints " 
+    prompt = "You are conducting a qualitative analysis of a software system using ATAM. \
+                You have the architecture description, architectural approaches, quality criteria, and scenarios provided below. \
+                For eachgiven approach, analyse the risks, sensitivity points, and tradeoffs of each architectural decision for each scenario. \
+                Please also consider all constraints mentioned.\
+                You can focus on following structure: \n"
     
+    output_pattern = "architectural approach: (enter approach) \n\
+                        - scenario 1: (enter scenario name) \n\
+                        -- quality attribute: (enter quality attribute) \n\
+                        --- architectural description 1 \n\
+                        ---- risks: (enter risks) \n\
+                        ---- sensitivity points: (enter sensitivity points) \n\
+                        ---- tradeoffs: (enter tradeoffs) \n\
+                        --- architectural description 2 \n\
+                        ---- risks: (enter risks) \n\
+                        ---- sensitivity points: (enter sensitivity points) \n\
+                        ---- tradeoffs: (enter tradeoffs) \n\
+                        ... (add all mentioned architectural descriptions)\n"
+
     # Creating the message to send to the model
     formatted_input = {
         "role": "user",
-        "content": f"{prompt}\n\nArchitecture Description: {json.dumps(inputs.architecture_description)}\n\n"
-                   f"Architectural Approaches: {json.dumps(inputs.architectural_approaches)}\n\n"
-                   f"Quality Criteria: {json.dumps(inputs.quality_criteria)}\n\n"
-                   f"Scenarios: {json.dumps(inputs.scenarios)}"
+        "content": (f"{prompt}\n\n"
+                    f"{output_pattern}\n\n"
+                    f"Architecture Description: {json.dumps(inputs.architecture_description)}\n\n"
+                    f"Architectural Approaches: {json.dumps(inputs.architectural_approaches)}\n\n"
+                    f"Quality Criteria: {json.dumps(inputs.quality_criteria)}\n\n"
+                    f"Scenarios: {json.dumps(inputs.scenarios)}")
     }
     
     # Send the message to the model

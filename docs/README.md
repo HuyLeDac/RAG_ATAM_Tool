@@ -2,9 +2,12 @@
 
 An ATAM framework which semi-automatically analyses tradeoffs, risks and sensitivity points using Retrival Augmented Generation (RAG), focusing on qualitative analyses.
 
-## TODOs/Tasks
+## Requirements
 
-### Requirements
+### Observation (29.10.24)
+
+- Too many architectural approaches in one prompt is difficult for the LLM to process
+  - Generates completely different outputs compared to the prompt.
 
 ### Objectives
 
@@ -301,7 +304,7 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
         }
         ```
 
-    4. *Quality criteria:* 
+    4. *Quality criteria:*
 
         ```json
         {
