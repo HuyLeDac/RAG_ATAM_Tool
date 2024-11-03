@@ -40,26 +40,20 @@ def parse_file(file):
             return paragraphs
 
 def save_embeddings(file, embeddings):
-    base_name = os.path.splitext(os.path.basename(file))[0]
+    base_name = os.path.splitext(os.path.basename(file))
+    print(f"Base name: {base_name}")  # Debug print
     save_path = f"database/embeddings/{base_name}.json"
     
-    # Ensure the directory exists
-    os.makedirs("database/embeddings", exist_ok=True)
+    if not os.path.exists("database/embeddings"):
+        os.makedirs("database/embeddings")
     print(f"Attempting to save embeddings to {os.path.abspath(save_path)}")  # Debug print to verify path
     
-    # Check write permissions before saving
-    if not check_write_permission("database/embeddings"):
-        print("No write permission, aborting save.")
-        return
-
-    # Save embeddings
-    print(f"Embeddings to save: {embeddings}")  # Debug print
+    # Save embeddings folder
     with open(save_path, "w") as f:
         json.dump(embeddings, f)
     print("Embeddings saved successfully.")
 
     
-
 def load_embeddings(file):
     base_name = os.path.splitext(os.path.basename(file))[0]
     file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "database", "embeddings", f"{base_name}.json")
@@ -78,32 +72,13 @@ def get_embeddings(filename, embedding_model, paragraphs):
     
     # Generate and save embeddings
     embeddings = [ollama.embeddings(model=embedding_model, prompt=paragraph)["embedding"] for paragraph in paragraphs]
-    print(embeddings)
     save_embeddings(filename, embeddings)
     return embeddings
-
-
-def check_write_permission(path):
-    # Check if the path exists
-    if not os.path.exists(path):
-        print(f"The path {path} does not exist.")
-        return False
-    
-    # Check write permissions
-    if os.access(path, os.W_OK):
-        print(f"You have write permission for {path}.")
-        return True
-    else:
-        print(f"You do not have write permission for {path}.")
-        return False
 
 
 # Example usage
 file = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'database', 'Software-Architecture-Patterns.pdf')
 paragraphs = parse_file(file)
-
-#for i, paragraph in enumerate(paragraphs[:5]):
-#    print(f"Paragraph {i+1}: {paragraph} \n")
 
 # Load embeddings and print a sample
 embedding = get_embeddings(file, "all-minilm:l6-v2", paragraphs)
