@@ -56,7 +56,7 @@ class InputManager:
         )
 
     @staticmethod
-    def format_to_string(inputs):
+    def input_to_string(inputs):
         """
         Formats the loaded inputs into a structured prompt for the model.
 
