@@ -469,36 +469,46 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
 
 1. Activate virtual environment
 
-```bash
-source (name)/bin/activate
-deactivate // Only when you want to leave the virtual environment
-```
+    ```bash
+    source (name)/bin/activate
+    deactivate // Only when you want to leave the virtual environment
+    ```
 
-3. Install all necessary pip packages
+1. Install all necessary pip packages
 
-```bash
-pip install -r backend\requirements.txt
-```
+    ```bash
+    pip install -r backend\requirements.txt
+    ```
 
 **For local PCs:**
 
 1. Create a virtual environment
 
-```bash
-python3 -m venv (name)
-source (name)/bin/activate
-deactivate // Only when you want to leave the virtual environment
-```
+    ```bash
+    python3 -m venv (name)
+    source (name)/bin/activate
+    deactivate // Only when you want to leave the virtual environment
+    ```
 
-2. Install all necessary pip packages
+1. Install all necessary pip packages
 
-```bash
-pip install -r backend\requirements.txt
-```
+    ```bash
+    pip install -r backend\requirements.txt
+    ```
 
 ## Usage
 
-(TODO)
+1. Run **create_database.py** to create or update (in case there is already one) the database of the embedded documents.
+
+    ```bash
+    python backend/create_database.py
+    ```
+
+1. Run **query.py** to run the analysis process of the example file (backend/inputs/example1).
+
+    ```bash
+    python backend/query.py
+    ```
 
 ## License
 

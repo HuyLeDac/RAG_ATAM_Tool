@@ -1,13 +1,13 @@
+import json
+import os
 from inputs import InputLoader, Inputs
 from get_embedding_function import get_embedding_function 
 from langchain_chroma import Chroma
 from create_database import DATABASE_PATH  
-from langchain_chroma import Chroma
 from langchain.prompts import ChatPromptTemplate
 from langchain_ollama import OllamaLLM
-import json
 
-
+# Define the prompt template for generating the analysis
 PROMPT_TEMPLATE = """
 For the following context, you can use the following context AND your own knowledge to answer the question: 
 {context}
@@ -43,7 +43,7 @@ For the unknown context, you can use your own knowledge to answer the question.
 Try to provide a detailed analysis of the risks, tradeoffs and sensitivity points for each architectural decision for each decision mentioned in the architectural approach/style.
 
 -----
-Only respond with the format mentioned as follows. Don't include any other character or text in the response:
+Only respond with the format mentioned as follows. Don't include any other character or text in the response. Do this for each architectural decision mentioned in the architectural approach/style.:
 
 # Architectural Approach: (enter the name of the architectural approach)
 
@@ -61,13 +61,16 @@ Only respond with the format mentioned as follows. Don't include any other chara
 
 """
 
+# Function to load input data from a specified folder
 def get_inputs(folder_name):
     input_loader = InputLoader(folder_name)
     inputs = input_loader.load_inputs()
     return inputs
 
+# Function to format the input data for embedding
 def create_retrieval_query(inputs):
-    stringified_inputs= f"""
+    # Convert input data into a single string representation
+    stringified_inputs = f"""
     Architecture Description: 
     {json.dumps(inputs.architecture_description, indent=2)}
 
@@ -81,48 +84,62 @@ def create_retrieval_query(inputs):
     {json.dumps(inputs.scenarios, indent=2)}
 
     """
-
     return stringified_inputs
-    
 
+# Function to perform a retrieval query on the database
 def retrieval_query(retrieved_docs, inputs):
-    embedding = get_embedding_function()
+    embedding = get_embedding_function()  # Load the embedding function
 
+    # Initialize Chroma database with persistence and embedding function
     db = Chroma(
         persist_directory=DATABASE_PATH,
         embedding_function=embedding
     )
 
+    # Perform similarity search in the database
     top_k_results = db.similarity_search_with_score(retrieved_docs, k=3)
 
-    context_output =  "\n\n---\n\n".join([doc.page_content for doc, _score in top_k_results])
+    # Construct context output and format the prompt
+    context_output = "\n\n---\n\n".join([doc.page_content for doc, _score in top_k_results])
     template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
-    prompt = template.format(context=context_output, architecture_description=inputs.architecture_description, architectural_approaches=inputs.architectural_approaches, quality_criteria=inputs.quality_criteria, scenarios=inputs.scenarios)
+    prompt = template.format(
+        context=context_output, 
+        architecture_description=inputs.architecture_description, 
+        architectural_approaches=inputs.architectural_approaches, 
+        quality_criteria=inputs.quality_criteria, 
+        scenarios=inputs.scenarios
+    )
+    
+    # Display prompt for debugging purposes
     print("------------------------------------------------")
     print("START OF PROMPT")
     print(prompt)
     print("END OF PROMPT")
-    print("------------------------------------------------")
+    print("------------------------------------------------\n\n")
+    
     return [top_k_results, prompt]
 
+# Function to invoke the model for a response based on the retrieval results
 def query(retireval_results):
-    model = OllamaLLM(model="nemotron")
-    response_text = model.invoke(retireval_results[1])
+    model = OllamaLLM(model="nemotron")  # Initialize model with the specified model name
+    response_text = model.invoke(retireval_results[1])  # Generate response from prompt
 
+    # Extract sources and format the response output
     sources = [doc.metadata.get("id", None) for doc, _score in retireval_results[0]]
     formatted_response = f"Response: {response_text}\nSources: {sources}"
+    
+    # Display the response for debugging purposes
     print("---------------------------------------------------------")
-    print("SRART OF RESPONS:\n")
+    print("START OF RESPONSE:\n")
     print(formatted_response)
     print("END OF RESPONSE")
     print("---------------------------------------------------------")
+    
     return response_text
 
-    
-inputs = get_inputs("example1")
-retrieval = create_retrieval_query(inputs)
-prompt = retrieval_query(retrieval, inputs)
-query(prompt)
-
-
-
+if __name__ == "__main__":
+    # Execute the query pipeline
+    inputs = get_inputs("example1")
+    retrieval = create_retrieval_query(inputs)
+    prompt = retrieval_query(retrieval, inputs)
+    query(prompt)
