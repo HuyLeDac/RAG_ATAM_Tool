@@ -1,123 +1,128 @@
+from inputs import InputLoader, Inputs
+from get_embedding_function import get_embedding_function 
+from langchain_chroma import Chroma
+from create_database import DATABASE_PATH  
+from langchain_chroma import Chroma
+from langchain.prompts import ChatPromptTemplate
+from langchain_ollama import OllamaLLM
 import json
-import os
-import ollama
 
-# Define the Inputs class to store the architecture description, approaches, criteria, and scenarios.
-class Inputs:
-    def __init__(self, architecture_description, architectural_approaches, quality_criteria, scenarios):
-        self.architecture_description = architecture_description
-        self.architectural_approaches = architectural_approaches
-        self.quality_criteria = quality_criteria
-        self.scenarios = scenarios
 
-# Define the InputManager class to manage loading and formatting input data.
-class InputManager:
-    def __init__(self, folder_name):
-        """
-        Initializes the InputManager instance with a base directory path.
-        The path is derived from the script's directory and the specified folder name.
-        """
-        self.base_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "inputs", folder_name)
+PROMPT_TEMPLATE = """
+For the following context, you can use the following context AND your own knowledge to answer the question: 
+{context}
 
-    def load_inputs(self):
-        """
-        Loads JSON files containing the architecture description, architectural approaches,
-        quality criteria, and scenarios from the specified input folder.
+-----
+Also, consider the following inputs:
 
-        Returns:
-            Inputs: An instance of the Inputs class populated with the loaded data.
-        """
+Architecture Description: 
+{architecture_description}
 
-        # Define paths for each input JSON file
-        architecture_description_path = os.path.join(self.base_dir, "architecture_description.json")
-        architectural_approaches_path = os.path.join(self.base_dir, "architectural_approaches.json")
-        quality_criteria_path = os.path.join(self.base_dir, "quality_criteria.json")
-        scenarios_path = os.path.join(self.base_dir, "scenarios.json")
+Architectural Approaches:
+{architectural_approaches}
 
-        # Load JSON data from each file
-        with open(architecture_description_path, 'r') as file:
-            architecture_description = json.load(file)
+Quality Criteria:
+{quality_criteria}
 
-        with open(architectural_approaches_path, 'r') as file:
-            architectural_approaches = json.load(file)
-        
-        with open(quality_criteria_path, 'r') as file:
-            quality_criteria = json.load(file)
-        
-        with open(scenarios_path, 'r') as file:
-            scenarios = json.load(file)
+Scenarios:
+{scenarios}
 
-        # Return an instance of Inputs with the loaded data
-        return Inputs(
-            architecture_description=architecture_description,
-            architectural_approaches=architectural_approaches,
-            quality_criteria=quality_criteria,
-            scenarios=scenarios
-        )
+-----
+Situation:
 
-    @staticmethod
-    def input_to_string(inputs):
-        """
-        Formats the loaded inputs into a structured prompt for the model.
+We are in the middle of a software architecture design process called the Architecture Tradeoff Analysis Method (ATAM).
+Right now, we are trying to analyse different architectural approaches/styles mentioned above.
+For each approach we have a set of architectural decisions and we need to analyse the risks, tradeoffs and sensitivity points for each decision.
+We provided different architectural views and an architecture description to help us with analysis. 
+Additionally, we have a set of quality criteria and scenarios to consider.
 
-        Args:
-            inputs (Inputs): The input data to be formatted.
+Task:
+Your task is to provide an analysis of the architectural decisions for each architectural approach/style mentioned above.
+You can use the provided context and inputs to answer the question.
+For the unknown context, you can use your own knowledge to answer the question.
+Try to provide a detailed analysis of the risks, tradeoffs and sensitivity points for each architectural decision for each decision mentioned in the architectural approach/style.
 
-        Returns:
-            str: A formatted string combining all input data with a specific analysis template.
-        """
+-----
+Only respond with the format mentioned as follows. Don't include any other character or text in the response:
 
-        # Instruction prompt for the model
-        prompt = "You are conducting a qualitative analysis of a software system using ATAM. \
-                    You have the architecture description, architectural approaches, quality criteria, and scenarios provided below. \
-                    For each given approach, analyze the risks, sensitivity points, and tradeoffs of each architectural decision for each scenario. \
-                    Try to argue with the inputs provided. \
-                    Use the following template, and only fill in the blanks of this template, nothing else:\n"
-        
-        # Template pattern for the model output
-        output_pattern = """
-        **{architecture_approach}**
+# Architectural Approach: (enter the name of the architectural approach)
 
-        ### Scenario {scenario_number}: {scenario_name}
+    ## Scenario: (enter the name of the scenario)
+        ## Architectural decision: (enter the architectural decision)
+            ### Risks: (enter the risks)
+            ### Tradeoffs: (enter the tradeoffs)
+            ### Sensitivity Points (enter the sensitivity points)
+    
+        ## (Add other architectural decisions mentioned from the architectural_approach file)
+    
+    ## (Add other scenarios mentioned from the scenarios file)
 
-        * **Quality Attribute:** {quality_attribute}
-        * **Architectural Description 1:** {architectural_description_1}
-                + Risks: {risks_1}
-                + Sensitivity Points: {sensitivity_points_1}
-                + Tradeoffs: {tradeoffs_1}
-        * **Architectural Description 2:** {architectural_description_2}
-                + Risks: {risks_2}
-                + Sensitivity Points: {sensitivity_points_2}
-                + Tradeoffs: {tradeoffs_2}
-        """
-
-        # Concatenate the prompt and data in JSON format
-        stringified_input = (
-            f"{prompt}\n\n"
-            f"{output_pattern}\n\n"
-            f"Architecture Description: {json.dumps(inputs.architecture_description)}\n\n"
-            f"Architectural Approaches: {json.dumps(inputs.architectural_approaches)}\n\n"
-            f"Quality Criteria: {json.dumps(inputs.quality_criteria)}\n\n"
-            f"Scenarios: {json.dumps(inputs.scenarios)}"
-        )
-
-        return stringified_input
+# (Add other architectural approaches mentioned from the architectural_approaches file)
 
 """
-# Usage Example:
-# Initialize the input manager with the folder name containing your JSON files
-input_manager = InputManager(folder_name="example1")
-inputs = input_manager.load_inputs()
 
-# Format the input in the correct format for ollama.chat
-formatted_input = {
-    "role": "user",
-    "content": InputManager.format_to_string(inputs)
-}
+def get_inputs(folder_name):
+    input_loader = InputLoader(folder_name)
+    inputs = input_loader.load_inputs()
+    return inputs
 
-# Send the message to the model
-response = ollama.chat(model='nemotron', messages=[formatted_input])
+def create_retrieval_query(inputs):
+    stringified_inputs= f"""
+    Architecture Description: 
+    {json.dumps(inputs.architecture_description, indent=2)}
 
-# Output the response
-print(response['message']['content'])
-"""
+    Architectural Approaches:
+    {json.dumps(inputs.architectural_approaches, indent=2)}
+
+    Quality Criteria:
+    {json.dumps(inputs.quality_criteria, indent=2)}
+
+    Scenarios:
+    {json.dumps(inputs.scenarios, indent=2)}
+
+    """
+
+    return stringified_inputs
+    
+
+def retrieval_query(retrieved_docs, inputs):
+    embedding = get_embedding_function()
+
+    db = Chroma(
+        persist_directory=DATABASE_PATH,
+        embedding_function=embedding
+    )
+
+    top_k_results = db.similarity_search_with_score(retrieved_docs, k=3)
+
+    context_output =  "\n\n---\n\n".join([doc.page_content for doc, _score in top_k_results])
+    template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
+    prompt = template.format(context=context_output, architecture_description=inputs.architecture_description, architectural_approaches=inputs.architectural_approaches, quality_criteria=inputs.quality_criteria, scenarios=inputs.scenarios)
+    print("------------------------------------------------")
+    print("START OF PROMPT")
+    print(prompt)
+    print("END OF PROMPT")
+    print("------------------------------------------------")
+    return [top_k_results, prompt]
+
+def query(retireval_results):
+    model = OllamaLLM(model="nemotron")
+    response_text = model.invoke(retireval_results[1])
+
+    sources = [doc.metadata.get("id", None) for doc, _score in retireval_results[0]]
+    formatted_response = f"Response: {response_text}\nSources: {sources}"
+    print("---------------------------------------------------------")
+    print("SRART OF RESPONS:\n")
+    print(formatted_response)
+    print("END OF RESPONSE")
+    print("---------------------------------------------------------")
+    return response_text
+
+    
+inputs = get_inputs("example1")
+retrieval = create_retrieval_query(inputs)
+prompt = retrieval_query(retrieval, inputs)
+query(prompt)
+
+
+

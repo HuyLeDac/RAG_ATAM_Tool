@@ -1,15 +1,6 @@
-fastapi
-uvicorn
-sqlalchemy
-pymongo
+pypdf
 langchain
-transformers
-sentence-transformers
-ollama
-faiss-cpu
-plantuml
-python-dotenv
-pydantic
-tiktoken
-openai
-gunicorn
+chromadb # Vector storage
+pytest
+boto3
+json

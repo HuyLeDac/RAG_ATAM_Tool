@@ -3,10 +3,12 @@ from langchain.document_loaders.pdf import PyPDFDirectoryLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import os  
 
+DATA_PATH = os.path.join("backend", "data")
+
 # Load pdf documents from a directory 
 # For other document types, use the appropriate loader from langchain.document_loaders
 def load_docs():
-    document_loader = PyPDFDirectoryLoader(os.path.join("backend", "data"))    
+    document_loader = PyPDFDirectoryLoader(DATA_PATH)    
     documents = document_loader.load()
     return documents
 
@@ -43,10 +45,9 @@ def assign_ids(chunks):
         chunk.metadata["id"] = f"{current_page_id}:{current_chunk_index}"
         
 
-        
-
-docs = load_docs()
-chunks = split_docs(docs)
-assign_ids(chunks)
-print(f"\nNumber of chunks: {len(chunks)}")
+def get_chunks():    
+    docs = load_docs()
+    chunks = split_docs(docs)
+    assign_ids(chunks)
+    print(f"\nNumber of chunks: {len(chunks)}")
 
