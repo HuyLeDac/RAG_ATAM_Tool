@@ -9,10 +9,18 @@ from langchain_ollama import OllamaLLM
 
 # Define the prompt template for generating the analysis
 PROMPT_TEMPLATE = """
+
+<CONTEXT>
+
 For the following context, you can use the following context AND your own knowledge to answer the question: 
 {context}
 
+</CONTEXT>
+
 -----
+
+<INPUT>
+
 Also, consider the following inputs:
 
 Architecture Description: 
@@ -27,7 +35,12 @@ Quality Criteria:
 Scenarios:
 {scenarios}
 
+</INPUT>
+
 -----
+
+<TASK>
+
 Situation:
 
 We are in the middle of a software architecture design process called the Architecture Tradeoff Analysis Method (ATAM).
@@ -42,8 +55,12 @@ You can use the provided context and inputs to answer the question.
 For the unknown context, you can use your own knowledge to answer the question.
 Try to provide a detailed analysis of the risks, tradeoffs and sensitivity points for each architectural decision for each decision mentioned in the architectural approach/style.
 
+</TASK>
+
 -----
 Only respond with the format mentioned as follows. Don't include any other character or text in the response. Do this for each architectural decision mentioned in the architectural approach/style.:
+
+<TEMPLATE>
 
 # Architectural Approach: (enter the name of the architectural approach)
 
@@ -59,6 +76,7 @@ Only respond with the format mentioned as follows. Don't include any other chara
 
 # (Add other architectural approaches mentioned from the architectural_approaches file)
 
+</TEMPLATE>
 """
 
 # Function to load input data from a specified folder
@@ -121,7 +139,7 @@ def retrieval_query(retrieved_docs, inputs):
 
 # Function to invoke the model for a response based on the retrieval results
 def query(retireval_results):
-    model = OllamaLLM(model="nemotron")  # Initialize model with the specified model name
+    model = OllamaLLM(model="mistral")  # Initialize model with the specified model name
     response_text = model.invoke(retireval_results[1])  # Generate response from prompt
 
     # Extract sources and format the response output
@@ -132,7 +150,7 @@ def query(retireval_results):
     print("---------------------------------------------------------")
     print("START OF RESPONSE:\n")
     print(formatted_response)
-    print("END OF RESPONSE")
+    print("\nEND OF RESPONSE")
     print("---------------------------------------------------------")
     
     return response_text

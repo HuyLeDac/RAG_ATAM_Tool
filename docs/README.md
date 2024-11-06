@@ -13,7 +13,7 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
 - Next steps:
   - implement information retriever
   - Work on prompt template
-  - Work on input format 
+  - Work on input format
 
 ### Observation (29.10.24)
 
@@ -72,7 +72,6 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
             }
         }
         ```
-
 
     2. *Architectural approaches:* Approach, Description, Architectural Decisions, Architectural Views (Physical, Process, Deployment)
 
@@ -455,6 +454,9 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
 
 ![General Idea](readme_figures/general_idea.png)
 ![RAG Figure](readme_figures/RAG_sketch.png)
+
+Rough sequence diagram of the creation/update of the database: <br>
+![create_databse](readme_figures/create_database_sequence.png)
 
 ## Installation (Only compatible with Linux Distros)
 
