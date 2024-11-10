@@ -2,24 +2,6 @@
 
 An ATAM framework which semi-automatically analyses tradeoffs, risks and sensitivity points using Retrival Augmented Generation (RAG), focusing on qualitative analyses.
 
-## Updates
-
-### Update 04.11
-
-- Added first components of RAG database
-  - Text splitter
-  - Get embedding function
-  - build database with embedded documents
-- Next steps:
-  - implement information retriever
-  - Work on prompt template
-  - Work on input format
-
-### Observation (29.10.24)
-
-- Too many architectural approaches in one prompt is difficult for the LLM to process
-  - Generates completely different outputs compared to the prompt.
-
 ## Requirements
 
 ### Objectives
@@ -87,7 +69,7 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
                     ],
                     "architectural views": [
                         {
-                            "view": "Deployment View",
+                            "view": "Development View",
                             "description": "Illustrates how microservices are deployed and interact with each other, including load balancing and service discovery mechanisms.",
                             "diagram": "TODO: Add diagram here"
                         },
@@ -112,7 +94,7 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
                     ],
                     "architectural views": [
                         {
-                            "view": "Deployment View",
+                            "view": "Development View",
                             "description": "Illustrates how layers are deployed and their interactions, focusing on the separation of concerns.",
                             "diagram": "TODO: Add diagram here"
                         },
@@ -137,7 +119,7 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
                     ],
                     "architectural views": [
                         {
-                            "view": "Deployment View",
+                            "view": "Development View",
                             "description": "Illustrates how event-driven components are deployed and interact with each other.",
                             "diagram": "TODO: Add diagram here"
                         },
@@ -162,7 +144,7 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
                     ],
                     "architectural views": [
                         {
-                            "view": "Deployment View",
+                            "view": "Development View",
                             "description": "Illustrates how services are deployed and interact with each other, including routing and load balancing.",
                             "diagram": "TODO: Add diagram here"
                         },
@@ -187,7 +169,7 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
                     ],
                     "architectural views": [
                         {
-                            "view": "Deployment View",
+                            "view": "Development View",
                             "description": "Illustrates how the entire application is deployed as a single unit.",
                             "diagram": "TODO: Add diagram here"
                         },
@@ -458,7 +440,7 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
 Rough sequence diagram of the creation/update of the database: <br>
 ![create_databse](readme_figures/create_database_sequence.png)
 
-## Installation (Only compatible with Linux Distros)
+## Installation (Only compatible with Unix systems)
 
 **Prerequisities:**
 
@@ -500,6 +482,12 @@ Rough sequence diagram of the creation/update of the database: <br>
 
 ## Usage
 
+1. You can add new articles by pasting the link into the URLS list in **web_scraper.py**. Run it with:
+
+    ```bash
+    python backend/web_scraper.py
+    ```
+
 1. Run **create_database.py** to create or update (in case there is already one) the database of the embedded documents.
 
     ```bash
@@ -511,6 +499,25 @@ Rough sequence diagram of the creation/update of the database: <br>
     ```bash
     python backend/query.py
     ```
+
+## Updates
+
+### Update 04.11
+
+- Added first components of RAG database
+  - Text splitter
+  - Get embedding function
+  - build database with embedded documents
+- Next steps:
+  - implement information retriever
+  - Work on prompt template
+  - Work on input format
+
+### Observation (29.10.24)
+
+- Too many architectural approaches in one prompt is difficult for the LLM to process
+  - Generates completely different outputs compared to the prompt.
+
 
 ## License
 

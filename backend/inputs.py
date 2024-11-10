@@ -4,19 +4,37 @@ import os
 # Define the Inputs class to store the architecture description, approaches, criteria, and scenarios.
 class Inputs:
     def __init__(self, architecture_description, architectural_approaches, quality_criteria, scenarios):
-        """
-        Initializes an instance of Inputs with specified attributes.
-        
-        Args:
-            architecture_description (dict): The description of the software architecture.
-            architectural_approaches (dict): The approaches considered in the architecture.
-            quality_criteria (dict): The quality attributes criteria for evaluation.
-            scenarios (dict): The scenarios for analyzing architecture.
-        """
         self.architecture_description = architecture_description
         self.architectural_approaches = architectural_approaches
         self.quality_criteria = quality_criteria
         self.scenarios = scenarios
+
+    def get_architectural_decisions_as_list(self):
+        """
+        Extracts all architectural decisions from the architectural approaches.
+
+        Returns:
+            list: A list of architectural decisions from each approach.
+        """
+        decisions_list = []
+        for approach in self.architectural_approaches["architecturalApproaches"]:
+            decisions = approach.get("architectural decisions", [])
+            decisions_list.extend(decisions)
+        return decisions_list
+
+    def get_architectural_views_as_list(self):
+        """
+        Extracts all architectural views from each approach in the architectural approaches.
+
+        Returns:
+            list: A list of dictionaries, each containing information about an architectural view.
+        """
+        views_list = []
+        for approach in self.architectural_approaches["architecturalApproaches"]:
+            views = approach.get("architectural views", [])
+            views_list.extend(views)
+        return views_list
+
 
 # Define the InputLoader class to manage loading and formatting input data from JSON files.
 class InputLoader:
@@ -65,3 +83,34 @@ class InputLoader:
             quality_criteria=quality_criteria,
             scenarios=scenarios
         )
+
+    def get_architectural_decisions_as_list(self):
+        """
+        Loads and extracts all architectural decisions from the architectural approaches JSON.
+
+        Returns:
+            list: A list of architectural decisions from each approach.
+        """
+        inputs = self.load_inputs()
+        decisions_list = []
+        for approach in inputs.architectural_approaches["architecturalApproaches"]:
+            decisions = approach.get("architectural decisions", [])
+            decisions_list.extend(decisions)
+        return decisions_list
+
+    def get_architectural_views_as_list(self):
+        """
+        Loads and extracts all architectural views from each approach in the architectural approaches JSON.
+
+        Returns:
+            list: A list of dictionaries, each containing information about an architectural view.
+        """
+        inputs = self.load_inputs()
+        views_list = []
+        for approach in inputs.architectural_approaches["architecturalApproaches"]:
+            views = approach.get("architectural views", [])
+            views_list.extend(views)
+        return views_list
+
+    
+    

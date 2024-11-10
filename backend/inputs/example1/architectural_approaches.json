@@ -2,16 +2,16 @@
     "architecturalApproaches": [
         {
             "approach": "Microservices Architecture",
-            "description": "Decompose the SecureLoginApp into distinct services, such as Authentication, User Management, and Logging, with each service having its own database. This approach isolates components, enhances scalability, and enables independent deployment.",
+            "description": "Decompose the SecureLoginApp into distinct services, such as Authentication, User Management, and Logging, with each service having its own database. ",
             "architectural decisions": [
                 "Use API Gateway for routing requests to microservices.",
                 "Implement service discovery for dynamic service registration."
             ],
             "architectural views": [
                 {
-                    "view": "Deployment View",
-                    "description": "Illustrates how microservices are deployed and interact with each other, including load balancing and service discovery mechanisms.",
-                    "diagram": "@startuml\nnode API_Gateway\nnode Authentication_Service\nnode User_Management_Service\nnode Logging_Service\nAPI_Gateway --> Authentication_Service : route requests\nAPI_Gateway --> User_Management_Service : route requests\nAPI_Gateway --> Logging_Service : route logs\n@enduml"
+                    "view": "Component View",
+                    "description": "Depicts the system as a collection of interconnected components, showing each microservice as a component and its relationships with other components.",
+                    "diagram": "@startuml\npackage SecureLoginApp {\n  [API Gateway] --> [Authentication Service] : route requests\n  [API Gateway] --> [User Management Service] : route requests\n  [API Gateway] --> [Logging Service] : send logs\n  [Authentication Service] --> [Authentication DB] : manages\n  [User Management Service] --> [User Management DB] : manages\n  [Logging Service] --> [Log DB] : stores logs\n}\n@enduml"
                 },
                 {
                     "view": "Process View",
