@@ -6,27 +6,6 @@
             "environment": "Web Application",
             "stimulus": "User enters valid login credentials.",
             "response": "User is authenticated and granted access to the system."
-        },
-        {
-            "scenario": "Data Retrieval",
-            "attribute": "Performance",
-            "environment": "Mobile Application",
-            "stimulus": "User requests data from the server.",
-            "response": "Data is retrieved and displayed within an acceptable response time."
-        },
-        {
-            "scenario": "Password Reset",
-            "attribute": "Modifiability",
-            "environment": "Web Application",
-            "stimulus": "User requests a password reset.",
-            "response": "User receives a reset link via email and can update their password."
-        },
-        {
-            "scenario": "High Traffic Management",
-            "attribute": "Scalability",
-            "environment": "Cloud Infrastructure",
-            "stimulus": "High number of concurrent login attempts.",
-            "response": "System scales to handle the increased load without degradation in performance."
         }
     ]
 }

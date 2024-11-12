@@ -13,6 +13,7 @@ retrieval_model = OllamaLLM(model="mistral")  # Model for summarizing inputs for
 embedding = get_embedding_function()  # Embedding function to vectorize inputs for database search
 db = Chroma(persist_directory=DATABASE_PATH, embedding_function=embedding)  # Database for document retrieval
 
+RESPONSES_PATH = "respones/responses.json"  # Path to store responses
 
 # Function: Load JSON data from a specified folder
 # - Initializes InputLoader to load JSON data from `folder_name`.
@@ -96,9 +97,8 @@ def generate_analysis_prompt(context_output, approach, decision, scenario):
     </TASK>
 
     -----
-    Format response as json format. Don't use any other formats:
+    Format response as json format. Don't use any other formats and especially don't add any additional characters or spaces:
     
-    ```
     {{
      "architecturalApproach": "{current_approach}",
      "scenario": {{
@@ -125,7 +125,6 @@ def generate_analysis_prompt(context_output, approach, decision, scenario):
          }}
      ]
     }}
-    ```
 
     """
 
@@ -152,25 +151,37 @@ def generate_analysis_prompt(context_output, approach, decision, scenario):
 def query_multiple_chunks(top_k_results, inputs):
     # Convert top-k results into context text
     context_output = "\n\n---\n\n".join([doc.page_content for doc, _ in top_k_results])
-    responses = []
+    responses = []  # Initialize an empty list to store responses
+
     for approach in inputs.architectural_approaches['architecturalApproaches']:
         for decision in approach['architectural decisions']:
             for scenario in inputs.scenarios['scenarios']:
-                print(f"\n\nAnalyzing: {approach['approach']} - Decision: {decision} - Scenario: {scenario['scenario']}")
+                print(f"\n\nAnalyzing: {approach['approach']} - Decision: {decision} - Scenario: {scenario['scenario']}") # For debugging
                 formatted_prompt = generate_analysis_prompt(context_output, approach, decision, scenario)
                 
+                # Get the model's response
                 response_text = model.invoke(formatted_prompt)
+                
+                # Collect sources
                 sources = [doc.metadata.get("id") for doc, _ in top_k_results]
-                formatted_response = f"{response_text}\n\nSources: {sources}"
+                
+                # Create a dictionary for the response including the sources
+                response_dict = json.loads(response_text)
+                response_dict['sources'] = sources  # Add sources to the response dictionary
+
+                # Append the response dictionary to the list of responses
+                responses.append(response_dict)
 
                 # Display response for debugging purposes
                 print("---------------------------------------------------------")
                 print("START OF RESPONSE:\n")
-                print(formatted_response)
+                print(json.dumps(response_dict, indent=2))  # Print formatted JSON for clarity
                 print("\nEND OF RESPONSE")
                 print("---------------------------------------------------------")
 
-                responses.append(formatted_response)  # Store responses for further processing/logging
+    # After all responses are generated, store them in a JSON file
+    with open(RESPONSES_PATH, 'w') as json_file:
+        json.dump(responses, json_file, indent=2)
 
     return responses
 
@@ -180,7 +191,10 @@ def query_multiple_chunks(top_k_results, inputs):
 # Loads input data, creates a retrieval query, searches the database, and generates responses
 if __name__ == "__main__":
     # Execute the query pipeline
-    inputs = get_inputs("londonAmbulanceProblem")  # Load example data from specified folder
+    folder_name = "example1"
+    inputs = get_inputs(folder_name)  # Load example data from specified folder
     created_retrieval_query = create_retrieval_query(inputs)  # Summarize input for retrieval
     top_k_results = retrieval_query(created_retrieval_query)  # Retrieve relevant database docs
     responses = query_multiple_chunks(top_k_results, inputs)  # Generate prompts and responses
+
+
