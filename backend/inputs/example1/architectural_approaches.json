@@ -9,7 +9,7 @@
             ],
             "architectural views": [
                 {
-                    "view": "Component View",
+                    "view": "Development View",
                     "description": "Depicts the system as a collection of interconnected components, showing each microservice as a component and its relationships with other components.",
                     "diagram": "@startuml\npackage SecureLoginApp {\n  [API Gateway] --> [Authentication Service] : route requests\n  [API Gateway] --> [User Management Service] : route requests\n  [API Gateway] --> [Logging Service] : send logs\n  [Authentication Service] --> [Authentication DB] : manages\n  [User Management Service] --> [User Management DB] : manages\n  [Logging Service] --> [Log DB] : stores logs\n}\n@enduml"
                 },
@@ -22,6 +22,31 @@
                     "view": "Physical View",
                     "description": "Defines the data models used by each microservice, including database schemas, data formats, and data access patterns.",
                     "diagram": "@startuml\nentity Authentication_DB {\n  * user_id : int\n  * username : string\n  * password_hash : string\n}\nentity User_Management_DB {\n  * user_id : int\n  * user_profile : json\n}\nAuthentication_Service --> Authentication_DB : manages\nUser_Management_Service --> User_Management_DB : manages\n@enduml"
+                }
+            ]
+        },
+        {
+            "approach": "Layered Architecture",
+            "description": "Separate SecureLoginApp into layers, including Presentation, Business Logic, and Data Access. This structure promotes separation of concerns, making it easier to manage, test, and modify each layer individually.",
+            "architectural decisions": [
+                "Use Dependency Injection to manage component dependencies.",
+                "Implement a Repository pattern for data access."
+            ],
+            "architectural views": [
+                {
+                    "view": "Development View",
+                    "description": "Illustrates how layers are deployed and their interactions, focusing on the separation of concerns.",
+                    "diagram": "@startuml\npackage Presentation_Layer {\n  [Login UI] --> [Auth Controller]\n}\n\npackage Business_Logic_Layer {\n  [Auth Controller] --> [Auth Service]\n  [User Service] --> [Repository]\n}\n\npackage Data_Access_Layer {\n  [Repository] --> [Database]\n}\n\n[Login UI] -down-> [Auth Controller] : invokes\n[Auth Controller] -down-> [Auth Service] : delegates\n[Auth Service] --> [Repository] : accesses data\n@Repository --> [Database] : fetches data\n@enduml"
+                },
+                {
+                    "view": "Process View",
+                    "description": "Shows the flow of data within the application layers, detailing interactions between layers.",
+                    "diagram": "@startuml\nactor User\nparticipant Presentation_Layer\nparticipant Business_Logic_Layer\nparticipant Data_Access_Layer\n\nUser -> Presentation_Layer : submit login\nPresentation_Layer -> Business_Logic_Layer : validate credentials\nBusiness_Logic_Layer -> Data_Access_Layer : query user data\nData_Access_Layer --> Business_Logic_Layer : return data\nBusiness_Logic_Layer --> Presentation_Layer : send validation result\nPresentation_Layer --> User : login success/failure\n@enduml"
+                },
+                {
+                    "view": "Physical View",
+                    "description": "Defines the internal structures of each layer, including class diagrams and data models.",
+                    "diagram": "@startuml\nclass AuthController {\n  - authService : AuthService\n  + login() : boolean\n}\n\nclass AuthService {\n  - repository : Repository\n  + validateUser() : User\n}\n\nclass Repository {\n  - database : Database\n  + getUser() : User\n}\n\nclass Database {\n  + query() : Data\n}\n\nAuthController --> AuthService : depends on\nAuthService --> Repository : uses\nRepository --> Database : queries\n@enduml"
                 }
             ]
         }

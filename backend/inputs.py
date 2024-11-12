@@ -3,8 +3,8 @@ import os
 
 # Define the Inputs class to store the architecture description, approaches, criteria, and scenarios.
 class Inputs:
-    def __init__(self, architecture_description, architectural_approaches, quality_criteria, scenarios):
-        self.architecture_description = architecture_description
+    def __init__(self, architecture_context, architectural_approaches, quality_criteria, scenarios):
+        self.architecture_context = architecture_context
         self.architectural_approaches = architectural_approaches
         self.quality_criteria = quality_criteria
         self.scenarios = scenarios
@@ -58,14 +58,14 @@ class InputLoader:
         """
 
         # Define paths for each input JSON file
-        architecture_description_path = os.path.join(self.base_dir, "architecture_description.json")
+        architecture_context_path = os.path.join(self.base_dir, "architecture_context.json")
         architectural_approaches_path = os.path.join(self.base_dir, "architectural_approaches.json")
         quality_criteria_path = os.path.join(self.base_dir, "quality_criteria.json")
         scenarios_path = os.path.join(self.base_dir, "scenarios.json")
 
         # Load JSON data from each file, ensuring each required file is opened and read
-        with open(architecture_description_path, 'r') as file:
-            architecture_description = json.load(file)
+        with open(architecture_context_path, 'r') as file:
+            architecture_context = json.load(file)
 
         with open(architectural_approaches_path, 'r') as file:
             architectural_approaches = json.load(file)
@@ -78,7 +78,7 @@ class InputLoader:
 
         # Return an instance of Inputs populated with the data from the loaded JSON files
         return Inputs(
-            architecture_description=architecture_description,
+            architecture_context=architecture_context,
             architectural_approaches=architectural_approaches,
             quality_criteria=quality_criteria,
             scenarios=scenarios

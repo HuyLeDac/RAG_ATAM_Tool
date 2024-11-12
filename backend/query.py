@@ -24,20 +24,21 @@ def get_inputs(folder_name):
 
 
 # Helper Function: Format JSON data into a readable string
-# - `data`: JSON data to be formatted as a readable string.
-# - `indent`: Number of spaces for indentation in the formatted JSON string.
+#   - `data`: JSON data to be formatted as a readable string.
+#   - `indent`: Number of spaces for indentation in the formatted JSON string.
 def format_json(data, indent=2):
     return json.dumps(data, indent=indent)
 
 
 # Function: Create retrieval query from inputs
+#   - `inputs`: Structured input data containing architecture, approaches, decisions, and scenarios.
 # - Converts architecture description and approaches into a formatted string.
 # - Uses `retrieval_model` to generate a summarized query.
 # - Returns a string with key architectural information for similarity search.
 def create_retrieval_query(inputs):
     input_data_str = f"""
-    Architecture Description: 
-    {format_json(inputs.architecture_description)}
+    Architecture Context: 
+    {format_json(inputs.architecture_context)}
 
     Architectural Approaches:
     {format_json(inputs.architectural_approaches)}
@@ -51,16 +52,19 @@ def create_retrieval_query(inputs):
 
 
 # Function: Perform retrieval query on the database
-# - `query_text`: The formatted query text used for similarity search.
+#   - `query_text`: The formatted query text used for similarity search.
 # - Searches the Chroma database and returns the top `k` relevant documents.
 def retrieval_query(query_text):
-    top_k_results = db.similarity_search_with_score(query_text, k=4)
+    print("Retrieval Query:")
+    top_k_results = db.similarity_search_with_score(query_text, k=7)
+    for doc, score in top_k_results:
+        print(f"Document ID: {doc.metadata.get('id')} - Score: {score}")
     return top_k_results
 
 
 # Function: Generate analysis prompt for each architectural decision and scenario
-# - `context_output`: Text containing the context retrieved from the database.
-# - `approach`, `decision`, `scenario`: Specific data points for the current architectural decision and scenario.
+#   - `context_output`: Text containing the context retrieved from the database.
+#   - `approach`, `decision`, `scenario`: Specific data points for the current architectural decision and scenario.
 # - Formats the prompt for the model to evaluate architectural risks, tradeoffs, and sensitivity points.
 # - Returns the formatted prompt as a string.
 def generate_analysis_prompt(context_output, approach, decision, scenario):
@@ -74,16 +78,11 @@ def generate_analysis_prompt(context_output, approach, decision, scenario):
 
     <INPUT>
     User's input data:
-    Architecture Description: 
-    {architecture_description}
-    Architectural Views: 
-    {architectural_views}
-    Architectural Approach Description:
-    {approach_description}
-    Quality Criteria:
-    {quality_criteria}
-    Scenario:
-    {scenario}
+    Architecture Context: \n{architecture_context}
+    Architectural Approach Description: \n{approach_description}
+    Architectural Views: \n{architectural_views}
+    Quality Criteria: \n{quality_criteria}
+    Scenario: \n{scenario}
     </INPUT>
 
     -----
@@ -92,49 +91,72 @@ def generate_analysis_prompt(context_output, approach, decision, scenario):
     We are conducting a qualitative analysis based on ATAM.
 
     Task:
-    Provide the risks, tradeoffs, and sensitivity points for the scenario in the architectural decision: {decision}.
+    Provide the risks, tradeoffs, and sensitivity points regarding the scenario in the architectural decision: {decision}.
     Use the input data provided, marking any external knowledge as [LLM KNOWLEDGE].
     </TASK>
 
     -----
-    Format response as. Don't use any other formats:
+    Format response as json format. Don't use any other formats:
+    
+    ```
+    {{
+     "architecturalApproach": "{current_approach}",
+     "scenario": {{
+         "name": "{scenario_name}",
+         "qualityAttribute": "{quality_attribute}"
+     }},
+     "architecturalDecision": "{decision}",
+     "risks": [
+         {{
+         "source": "[LLM KNOWLEDGE/DATABASE SOURCE]",
+         "details": "(enter risks)"
+         }}
+     ],
+     "tradeoffs": [
+         {{
+         "source": "[LLM KNOWLEDGE/DATABASE SOURCE]",
+         "details": "(enter tradeoffs)"
+         }}
+     ],
+     "sensitivityPoints": [
+         {{
+         "source": "[LLM KNOWLEDGE/DATABASE SOURCE]",
+         "details": "(enter sensitivity points)"
+         }}
+     ]
+    }}
+    ```
 
-    # Architectural Approach: {current_approach}
-    ## Scenario: {scenario_name}; Quality Attribute: {quality_attribute}
-    ### Architectural Decision: {decision}
-    #### Risks: [LLM KNOWLEDGE/DATABASE SOURCE](enter risks)
-    - (enter risks)
-    #### Tradeoffs: [LLM KNOWLEDGE/DATABASE SOURCE](enter tradeoffs)
-    - (enter tradeoffs)
-    #### Sensitivity Points: [LLM KNOWLEDGE/DATABASE SOURCE](enter sensitivity points)
-    - (enter sensitivity points)
     """
+
     return template.format(
         context=context_output,
-        architecture_description=format_json(inputs.architecture_description),
+        architecture_context=format_json(inputs.architecture_context),
         architectural_views=format_json(inputs.get_architectural_views_as_list()),
         quality_criteria=format_json(inputs.quality_criteria),
         scenario=format_json(scenario),
-        current_approach=approach['approach'],
-        approach_description=approach['description'],
+        current_approach=approach.get('approach', 'Unknown'),
+        approach_description=approach.get('description', 'No description provided'),
         decision=decision,
-        scenario_name=scenario["scenario"],
-        quality_attribute=scenario["attribute"]
+        scenario_name=scenario.get("scenario", "Unnamed Scenario"),
+        quality_attribute=scenario.get("attribute", "No attribute provided")
     )
 
-
-# Function: Process multiple architectural approaches, decisions, and scenarios
+# Function: Process multiple architectural approaches, decisions, and scenarios.
+#   - `top_k_results`: List of top-k relevant documents retrieved from the database.
+#   - `inputs`: Structured input data containing architecture, approaches, decisions, and scenarios.
 # - Iterates through each approach, decision, and scenario to generate prompts.
 # - Sends prompts to `model` and appends responses with context and sources.
 # - Prints each response for debugging and stores responses for further use.
+# - For each combination of approach, decision, and scenario, generate a prompt and query the model O(n^3).
 def query_multiple_chunks(top_k_results, inputs):
     # Convert top-k results into context text
     context_output = "\n\n---\n\n".join([doc.page_content for doc, _ in top_k_results])
-
     responses = []
     for approach in inputs.architectural_approaches['architecturalApproaches']:
         for decision in approach['architectural decisions']:
             for scenario in inputs.scenarios['scenarios']:
+                print(f"\n\nAnalyzing: {approach['approach']} - Decision: {decision} - Scenario: {scenario['scenario']}")
                 formatted_prompt = generate_analysis_prompt(context_output, approach, decision, scenario)
                 
                 response_text = model.invoke(formatted_prompt)
@@ -153,11 +175,12 @@ def query_multiple_chunks(top_k_results, inputs):
     return responses
 
 
-# Main Execution
+
+# Main Execution: Query Pipeline
 # Loads input data, creates a retrieval query, searches the database, and generates responses
 if __name__ == "__main__":
     # Execute the query pipeline
-    inputs = get_inputs("example1")  # Load example data from specified folder
+    inputs = get_inputs("londonAmbulanceProblem")  # Load example data from specified folder
     created_retrieval_query = create_retrieval_query(inputs)  # Summarize input for retrieval
     top_k_results = retrieval_query(created_retrieval_query)  # Retrieve relevant database docs
-    query_multiple_chunks(top_k_results, inputs)  # Generate prompts and responses
+    responses = query_multiple_chunks(top_k_results, inputs)  # Generate prompts and responses

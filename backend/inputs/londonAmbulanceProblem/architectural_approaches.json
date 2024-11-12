@@ -1,0 +1,82 @@
+{
+    "architecturalApproaches": [
+        {
+            "approach": "Layered Architecture with Fault Tolerance",
+            "description": "Organize the system into separate layers (e.g., User Interface, Application, and Data), ensuring fault tolerance mechanisms (e.g., failover systems, redundant components) are included to prevent system-wide failures during high-demand periods.",
+            "architectural decisions": [
+                "Implement a clear separation of concerns between layers.",
+                "Introduce fault-tolerant mechanisms to prevent cascading failures.",
+                "Use redundant components for high-availability services."
+            ],
+            "architectural views": [
+                {
+                    "view": "Development View",
+                    "description": "Shows the key components of the system, focusing on the layered approach and fault tolerance between components.",
+                    "diagram": "@startuml\npackage LondonAmbulanceSystem {\n  [UI Layer] --> [Application Layer] : communicates\n  [Application Layer] --> [Data Layer] : accesses data\n  [Application Layer] --> [Dispatch Service] : manages dispatch\n  [Dispatch Service] --> [Backup System] : failover\n  [Data Layer] --> [Database] : stores data\n}\n@enduml"
+                },
+                {
+                    "view": "Process View",
+                    "description": "Illustrates the flow of requests between layers and highlights the failover processes during high-demand periods.",
+                    "diagram": "@startuml\nparticipant User\nparticipant UI_Layer\nparticipant Application_Layer\nparticipant Data_Layer\nparticipant Dispatch_Service\nparticipant Backup_System\nUser -> UI_Layer : request dispatch\nUI_Layer -> Application_Layer : route request\nApplication_Layer -> Dispatch_Service : dispatch ambulance\nDispatch_Service -> Backup_System : check failover\nDispatch_Service --> Data_Layer : fetch location\nData_Layer --> Dispatch_Service : return location\n@enduml"
+                },
+                {
+                    "view": "Physical View",
+                    "description": "Defines the physical structure of the layers, including the redundancies and backup systems.",
+                    "diagram": "@startuml\nentity Dispatch_Service {\n  * service_id : int\n  * location : string\n  * status : string\n}\nentity Backup_System {\n  * backup_id : int\n  * status : string\n}\nDispatch_Service --> Backup_System : failover\n@enduml"
+                }
+            ]
+        },
+        {
+            "approach": "Scalable and Distributed Architecture",
+            "description": "Use a distributed system to scale horizontally and ensure the system can handle high loads, especially during peak times. Load balancing and cloud-based infrastructure should be leveraged to provide scalability.",
+            "architectural decisions": [
+                "Use cloud infrastructure for scalability.",
+                "Implement load balancing across servers.",
+                "Employ microservices to scale individual components based on demand."
+            ],
+            "architectural views": [
+                {
+                    "view": "Development View",
+                    "description": "Illustrates the components of the system as microservices, showing how they interact and scale independently.",
+                    "diagram": "@startuml\npackage LondonAmbulanceSystem {\n  [Dispatch Service] --> [Cloud Load Balancer] : routes requests\n  [Dispatch Service] --> [Cloud Servers] : scales services\n  [Dispatch Service] --> [Database] : accesses data\n  [Backup System] --> [Cloud Servers] : backup scaling\n}\n@enduml"
+                },
+                {
+                    "view": "Process View",
+                    "description": "Shows how requests are handled through load balancing and distributed across servers.",
+                    "diagram": "@startuml\nparticipant User\nparticipant Cloud_LB\nparticipant Dispatch_Service\nparticipant Cloud_Servers\nUser -> Cloud_LB : send request\nCloud_LB -> Dispatch_Service : route request\nDispatch_Service -> Cloud_Servers : scale service\nDispatch_Service --> Database : fetch data\n@enduml"
+                },
+                {
+                    "view": "Physical View",
+                    "description": "Shows the physical deployment of microservices across distributed cloud servers.",
+                    "diagram": "@startuml\nentity Dispatch_Service {\n  * service_id : int\n  * status : string\n}\nentity Cloud_Servers {\n  * server_id : int\n  * load_balance : boolean\n}\nDispatch_Service --> Cloud_Servers : runs on\n@enduml"
+                }
+            ]
+        },
+        {
+            "approach": "Fault-Tolerant and High-Availability Systems",
+            "description": "Design the system with built-in redundancy and fault tolerance to ensure high availability, using techniques like data replication, load balancing, and automatic failover during outages.",
+            "architectural decisions": [
+                "Implement automatic failover systems to ensure service continuity during failures.",
+                "Use data replication across multiple nodes for high availability.",
+                "Monitor system health to trigger failover or backup systems."
+            ],
+            "architectural views": [
+                {
+                    "view": "Development View",
+                    "description": "Shows components responsible for fault tolerance, like failover systems, backup servers, and redundant services.",
+                    "diagram": "@startuml\npackage LondonAmbulanceSystem {\n  [Main Service] --> [Primary Database] : stores data\n  [Backup System] --> [Primary Database] : replicates data\n  [Main Service] --> [Failover System] : uses for backup\n  [Failover System] --> [Backup Database] : access backup\n}\n@enduml"
+                },
+                {
+                    "view": "Process View",
+                    "description": "Illustrates how the system handles failovers during failures, showing the switching process from primary to backup services.",
+                    "diagram": "@startuml\nparticipant User\nparticipant Main_Service\nparticipant Failover_System\nparticipant Backup_Service\nUser -> Main_Service : request service\nMain_Service -> Backup_Service : failover request\nFailover_System --> Backup_Service : trigger failover\n@enduml"
+                },
+                {
+                    "view": "Physical View",
+                    "description": "Shows the physical infrastructure and redundant components that enable high availability and fault tolerance.",
+                    "diagram": "@startuml\nentity Main_Service {\n  * service_id : int\n  * status : string\n}\nentity Failover_System {\n  * failover_id : int\n  * status : string\n}\nentity Backup_Service {\n  * service_id : int\n  * status : string\n}\nMain_Service --> Failover_System : uses\nFailover_System --> Backup_Service : triggers failover\n@enduml"
+                }
+            ]
+        }
+    ]
+}

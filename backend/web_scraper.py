@@ -6,6 +6,21 @@ import os
 # Example usage
 URLS = [
     "https://www.linkedin.com/advice/0/what-some-common-security-risks-challenges",
+    "https://www.redhat.com/en/blog/circuit-breaker-architecture-pattern",
+    "https://www.redhat.com/en/blog/5-essential-patterns-software-architecture#client-server",
+    "https://www.redhat.com/en/blog/pros-and-cons-cqrs",
+    "https://www.redhat.com/en/blog/5-essential-patterns-software-architecture#controller-responder",
+    "https://www.redhat.com/en/blog/pros-and-cons-event-sourcing-architecture-pattern",
+    "https://www.redhat.com/en/blog/5-essential-patterns-software-architecture#layered",
+    "https://www.redhat.com/en/blog/5-essential-patterns-software-architecture#microservices",
+    "https://www.redhat.com/en/blog/5-essential-patterns-software-architecture#MVC",
+    "https://www.redhat.com/en/blog/pub-sub-pros-and-cons",
+    "https://www.redhat.com/en/blog/pros-and-cons-saga-architecture-pattern",
+    "https://www.redhat.com/en/blog/pros-and-cons-sharding",
+    "https://www.redhat.com/en/blog/pros-and-cons-static-content-hosting-architecture-pattern",
+    "https://www.redhat.com/en/blog/pros-and-cons-strangler-architecture-pattern",
+    "https://www.redhat.com/en/blog/pros-and-cons-throttling",
+
 ]
 
 def scrape_website(url):
@@ -56,8 +71,11 @@ def save_to_pdf(data, output_dir="backend/data"):
     pdf.output(pdf_filename)
     print(f"Saved: {pdf_filename}")
 
+def main():
+    for url in URLS:
+        data = scrape_website(url)
+        if data:
+            save_to_pdf(data)
 
-for url in URLS:
-    data = scrape_website(url)
-    if data:
-        save_to_pdf(data)
+if __name__ == "__main__":
+    main()

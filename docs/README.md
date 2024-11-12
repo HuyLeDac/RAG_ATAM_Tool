@@ -32,15 +32,16 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
     1. *Architectural approaches*
 - **How will this data be structured (Format)?**
 
-    1. *Architecture description:*
+    1. *Architecture context:*
 
         - technical constraints such as an OS, hardware, or middleware prescribed for use
         - other systems with which the system must interact
-        - architectural approaches used to meet quality attribute requirements
+        - System purpose
 
         ```json
         {
             "architectureDescription": {
+                "systemPurpose": "The SecureLoginApp provides a secure, scalable, and modular authentication solution for user management. It enables secure user authentication, session management, and logging while ensuring compliance with security and performance standards. The architecture is designed to facilitate seamless interaction with external services, scalability for high traffic volumes, and flexibility for future expansions.",
                 "technicalConstraints": [
                     "Operating System: Linux-based servers for backend, iOS/Android compatibility for frontend.",
                     "Middleware: NGINX as the API gateway and Redis for session management.",
@@ -50,9 +51,10 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
                     "Integrates with external Identity Providers (IDPs) for OAuth2-based authentication.",
                     "Communicates with a centralized logging service for auditing and monitoring.",
                     "Interacts with a customer data service for personalized user experience."
-                ],
+                ]
             }
         }
+
         ```
 
     2. *Architectural approaches:* Approach, Description, Architectural Decisions, Architectural Views (Physical, Process, Deployment)
@@ -365,8 +367,87 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
         }
         ```
 
-- **How will the input prompt look like (for information retriever and LLM)?**
-    *TODO*
+- **How will the input prompt look like (for information retriever and LLM)?** <br>
+    For each (Architectural approach, decision, scenario)-tuple:
+    ```python
+    """
+    <CONTEXT>
+    Use the context and your own knowledge to fulfill the task: 
+    {context}
+    </CONTEXT>
+
+    -----
+
+    <INPUT>
+    User's input data:
+    Architecture Context: \n{architecture_context}
+    Architectural Approach Description: \n{approach_description}
+    Architectural Views: \n{architectural_views}
+    Quality Criteria: \n{quality_criteria}
+    Scenario: \n{scenario}
+    </INPUT>
+
+    -----
+
+    <TASK>
+    We are conducting a qualitative analysis based on ATAM.
+
+    Task:
+    Provide the risks, tradeoffs, and sensitivity points for the scenario in the architectural decision: {decision}.
+    Use the input data provided, marking any external knowledge as [LLM KNOWLEDGE].
+    </TASK>
+
+    -----
+    Format response as. Don't use any other formats:
+
+    # Architectural Approach: {current_approach}
+    ## Scenario: {scenario_name}; Quality Attribute: {quality_attribute}
+    ### Architectural Decision: {decision}
+
+    #### Risks: [LLM KNOWLEDGE/DATABASE SOURCE](enter risks)
+    - (enter risks)
+
+    #### Tradeoffs: [LLM KNOWLEDGE/DATABASE SOURCE](enter tradeoffs)
+    - (enter tradeoffs)
+
+    #### Sensitivity Points: [LLM KNOWLEDGE/DATABASE SOURCE](enter sensitivity points)
+    - (enter sensitivity points)
+    """
+    ```
+
+- How does the output look like?
+
+    ```python
+    """
+    Analyzing: Microservices Architecture - Implement service discovery for dynamic service registration. - Password Reset
+    ---------------------------------------------------------
+    START OF RESPONSE:
+
+    # Architectural Approach: Microservices Architecture
+    ## Scenario: Password Reset; Quality Attribute: Modifiability
+    ### Architectural Decision: Implement service discovery for dynamic service registration.
+
+    #### Risks: [LLM KNOWLEDGE]
+    - **Increased Complexity**: Adding a service discovery mechanism can introduce additional complexity to the system, potentially leading to longer development and debugging times.
+    - **Security Vulnerabilities**: If not properly secured, dynamic service registration can expose the system to security risks, such as unauthorized service registrations or man-in-the-middle attacks.
+    - **Dependence on Discovery Service Uptime**: The overall system's availability may become dependent on the uptime of the service discovery mechanism, introducing a potential single point of failure.
+
+    #### Tradeoffs: [DATABASE SOURCE - Input Data Quality Criteria]
+    - **Modifiability vs. Complexity**: Enhancing modifiability through dynamic service registration may trade off with increased system complexity.
+    - **Scalability vs. Security**: Allowing for dynamic registrations can improve scalability but may compromise security if not properly implemented, as noted in the quality criteria questions related to security.
+    - **Performance Optimization**: The decision might also involve trading off some performance optimization (e.g., slightly slower initial service discovery) for the benefit of easier modification and scaling.
+
+    #### Sensitivity Points: [LLM KNOWLEDGE]
+    - **Service Registration Validation Mechanisms**: How robust are the validation mechanisms for new service registrations? Weak validations could lead to security breaches.
+    - **Discovery Service Scalability**: Can the service discovery mechanism scale in tandem with the growing number of services, or will it become a bottleneck?
+    - **Monitoring and Logging Implementations**: Are comprehensive monitoring and logging tools in place to quickly identify and respond to issues arising from dynamic service registrations?
+
+    Sources: ['backend/data/www.linkedin.com_advice_0_what-some-common-security-risks-challenges.pdf:1:1', 'backend/data/www.linkedin.com_advice_0_what-some-common-security-risks-challenges.pdf:23:0', 'backend/data/www.linkedin.com_advice_0_what-some-common-security-risks-challenges.pdf:3:2', 'backend/data/A_REVIEW_ON_SOFTWARE_ARCHITECTURAL_PATTERNS.pdf:4:9']
+
+    END OF RESPONSE
+    ---------------------------------------------------------
+    """
+    ```
 
 ### Decision Analysis
 
@@ -430,7 +511,8 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
 
 ### Success  Metrics
 
-- **How do we measure the quality of the solutions?**
+- **How do we measure the quality of the solutions?** <br>
+    **TODO**
 
 ### Concept Design
 
@@ -444,8 +526,9 @@ Rough sequence diagram of the creation/update of the database: <br>
 
 **Prerequisities:**
 
-- [Ollama](https://ollama.com/download) with the Llama 3.1 70b model (Click [here](https://medium.com/@gabrielrodewald/running-models-with-ollama-step-by-step-60b6f6125807) and follow the instructions)
+- [Ollama](https://ollama.com/download) with the Llama 3.1 70b or nemotron model (Click [here](https://medium.com/@gabrielrodewald/running-models-with-ollama-step-by-step-60b6f6125807) and follow the instructions)
 - [Python](https://www.python.org/downloads/)  
+- 
 
 **For ESE GPU Server:**
 
@@ -502,7 +585,11 @@ Rough sequence diagram of the creation/update of the database: <br>
 
 ## Updates
 
-### Update 04.11
+### Update 11.11.2024
+
+- query.py can now chunk the whole input data and send multiple requests to the model for more precise analysis
+
+### Update 04.11.2024
 
 - Added first components of RAG database
   - Text splitter
@@ -513,7 +600,7 @@ Rough sequence diagram of the creation/update of the database: <br>
   - Work on prompt template
   - Work on input format
 
-### Observation (29.10.24)
+### Update 29.10.24
 
 - Too many architectural approaches in one prompt is difficult for the LLM to process
   - Generates completely different outputs compared to the prompt.
