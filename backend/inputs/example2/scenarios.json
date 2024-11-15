@@ -1,0 +1,53 @@
+{
+    "scenarios": [
+        {
+            "scenario": "Call Processing and Dispatching",
+            "attribute": "Performance",
+            "environment": "Dispatch System",
+            "stimulus": "A call is received, and an ambulance must be dispatched based on location and availability.",
+            "response": "The system processes the call and dispatches an appropriate ambulance with minimal delay, ensuring timely response."
+        },
+        {
+            "scenario": "Exception Handling",
+            "attribute": "Reliability",
+            "environment": "Dispatch System",
+            "stimulus": "Multiple exceptions occur due to failed updates or message overload.",
+            "response": "The system flags the exceptions, notifies operators, and ensures that the queue does not overflow, allowing for prompt resolution."
+        },
+        {
+            "scenario": "Vehicle Location Update",
+            "attribute": "Performance",
+            "environment": "Vehicle Tracking System (AVLS)",
+            "stimulus": "An ambulance moves to a new location.",
+            "response": "The system updates the ambulance's location in real-time and ensures that dispatch decisions are based on accurate information."
+        },
+        {
+            "scenario": "Manual Dispatch Mode",
+            "attribute": "Usability",
+            "environment": "Dispatch System",
+            "stimulus": "The automated dispatch system fails, and operators must manually dispatch ambulances.",
+            "response": "Operators are able to manually dispatch ambulances with minimal error and confusion, relying on a simple and clear interface."
+        },
+        {
+            "scenario": "High Call Volume",
+            "attribute": "Scalability",
+            "environment": "Dispatch System",
+            "stimulus": "The system experiences a surge in incoming calls due to a major incident or high traffic volume.",
+            "response": "The system scales up by prioritizing calls and dispatching available resources, maintaining response times even under load."
+        },
+        {
+            "scenario": "System Recovery from Failure",
+            "attribute": "Availability",
+            "environment": "Dispatch System",
+            "stimulus": "The primary dispatch system experiences a failure (e.g., server crash).",
+            "response": "The backup system kicks in immediately to continue dispatch operations with minimal disruption to service."
+        },
+        {
+            "scenario": "Data Synchronization",
+            "attribute": "Reliability",
+            "environment": "Mobile Data Terminals (MDTs)",
+            "stimulus": "An ambulance unit updates its status or location.",
+            "response": "The system ensures the updates are synchronized across all relevant components, maintaining an accurate and consistent database."
+        }
+    ]
+}

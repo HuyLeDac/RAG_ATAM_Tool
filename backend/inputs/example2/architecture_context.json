@@ -1,0 +1,17 @@
+{
+    "architectureDescription": {
+        "systemPurpose": "The London Ambulance Service (LAS) Computer-Aided Dispatch (CAD) system was intended to automate the dispatch of ambulances by assisting with receiving emergency calls, tracking ambulance locations using Automatic Vehicle Location System (AVLS), and dispatching ambulances based on resource availability. The system was designed to replace a manual dispatch process and improve response time and resource allocation.",
+        "technicalConstraints": [
+            "The CAD system required integration with Automatic Vehicle Location System (AVLS) for real-time tracking of ambulances.",
+            "Mobile Data Terminals (MDTs) were used for communication with ambulances, which required reliable and clear data input from field personnel.",
+            "The system needed to handle high volumes of calls without performance degradation and maintain an accurate and up-to-date database of ambulance statuses and locations.",
+            "A backup server was included in the design but was inadequately tested, leading to failures in emergency situations."
+        ],
+        "systemInteractions": [
+            "Receives emergency calls from the public and records necessary information for dispatching.",
+            "Communicates with ambulance crews through MDTs, requiring field personnel to input status updates accurately and in sequence.",
+            "Tracks real-time location and status of ambulances using AVLS to make optimal dispatch decisions.",
+            "Manages and displays exception messages, alerts, and system notifications to dispatch operators."
+        ]
+    }
+}

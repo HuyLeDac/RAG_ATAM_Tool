@@ -577,13 +577,18 @@ Rough sequence diagram of the creation/update of the database: <br>
     python backend/create_database.py
     ```
 
-1. Run **query.py** to run the analysis process of the example file (backend/inputs/example1).
+1. Run **query.py** to run the analysis process. Type the folder name of the folder in the backend/inputs directorys.
 
     ```bash
-    python backend/query.py
+    python backend/query.py (enter folder name)
     ```
 
 ## Updates
+
+### Update 13.11.2024
+
+- query.py can now format the responses from the LLM into json.
+- stored in backend/respones/responses.json
 
 ### Update 11.11.2024
 

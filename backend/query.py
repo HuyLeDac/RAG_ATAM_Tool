@@ -1,7 +1,8 @@
 import json
 import os
+import argparse  # Import argparse for command-line arguments
 from inputs import InputLoader, Inputs
-from get_embedding_function import get_embedding_function 
+from get_embedding_function import get_embedding_function
 from langchain_chroma import Chroma
 from create_database import DATABASE_PATH  
 from langchain.prompts import ChatPromptTemplate
@@ -10,10 +11,9 @@ from langchain_ollama import OllamaLLM
 # Initialize the models and embedding function once to optimize performance
 model = OllamaLLM(model="nemotron")  # Main model used for querying decisions and scenarios
 retrieval_model = OllamaLLM(model="mistral")  # Model for summarizing inputs for retrieval from database
-embedding = get_embedding_function()  # Embedding function to vectorize inputs for database search
-db = Chroma(persist_directory=DATABASE_PATH, embedding_function=embedding)  # Database for document retrieval
+db = Chroma(persist_directory=DATABASE_PATH, embedding_function=get_embedding_function())  # Database for document retrieval
 
-RESPONSES_PATH = "respones/responses.json"  # Path to store responses
+RESPONSES_PATH = "backend/responses/responses.json"  # Path to store responses
 
 # Function: Load JSON data from a specified folder
 # - Initializes InputLoader to load JSON data from `folder_name`.
@@ -47,7 +47,7 @@ def create_retrieval_query(inputs):
 
     # Generate a summarized retrieval query for database search
     summarized_query = retrieval_model.invoke(
-        "Summarize the most important keywords points of the architecture:\n " + input_data_str
+        "Summarize the most important keywords points of the architecture. Add the keywords risks, tradeoffs and sensitivity points under the summary:\n " + input_data_str
     )
     return summarized_query
 
@@ -93,7 +93,7 @@ def generate_analysis_prompt(context_output, approach, decision, scenario):
 
     Task:
     Provide the risks, tradeoffs, and sensitivity points regarding the scenario in the architectural decision: {decision}.
-    Use the input data provided, marking any external knowledge as [LLM KNOWLEDGE].
+    Use the input data provided, marking any external knowledge as [LLM KNOWLEDGE]and other data as .
     </TASK>
 
     -----
@@ -178,6 +178,9 @@ def query_multiple_chunks(top_k_results, inputs):
                 print(json.dumps(response_dict, indent=2))  # Print formatted JSON for clarity
                 print("\nEND OF RESPONSE")
                 print("---------------------------------------------------------")
+    
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(RESPONSES_PATH), exist_ok=True)
 
     # After all responses are generated, store them in a JSON file
     with open(RESPONSES_PATH, 'w') as json_file:
@@ -186,15 +189,17 @@ def query_multiple_chunks(top_k_results, inputs):
     return responses
 
 
-
 # Main Execution: Query Pipeline
 # Loads input data, creates a retrieval query, searches the database, and generates responses
 if __name__ == "__main__":
+    # Use argparse to accept a folder name as a command-line argument
+    parser = argparse.ArgumentParser(description="Query Pipeline for Architectural Analysis")
+    parser.add_argument("folder_name", type=str, help="The folder containing the input data")
+    args = parser.parse_args()
+
     # Execute the query pipeline
-    folder_name = "example1"
-    inputs = get_inputs(folder_name)  # Load example data from specified folder
+    inputs = get_inputs(args.folder_name)  # Load data from specified folder
     created_retrieval_query = create_retrieval_query(inputs)  # Summarize input for retrieval
     top_k_results = retrieval_query(created_retrieval_query)  # Retrieve relevant database docs
     responses = query_multiple_chunks(top_k_results, inputs)  # Generate prompts and responses
-
-
+    print(f"Responses stored in: {RESPONSES_PATH}")  # Print the path to the stored responses
