@@ -188,10 +188,7 @@ def query_multiple_chunks(top_k_results, inputs):
 
     return responses
 
-
-# Main Execution: Query Pipeline
-# Loads input data, creates a retrieval query, searches the database, and generates responses
-if __name__ == "__main__":
+def main():
     # Use argparse to accept a folder name as a command-line argument
     parser = argparse.ArgumentParser(description="Query Pipeline for Architectural Analysis")
     parser.add_argument("folder_name", type=str, help="The folder containing the input data")
@@ -203,3 +200,8 @@ if __name__ == "__main__":
     top_k_results = retrieval_query(created_retrieval_query)  # Retrieve relevant database docs
     responses = query_multiple_chunks(top_k_results, inputs)  # Generate prompts and responses
     print(f"Responses stored in: {RESPONSES_PATH}")  # Print the path to the stored responses
+
+# Main Execution: Query Pipeline
+# Loads input data, creates a retrieval query, searches the database, and generates responses
+if __name__ == "__main__":
+    main()
