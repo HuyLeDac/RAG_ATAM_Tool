@@ -1,0 +1,42 @@
+.col{display:flex;}
+.col div{flex:1}
+.col1{background:rgba(255, 255, 255, 0.767)}
+.col2{background:rgba(185, 177, 177, 0.798)}
+
+.button1{
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 15px 40px;
+    display: inline-block;
+    border-radius: 100px;
+    transition: all .2s;
+    position: relative;
+    margin-left: 15px;
+    margin-top: 20px;
+}
+
+.button2{
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 15px 40px;
+    display: inline-block;
+    border-radius: 100px;
+    transition: all .2s;
+    position: relative;
+    margin-left: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.button3{
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 15px 40px;
+    display: inline-block;
+    border-radius: 100px;
+    transition: all .2s;
+    position: relative;
+    margin-left: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
