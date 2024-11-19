@@ -112,13 +112,15 @@ def generate_analysis_prompt(context_output: str, approach: dict, decision: str,
     User's input data:
     Architecture Context: 
     {architecture_context}
+    Current architectural Approach:
+    {current_approach}
     Architectural Approach Description: 
     {approach_description}
     Architectural Views: 
     {architectural_views}
     Quality Criteria: 
     {quality_criteria}
-    Scenario: 
+    Current Scenario: 
     {scenario}
     </INPUT>
 
