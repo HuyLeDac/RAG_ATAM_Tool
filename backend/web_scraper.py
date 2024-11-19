@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 import os
 
-URLS_PATH = "backend/data/URLs.txt"
+URLS_PATH = "data/URLs.txt"
 
 def read_urls(file_path):
     with open(file_path, 'r') as f:
@@ -31,7 +31,7 @@ def scrape_website(url):
         print(f"Error fetching {url}: {e}")
         return None
 
-def save_to_pdf(data, output_dir="backend/data"):
+def save_to_pdf(data, output_dir="data"):
     if not os.path.exists(output_dir):
         print(f"Error: Directory '{output_dir}' does not exist.")
         return

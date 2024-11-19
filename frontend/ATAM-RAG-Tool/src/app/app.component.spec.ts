@@ -14,16 +14,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'ATAM-RAG-tool' title`, () => {
+  it(`should have the 'ATAM-RAG-Tool' title`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('ATAM-RAG-tool');
+    expect(app.title).toEqual('ATAM-RAG-Tool');
   });
 
   it('should render title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, ATAM-RAG-tool');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, ATAM-RAG-Tool');
   });
 });
