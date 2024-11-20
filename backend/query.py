@@ -13,7 +13,7 @@ model = OllamaLLM(model="nemotron")  # Main model used for querying decisions an
 retrieval_model = OllamaLLM(model="mistral")  # Model for summarizing inputs for retrieval from database
 db = Chroma(persist_directory=DATABASE_PATH, embedding_function=get_embedding_function())  # Database for document retrieval
 
-RESPONSES_PATH = "backend/responses/responses.json"  # Path to store responses
+RESPONSES_PATH = "responses/responses.json"  # Path to store responses
 
 # Function: Load JSON data from a specified folder
 # - Initializes InputLoader to load JSON data from `folder_name`.
