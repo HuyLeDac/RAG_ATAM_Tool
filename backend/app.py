@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)
 
 # Directory setup
-INPUT_DIR = "inputs/temp"
+INPUT_DIR = "inputs/example1"
 os.makedirs(INPUT_DIR, exist_ok=True)
 
 @app.route('/')
