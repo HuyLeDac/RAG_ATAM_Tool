@@ -9,7 +9,7 @@ from langchain.prompts import ChatPromptTemplate
 from langchain_ollama import OllamaLLM
 
 # Constants
-RESPONSES_PATH = "backend/responses/responses.json"  # Path to store responses
+RESPONSES_PATH = "responses/responses.json"  # Path to store responses
 
 # Initialize models and database
 MODEL = OllamaLLM(model="nemotron")
