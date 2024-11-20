@@ -68,7 +68,7 @@ def retrieval_query(query_text):
 #   - `approach`, `decision`, `scenario`: Specific data points for the current architectural decision and scenario.
 # - Formats the prompt for the model to evaluate architectural risks, tradeoffs, and sensitivity points.
 # - Returns the formatted prompt as a string.
-def generate_analysis_prompt(context_output, approach, decision, scenario):
+def generate_analysis_prompt(context_output, approach, decision, scenario, inputs):
     template = """
     <CONTEXT>
     Use the context and your own knowledge to fulfill the task: 
@@ -128,6 +128,19 @@ def generate_analysis_prompt(context_output, approach, decision, scenario):
 
     """
 
+    print(template.format(
+        context=context_output,
+        architecture_context=format_json(inputs.architecture_context),
+        architectural_views=format_json(inputs.get_architectural_views_as_list()),
+        quality_criteria=format_json(inputs.quality_criteria),
+        scenario=format_json(scenario),
+        current_approach=approach.get('approach', 'Unknown'),
+        approach_description=approach.get('description', 'No description provided'),
+        decision=decision,
+        scenario_name=scenario.get("scenario", "Unnamed Scenario"),
+        quality_attribute=scenario.get("attribute", "No attribute provided")
+    ))
+
     return template.format(
         context=context_output,
         architecture_context=format_json(inputs.architecture_context),
@@ -157,7 +170,7 @@ def query_multiple_chunks(top_k_results, inputs):
         for decision in approach['architectural decisions']:
             for scenario in inputs.scenarios['scenarios']:
                 print(f"\n\nAnalyzing: {approach['approach']} - Decision: {decision} - Scenario: {scenario['scenario']}") # For debugging
-                formatted_prompt = generate_analysis_prompt(context_output, approach, decision, scenario)
+                formatted_prompt = generate_analysis_prompt(context_output, approach, decision, scenario, inputs)
                 
                 # Get the model's response
                 response_text = model.invoke(formatted_prompt)

@@ -10,6 +10,6 @@ https://www.redhat.com/en/blog/5-essential-patterns-software-architecture#MVC
 https://www.redhat.com/en/blog/pub-sub-pros-and-cons
 https://www.redhat.com/en/blog/pros-and-cons-saga-architecture-pattern
 https://www.redhat.com/en/blog/pros-and-cons-sharding
-https://www.redhat.com/en/blog/pros-and-cons-static-content-hosting-architecture-patter,
+https://www.redhat.com/en/blog/pros-and-cons-static-content-hosting-architecture-pattern
 https://www.redhat.com/en/blog/pros-and-cons-strangler-architecture-pattern
 https://www.redhat.com/en/blog/pros-and-cons-throttling
