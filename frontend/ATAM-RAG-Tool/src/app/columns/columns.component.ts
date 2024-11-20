@@ -8,4 +8,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./columns.component.scss'] // Corrected to styleUrls (plural)
 })
 export class ColumnsComponent {
+startAnalysisProcess() {
+throw new Error('Method not implemented.');
+}
 }
