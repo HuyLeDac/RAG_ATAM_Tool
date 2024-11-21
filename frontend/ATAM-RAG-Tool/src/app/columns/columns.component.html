@@ -1,0 +1,49 @@
+<div class="col">
+  <div class="col1">
+    <button class="button1">Add PDFs</button>
+    <br>
+    <button class="button2">Add URLs</button>
+    <br>
+    <button class="button3" (click)="checkAndstartAnalysisProcess()">Start Analysis Progress</button>
+  </div>
+
+  <!-- Architecture Context Section -->
+  <div class="col2">
+    <h3>Architecture Context</h3>
+    <textarea
+      class="input-field"
+      placeholder="Enter architecture context here"
+      [(ngModel)]="architectureContext"
+    ></textarea>
+  </div>
+
+  <!-- Architectural Approaches Section -->
+  <div class="col2">
+    <h3>Architectural Approaches</h3>
+    <textarea
+      class="input-field"
+      placeholder="Enter architectural approaches here"
+      [(ngModel)]="architecturalApproaches"
+    ></textarea>
+  </div>
+
+  <!-- Quality Attribute Criteria Section -->
+  <div class="col2">
+    <h3>Quality Attribute Criteria</h3>
+    <textarea
+      class="input-field"
+      placeholder="Enter quality attribute criteria here"
+      [(ngModel)]="qualityAttributeCriteria"
+    ></textarea>
+  </div>
+
+  <!-- Scenarios Section -->
+  <div class="col2">
+    <h3>Scenarios</h3>
+    <textarea
+      class="input-field"
+      placeholder="Enter scenarios here"
+      [(ngModel)]="scenarios"
+    ></textarea>
+  </div>
+</div>

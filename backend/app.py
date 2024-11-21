@@ -8,13 +8,17 @@ import subprocess
 app = Flask(__name__)
 CORS(app)
 
+<<<<<<< HEAD
 # Directory setup
+=======
+# Directory setup, use example1 for testing, temp for production
+>>>>>>> frontend
 INPUT_DIR = "inputs/example1"
 os.makedirs(INPUT_DIR, exist_ok=True)
 
 @app.route('/')
 def root():
-    return jsonify({"message": "Hello World!"})
+    return jsonify({"message": "Server active!"})
 
 @app.route('/upload-inputs', methods=['POST'])
 def upload_inputs():
