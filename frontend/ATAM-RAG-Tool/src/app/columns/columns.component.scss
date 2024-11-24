@@ -14,9 +14,10 @@ div.col .col1 {
 .col2 {
     flex: 1; /* Take the remaining space */
     background: rgba(185, 177, 177, 0.798);
+    margin-left: 10px;
 }
 
-.button1, .button2, .button3 {
+.button1, .button2, .button3, .button4{
     text-transform: uppercase;
     text-decoration: none;
     padding: 15px 40px;
@@ -37,6 +38,12 @@ div.col .col1 {
 }
 
 .button3 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 15px;
+}
+
+.button4 {
     margin-top: 10px;
     margin-bottom: 10px;
     margin-right: 15px;

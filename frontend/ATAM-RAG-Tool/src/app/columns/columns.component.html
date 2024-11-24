@@ -4,42 +4,38 @@
     <br>
     <button class="button2">Add URLs</button>
     <br>
-    <button class="button3" (click)="checkAndstartAnalysisProcess()">Start Analysis Progress</button>
+    <button class="button3" (click)="uploadInputs()">Add input</button>
+    <br>
+    <button class="button4" (click)="fetchResults()">Fetch Results</button>
   </div>
 
-  <!-- Architecture Context Section -->
+  <!-- Architecture Context/Approaches Section -->
   <div class="col2">
-    <h3>Architecture Context</h3>
+    <h3 class="title1">Architecture Context</h3>
     <textarea
       class="input-field"
       placeholder="Enter architecture context here"
-      [(ngModel)]="architectureContext"
+      [(ngModel)]="architecture_context"
     ></textarea>
-  </div>
-
-  <!-- Architectural Approaches Section -->
-  <div class="col2">
-    <h3>Architectural Approaches</h3>
+    <br>
+    <h3 class="title2">Architectural Approaches</h3>
     <textarea
       class="input-field"
       placeholder="Enter architectural approaches here"
-      [(ngModel)]="architecturalApproaches"
+      [(ngModel)]="architectural_approaches"
     ></textarea>
   </div>
 
-  <!-- Quality Attribute Criteria Section -->
+  <!-- Quality Attribute Criteria/Scenarios Section -->
   <div class="col2">
-    <h3>Quality Attribute Criteria</h3>
+    <h3 class="title3">Quality Attribute Criteria</h3>
     <textarea
       class="input-field"
       placeholder="Enter quality attribute criteria here"
-      [(ngModel)]="qualityAttributeCriteria"
+      [(ngModel)]="quality_criteria"
     ></textarea>
-  </div>
-
-  <!-- Scenarios Section -->
-  <div class="col2">
-    <h3>Scenarios</h3>
+    <br>
+    <h3 class="title4">Scenarios</h3>
     <textarea
       class="input-field"
       placeholder="Enter scenarios here"

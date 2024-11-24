@@ -8,12 +8,8 @@ import subprocess
 app = Flask(__name__)
 CORS(app)
 
-<<<<<<< HEAD
 # Directory setup
-=======
-# Directory setup, use example1 for testing, temp for production
->>>>>>> frontend
-INPUT_DIR = "inputs/example1"
+INPUT_DIR = "inputs/temp"
 os.makedirs(INPUT_DIR, exist_ok=True)
 
 @app.route('/')
@@ -22,30 +18,35 @@ def root():
 
 @app.route('/upload-inputs', methods=['POST'])
 def upload_inputs():
-    # Create the temp directory if it doesn't exist
     temp_dir = INPUT_DIR
-    os.makedirs(temp_dir, exist_ok=True)
-    
-    # Get uploaded files
-    files = request.files
-    required_files = [
-        "architectural_approaches",
+
+    # clear the temp directory
+    for file in os.listdir(temp_dir):
+        os.remove(os.path.join(temp_dir, file))
+
+    # Get the incoming JSON data from the request body
+    data = request.get_json()
+
+    # Ensure all required fields are present
+    required_fields = [
         "architecture_context",
+        "architectural_approaches",
         "quality_criteria",
         "scenarios"
     ]
+    for field in required_fields:
+        if field not in data:
+            return jsonify({"error": f"Missing field: {field}"}), 400
 
-    # Ensure all required files are present
-    for file_key in required_files:
-        if file_key not in files:
-            return jsonify({"error": f"Missing file: {file_key}"}), 400
+    # Save the JSON data to temporary files (you can write each field as its own JSON file)
+    os.makedirs(temp_dir, exist_ok=True)
 
-    # Save each file to the temp directory
-    for file_key in required_files:
-        file = files[file_key]
-        file.save(os.path.join(temp_dir, f"{file_key}.json"))
+    for field in required_fields:
+        with open(os.path.join(temp_dir, f"{field}.json"), 'w') as file:
+            json.dump(data[field], file)
 
-    return jsonify({"message": "Files uploaded and saved successfully."}), 200
+    return jsonify({"message": "Inputs uploaded and saved successfully."}), 200
+
 
 # Endpoint to receive uploaded files
 @app.route('/upload-pdf', methods=['POST'])
@@ -108,6 +109,10 @@ def upload_url():
 @app.route('/get-results', methods=['GET'])
 def get_results():
     try:
+        # Clear directory
+        if os.path.exists(RESPONSES_PATH):
+            os.remove(RESPONSES_PATH)
+
         # Web scraping process
         subprocess.run(['python', 'web_scraper.py'], check=True)
 
@@ -121,13 +126,32 @@ def get_results():
         with open(RESPONSES_PATH, 'r') as json_file:
             responses = json.load(json_file)
 
-        return jsonify(responses), 200
+        return serialize_architectural_data(responses), 200
     except subprocess.CalledProcessError as e:
         return jsonify({"error": f"Subprocess error: {str(e)}"}), 500
     except FileNotFoundError:
         return jsonify({"error": "Response file not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+def serialize_architectural_data(data):
+    def custom_sort(item):
+        # Define the exact order of keys
+        ordered_data = {
+            "architecturalApproach": item.get("architecturalApproach"),
+            "scenario": item.get("scenario"),
+            "architecturalDecision": item.get("architecturalDecision"),
+            "risks": item.get("risks"),
+            "tradeoffs": item.get("tradeoffs"),
+            "sensitivityPoints": item.get("sensitivityPoints"),
+            "sources": item.get("sources"),
+        }
+        return ordered_data
+    
+    # Apply custom ordering
+    ordered_data = [custom_sort(item) for item in data]
+    return json.dumps(ordered_data, indent=2)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
