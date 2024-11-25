@@ -2,6 +2,78 @@
 
 An ATAM framework which semi-automatically analyses tradeoffs, risks and sensitivity points using Retrival Augmented Generation (RAG), focusing on qualitative analyses.
 
+### Concept Design
+
+![General Idea](readme_figures/general_idea.png)
+![RAG Figure](readme_figures/RAG_sketch.png)
+
+Rough sequence diagram of the creation/update of the database: <br>
+![create_databse](readme_figures/create_database_sequence.png)
+
+## Installation (Only compatible with Unix systems)
+
+**Prerequisities:**
+
+- [Ollama](https://ollama.com/download) with the Llama 3.1 70b or nemotron model (Click [here](https://medium.com/@gabrielrodewald/running-models-with-ollama-step-by-step-60b6f6125807) and follow the instructions)
+- [Python](https://www.python.org/downloads/)  
+- [Node.js](https://nodejs.org/en)
+
+**For ESE GPU Server:**
+
+1. Create a virtual environment with the following [instructions](https://3.basecamp.com/4433092/buckets/35597770/documents/7773388048)
+
+1. Activate virtual environment
+
+    ```bash
+    source (name)/bin/activate
+    deactivate // Only when you want to leave the virtual environment
+    ```
+
+1. Install all necessary pip packages
+
+    ```bash
+    pip install -r backend\requirements.txt
+    ```
+
+**For local PCs:**
+
+1. Create a virtual environment
+
+    ```bash
+    python3 -m venv (name)
+    source (name)/bin/activate
+    deactivate // Only when you want to leave the virtual environment
+    ```
+
+1. Install all necessary pip packages
+
+    ```bash
+    pip install -r backend\requirements.txt
+    ```
+
+## Usage
+
+1. Run Python server
+
+    ```bash
+    python backend/app.py
+    ```
+
+1. Run Angular App Locally
+
+    ```bash
+    cd frontend/ATAM-RAG-Tool
+    npx -p @angular/cli ng serve
+    ```
+
+1. Open [localhost website](http://localhost:4200/) on port 4200. It should look like this:
+    ![Website layout](readme_figures/website.png)
+
+1. Type in all necessary inputs needed for the analysis:
+    - "Add PDFs/URLs": You can add PDFs/URLs which can be helpful for the architecture analysis
+    - "Add input": After adding the contents, you can press "Add input". The contents will then be added to the server.
+    - "Fetch Results":  This button starts the analysis. The response will then be added to the Footer when finished.
+
 ## Requirements
 
 ### Objectives
@@ -513,75 +585,6 @@ An ATAM framework which semi-automatically analyses tradeoffs, risks and sensiti
 
 - **How do we measure the quality of the solutions?** <br>
     **TODO**
-
-### Concept Design
-
-![General Idea](readme_figures/general_idea.png)
-![RAG Figure](readme_figures/RAG_sketch.png)
-
-Rough sequence diagram of the creation/update of the database: <br>
-![create_databse](readme_figures/create_database_sequence.png)
-
-## Installation (Only compatible with Unix systems)
-
-**Prerequisities:**
-
-- [Ollama](https://ollama.com/download) with the Llama 3.1 70b or nemotron model (Click [here](https://medium.com/@gabrielrodewald/running-models-with-ollama-step-by-step-60b6f6125807) and follow the instructions)
-- [Python](https://www.python.org/downloads/)  
-- 
-
-**For ESE GPU Server:**
-
-1. Create a virtual environment with the following [instructions](https://3.basecamp.com/4433092/buckets/35597770/documents/7773388048)
-
-1. Activate virtual environment
-
-    ```bash
-    source (name)/bin/activate
-    deactivate // Only when you want to leave the virtual environment
-    ```
-
-1. Install all necessary pip packages
-
-    ```bash
-    pip install -r backend\requirements.txt
-    ```
-
-**For local PCs:**
-
-1. Create a virtual environment
-
-    ```bash
-    python3 -m venv (name)
-    source (name)/bin/activate
-    deactivate // Only when you want to leave the virtual environment
-    ```
-
-1. Install all necessary pip packages
-
-    ```bash
-    pip install -r backend\requirements.txt
-    ```
-
-## Usage
-
-1. You can add new articles by pasting the link into the URLS list in **web_scraper.py**. Run it with:
-
-    ```bash
-    python backend/web_scraper.py
-    ```
-
-1. Run **create_database.py** to create or update (in case there is already one) the database of the embedded documents.
-
-    ```bash
-    python backend/create_database.py
-    ```
-
-1. Run **query.py** to run the analysis process. Type the folder name of the folder in the backend/inputs directorys.
-
-    ```bash
-    python backend/query.py (enter folder name)
-    ```
 
 ## Updates
 

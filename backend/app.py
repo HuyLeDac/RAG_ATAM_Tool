@@ -14,6 +14,14 @@ os.makedirs(INPUT_DIR, exist_ok=True)
 
 @app.route('/')
 def root():
+    # Clear INPUT_DIR contents
+    for file in os.listdir(INPUT_DIR):
+        os.remove(os.path.join(INPUT_DIR, file))
+
+    # Clear RESPONSES_PATH content
+    if os.path.exists(RESPONSES_PATH):
+        with open(RESPONSES_PATH, 'w') as file:
+            file.write(json.dumps([]))
     return jsonify({"message": "Server active!"})
 
 @app.route('/upload-inputs', methods=['POST'])
