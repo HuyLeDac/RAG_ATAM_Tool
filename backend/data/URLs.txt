@@ -12,4 +12,3 @@ https://www.redhat.com/en/blog/pros-and-cons-saga-architecture-pattern
 https://www.redhat.com/en/blog/pros-and-cons-sharding
 https://www.redhat.com/en/blog/pros-and-cons-static-content-hosting-architecture-pattern
 https://www.redhat.com/en/blog/pros-and-cons-strangler-architecture-pattern
-https://www.redhat.com/en/blog/pros-and-cons-throttling

@@ -48,61 +48,59 @@ def upload_inputs():
     return jsonify({"message": "Inputs uploaded and saved successfully."}), 200
 
 
-# Endpoint to receive uploaded files
+# Endpoint to receive uploaded PDF files
 @app.route('/upload-pdf', methods=['POST'])
 def upload_pdf():
-    # Directory for storing PDF files
+    # Check if a file was part of the request
+    if 'pdf' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    
+    file = request.files['pdf']
+    
+    # If no file was selected
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+    
+    # Ensure it's a PDF file
+    if not file.filename.endswith('.pdf'):
+        return jsonify({"error": "Invalid file type, only PDF files are allowed."}), 400
+    
+    # Directory where the PDF will be saved
     pdf_dir = os.path.join("data")
     os.makedirs(pdf_dir, exist_ok=True)
+    
+    # Save the file with a unique name (e.g., with timestamp or original name)
+    pdf_path = os.path.join(pdf_dir, file.filename)
+    file.save(pdf_path)
+    
+    return jsonify({"message": f"PDF uploaded successfully and saved to {pdf_path}."}), 200
 
-    # Get uploaded files
-    files = request.files.getlist("pdfs")  # Allows multiple file uploads with the key "pdfs"
-
-    if not files:
-        return jsonify({"error": "No files uploaded"}), 400
-
-    saved_files = []
-
-    for file in files:
-        if file.filename.endswith('.pdf'):
-            # Save the PDF file
-            file_path = os.path.join(pdf_dir, file.filename)
-            file.save(file_path)
-            saved_files.append(file.filename)
-        else:
-            return jsonify({"error": f"Invalid file format: {file.filename}. Only PDF files are allowed."}), 400
-
-    return jsonify({"message": "PDF files uploaded successfully", "files": saved_files}), 200
+    
 
 # Endpoint to receive a URL for processing
 @app.route('/upload-url', methods=['POST'])
 def upload_url():
-    # Directory for storing URLs
-    data_dir = "data"
-    os.makedirs(data_dir, exist_ok=True)
-
-    # File to store the URLs
-    url_file = os.path.join(data_dir, "URLs.txt")
-
-    # Get the URL from the request
+    # Get the incoming JSON data from the request body
     data = request.get_json()
-    if not data or "url" not in data:
-        return jsonify({"error": "Missing 'url' in the request body."}), 400
+
+    # Ensure the URL field is present
+    if "url" not in data:
+        return jsonify({"error": "Missing field: url"}), 400
 
     url = data["url"]
 
-    # Validate the URL format (optional, can be more robust)
-    if not url.startswith(("http://", "https://")):
-        return jsonify({"error": "Invalid URL format."}), 400
+    # Directory for storing URLs
+    url_dir = os.path.join("data")
+    os.makedirs(url_dir, exist_ok=True)
+
+    # Path to the URLs file
+    url_file_path = os.path.join(url_dir, "URLs.txt")
 
     # Append the URL to the file
-    try:
-        with open(url_file, "a") as f:
-            f.write(f"{url}\n")
-    except Exception as e:
-        return jsonify({"error": f"Failed to write URL to file: {str(e)}"}), 500
+    with open(url_file_path, 'a') as url_file:
+        url_file.write(url + "\n")
 
-    return jsonify({"message": "URL saved successfully", "url": url}), 200
+    return jsonify({"message": "URL uploaded and saved successfully."}), 200
 
 
 # Endpoint to retrieve the results after processing
