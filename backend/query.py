@@ -7,6 +7,8 @@ from langchain_chroma import Chroma
 from create_database import DATABASE_PATH  
 from langchain.prompts import ChatPromptTemplate
 from langchain_ollama import OllamaLLM
+import time  # For adding a delay between retries
+
 
 # Initialize the models and embedding function once to optimize performance
 model = OllamaLLM(model="nemotron")  # Main model used for querying decisions and scenarios
@@ -169,29 +171,54 @@ def query_multiple_chunks(top_k_results, inputs):
     for approach in inputs.architectural_approaches['architecturalApproaches']:
         for decision in approach['architectural decisions']:
             for scenario in inputs.scenarios['scenarios']:
-                print(f"\n\nAnalyzing: {approach['approach']} - Decision: {decision} - Scenario: {scenario['scenario']}") # For debugging
+                print(f"\n\nAnalyzing: {approach['approach']} - Decision: {decision} - Scenario: {scenario['scenario']}")  # For debugging
+                
                 formatted_prompt = generate_analysis_prompt(context_output, approach, decision, scenario, inputs)
-                
-                # Get the model's response
-                response_text = model.invoke(formatted_prompt)
-                
-                # Collect sources
-                sources = [doc.metadata.get("id") for doc, _ in top_k_results]
-                
-                # Create a dictionary for the response including the sources
-                response_dict = json.loads(response_text)
-                response_dict['sources'] = sources  # Add sources to the response dictionary
+                max_retries = 3  # Number of retries
+                retry_count = 0
 
-                # Append the response dictionary to the list of responses
-                responses.append(response_dict)
+                while retry_count < max_retries:
+                    try:
+                        # Get the model's response
+                        response_text = model.invoke(formatted_prompt)
 
-                # Display response for debugging purposes
-                print("---------------------------------------------------------")
-                print("START OF RESPONSE:\n")
-                print(json.dumps(response_dict, indent=2))  # Print formatted JSON for clarity
-                print("\nEND OF RESPONSE")
-                print("---------------------------------------------------------")
-    
+                        # Attempt to parse the response as JSON
+                        response_dict = json.loads(response_text)
+                        
+                        # Add sources to the response dictionary
+                        sources = [doc.metadata.get("id") for doc, _ in top_k_results]
+                        response_dict['sources'] = sources
+                        
+                        # Append the response dictionary to the list of responses
+                        responses.append(response_dict)
+
+                        # Display response for debugging purposes
+                        print("---------------------------------------------------------")
+                        print("START OF RESPONSE:\n")
+                        print(json.dumps(response_dict, indent=2))  # Print formatted JSON for clarity
+                        print("\nEND OF RESPONSE")
+                        print("---------------------------------------------------------")
+                        
+                        # Break out of the retry loop on success
+                        break
+                    except json.JSONDecodeError as e:
+                        retry_count += 1
+                        print(f"JSON decoding failed (attempt {retry_count}/{max_retries}): {e}")
+                        print("Response text was:")
+                        print(response_text)  # Log problematic response
+                        if retry_count < max_retries:
+                            print("Retrying...")
+                            time.sleep(1)  # Optional: Add delay between retries
+                        else:
+                            print("Max retries reached. Skipping this input.")
+                            response_dict = {
+                                "error": "Invalid JSON response",
+                                "response_text": response_text,
+                                "sources": [doc.metadata.get("id") for doc, _ in top_k_results]
+                            }
+                            responses.append(response_dict)
+                            break
+
     # Ensure the directory exists
     os.makedirs(os.path.dirname(RESPONSES_PATH), exist_ok=True)
 

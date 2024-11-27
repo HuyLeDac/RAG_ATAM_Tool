@@ -6,13 +6,20 @@ import { CommonModule } from '@angular/common'; // Import CommonModule
 import { SharedDataService } from '../shared/shared-data.service'; // Import the SharedDataService
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AddUrlDialogComponent } from '../add-url-dialog/add-url-dialog.component';
-
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { LoadingDialogComponent } from '../loading-dialog/loading-dialog.component';
 
 
 @Component({
   selector: 'app-columns',
   standalone: true,
-  imports: [HttpClientModule, FormsModule, CommonModule, MatDialogModule, AddUrlDialogComponent], // Add CommonModule
+  imports: [HttpClientModule, 
+            FormsModule, 
+            CommonModule, 
+            MatDialogModule, 
+            AddUrlDialogComponent, 
+            MatProgressSpinnerModule, 
+            LoadingDialogComponent], // Add CommonModule
   templateUrl: './columns.component.html',
   styleUrls: ['./columns.component.scss']
 })
@@ -26,8 +33,9 @@ export class ColumnsComponent implements OnInit {
   quality_criteria: any;
   scenarios: any;
   inputsUploaded = false; // Flag to track if inputs have been uploaded
+  loading = false; // New loading state
 
-  constructor(private http: HttpClient, private sharedDataService: SharedDataService, private dialog: MatDialog ) {}
+  constructor(private http: HttpClient, private sharedDataService: SharedDataService, private dialog: MatDialog) {}
 
   ngOnInit() {
     // Initialization logic
@@ -35,9 +43,9 @@ export class ColumnsComponent implements OnInit {
 
   addURL() {
     const dialogRef = this.dialog.open(AddUrlDialogComponent);
-
+  
     dialogRef.afterClosed().subscribe((url) => {
-      if (url) {
+      if (url && this.isValidUrl(url)) {
         // Send the URL to the backend
         this.http.post('http://127.0.0.1:5000/upload-url', { url }).subscribe(
           (response) => {
@@ -49,9 +57,27 @@ export class ColumnsComponent implements OnInit {
             alert('An error occurred while uploading the URL.');
           }
         );
+      } else if (url) {
+        alert('Invalid URL format. Please enter a valid URL.');
       }
     });
   }
+  
+
+  isValidUrl(url: string): boolean {
+    const urlPattern = new RegExp(
+      '^(https?:\\/\\/)?' + // protocol
+      '((([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,})|' + // domain name
+      'localhost|' + // or localhost
+      '\\d{1,3}(\\.\\d{1,3}){3})' + // or IP address
+      '(\\:\\d+)?(\\/[-a-zA-Z0-9@:%._\\+~#=]*)*' + // port and path
+      '(\\?[;&a-zA-Z0-9%_.~+=-]*)?' + // query string
+      '(\\#[-a-zA-Z0-9_]*)?$', // fragment locator
+      'i'
+    );
+    return !!urlPattern.test(url);
+  }
+  
 
   addPdf(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -121,8 +147,8 @@ export class ColumnsComponent implements OnInit {
     this.http.post('http://127.0.0.1:5000/upload-inputs', requestBody)
       .subscribe(
         response => {
-          console.log('Analysis started successfully:', response);
-          alert('Analysis process started successfully!');
+          console.log('Input uploaded successfully:', response);
+          alert('Input uploaded successfully!');
           this.inputsUploaded = true; // Mark inputs as uploaded
         },
         error => {
@@ -137,18 +163,34 @@ export class ColumnsComponent implements OnInit {
       alert('Please upload inputs first by pressing "Add input" before fetching results.');
       return;
     }
-
-    this.http.get('http://127.0.0.1:5000/get-results')
-      .subscribe(
-        (response: any) => {
-          console.log('Results fetched successfully:', response);
-          this.results = response; 
-          this.sharedDataService.updateResults(this.results); // Share results with other components
-        },
-        error => {
-          console.error('Error fetching results:', error);
-          alert('An error occurred while fetching the results.');
-        }
-      );
+  
+    const dialogRef = this.dialog.open(LoadingDialogComponent, {
+      disableClose: true, // Prevent closing the dialog manually
+    });
+  
+    this.http.get('http://127.0.0.1:5000/get-results').subscribe(
+      (response: any) => {
+        console.log('Results fetched successfully:', response);
+        alert('Results fetched successfully!');
+        this.results = response;
+        this.sharedDataService.updateResults(this.results);
+        dialogRef.close(); // Close the loading dialog
+      },
+      (error) => {
+        console.error('Error fetching results:', error);
+        alert('An error occurred while fetching the results.');
+        dialogRef.close(); // Close the loading dialog
+      }
+    );
+  }
+  
+  reset() {
+    this.results = null;
+    this.sharedDataService.updateResults(this.results);
+    this.architecture_context = '';
+    this.architectural_approaches = '';
+    this.quality_criteria = '';
+    this.scenarios = '';
+    this.inputsUploaded = false;
   }
 }

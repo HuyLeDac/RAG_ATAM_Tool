@@ -40,6 +40,11 @@ def save_to_pdf(data, output_dir="data"):
     sanitized_url = data['url'].replace("https://", "").replace("http://", "").replace("/", "_")
     pdf_filename = os.path.join(output_dir, f"{sanitized_url}.pdf")
 
+    # Check if the PDF already exists
+    if os.path.exists(pdf_filename):
+        print(f"Skipping: {pdf_filename} already exists.")
+        return
+
     # Create the PDF with UTF-8 support
     pdf = FPDF()
     pdf.add_page()

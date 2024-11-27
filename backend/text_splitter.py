@@ -3,7 +3,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 import os  
 
 # Define the path to the directory containing PDF documents
-DATA_PATH = os.path.join("backend", "data")
+DATA_PATH = os.path.join("data")
 
 # Load PDF documents from a specified directory
 # Uses PyPDFDirectoryLoader to handle loading all PDFs within the given directory

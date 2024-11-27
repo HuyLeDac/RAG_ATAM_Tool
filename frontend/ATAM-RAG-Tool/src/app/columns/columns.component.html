@@ -1,4 +1,5 @@
 <div class="col">
+  <!-- Buttons Section -->
   <div class="col1">
     <button class="button1" (click)="triggerPdfUpload()">Add PDFs</button>
     <input
@@ -14,7 +15,16 @@
     <br />
     <button class="button3" (click)="uploadInputs()">Add input</button>
     <br />
-    <button class="button4" (click)="fetchResults()">Fetch Results</button>
+    <button class="button4" (click)="fetchResults()" [disabled]="loading">
+      Fetch Results
+    </button>
+    <br />
+    <button class="button5" (click)="reset()">Reset</button>
+
+    <!-- Loading Spinner -->
+    <div *ngIf="loading" class="loading-container">
+      <mat-spinner></mat-spinner>
+    </div>
   </div>
 
   <!-- Architecture Context/Approaches Section -->

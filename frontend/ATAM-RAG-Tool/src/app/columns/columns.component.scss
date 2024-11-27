@@ -75,6 +75,14 @@ button:hover {
 background-color: #0056b3;
 }
 
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+
+
 
 @media (max-width: 768px) {
     .col {

@@ -8,26 +8,8 @@ import { FormsModule } from '@angular/forms'; // For [(ngModel)]
   selector: 'app-add-url-dialog',
   standalone: true,
   imports: [MatFormFieldModule, MatInputModule, FormsModule], // Import required modules
-  template: `
-    <h1 mat-dialog-title>Add URL</h1>
-    <div mat-dialog-content>
-      <mat-form-field style="width: 100%;">
-        <mat-label>Enter URL</mat-label>
-        <input matInput [(ngModel)]="url" placeholder="e.g., https://example.com" />
-      </mat-form-field>
-    </div>
-    <div mat-dialog-actions align="end">
-      <button mat-button (click)="close()">Cancel</button>
-      <button mat-button color="primary" (click)="submit()">Add</button>
-    </div>
-  `,
-  styles: [
-    `
-      mat-form-field {
-        margin-top: 10px;
-      }
-    `,
-  ],
+  templateUrl: './add-url-dialog.component.html',
+  styleUrls: ['./add-url-dialog.component.scss']
 })
 export class AddUrlDialogComponent {
   url: string = '';
