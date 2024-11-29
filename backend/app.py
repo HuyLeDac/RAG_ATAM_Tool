@@ -139,6 +139,27 @@ def get_results():
         return jsonify({"error": "Response file not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route('/get-results-without-retrieval', methods=['GET'])
+def get_results_without_retrieval():
+    try:
+        # Clear directory
+        if os.path.exists(RESPONSES_PATH):
+            os.remove(RESPONSES_PATH)
+
+        # Query the model
+        subprocess.run(['python', 'query.py', '--without_retrieval', os.path.basename(INPUT_DIR)], check=True)
+
+        # Read and return the responses
+        with open(RESPONSES_PATH, 'r') as json_file:
+            responses = json.load(json_file)
+
+
+        return serialize_architectural_data(responses), 200
+    except FileNotFoundError:
+        return jsonify({"error": "Response file not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 def serialize_architectural_data(data):
     def custom_sort(item):

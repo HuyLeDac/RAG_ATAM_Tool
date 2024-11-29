@@ -1,39 +1,104 @@
-/* columns.component.scss */
-/* Adjust the grid template for the layout */
+html, body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
 /* Grid layout for the columns */
 .col {
-    display: grid;
-    grid-template-columns: 1.5fr 2.5fr 2.5fr; /* Left column is wider (1.5fr), right columns share the remaining space */
-    gap: 16px; /* Spacing between columns */
-    height: 100vh; /* Full page height */
-    width: 100%; /* Full page width */
-    padding: 16px; /* Padding around the grid */
-    box-sizing: border-box; /* Include padding in width calculation */
+  display: grid;
+  grid-template-columns: 0.8fr 5fr; /* Define column widths */
+  gap: 16px; /* Spacing between columns */
+  height: 100vh; /* Full viewport height */
+  width: 100%; /* Full page width */
+  padding: 16px; /* Padding around the grid */
+  box-sizing: border-box; /* Include padding in width calculation */
+  overflow: hidden; /* Prevent overflow outside the grid */
+}
+
+.col1, .col2 {
+  background-color: #ffffff; /* Optional background */
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px; /* Rounded corners */
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Space between items */
+  height: calc(100vh - 32px); /* Adjust height to fit the viewport and account for padding */
+  min-width: 0;
+}
+
+.col1 {
+  background-color: #ffffff;
+  padding: 16px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow-y: auto; /* Enable vertical scrolling */
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Space between items */
+  height: calc(100vh - 32px); /* Ensure it fills the viewport height minus padding */
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+
+
+.col2 {
+  flex: 1;
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 16px; /* Space between fields */
+  padding-bottom: 300px; /* Add extra padding to the bottom */
+}
+
+@media (max-width: 768px) {
+  .col {
+    grid-template-columns: 1fr; /* Stack all columns vertically on smaller screens */
+    height: auto; /* Adjust height for smaller screens */
+    overflow: visible; /* Allow natural content flow */
   }
-  
-  /* Ensure each column is styled appropriately */
+
   .col1, .col2 {
-    background-color: #ffffff; /* Optional background */
-    padding: 16px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    border-radius: 8px; /* Rounded corners */
-    overflow-y: auto; /* Scrollable content if needed */
+    height: auto; /* Remove fixed height */
+    overflow-y: visible; /* Allow full content display */
   }
-  
-  /* Ensure responsive behavior */
-  @media (max-width: 768px) {
-    .col {
-      grid-template-columns: 1fr; /* Stack all columns vertically */
-      height: auto; /* Adjust height for smaller screens */
-    }
+}
+
+/* Ensure fields in the "Scenarios" section fit and are scrollable */
+.scenarios-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Space between text fields */
+}
+
+
+/* Ensure scrolling works properly for the content inside col2 */
+.col2 > * {
+  flex-shrink: 0; /* Prevent items from shrinking unexpectedly */
+}
+
+/* Responsive behavior */
+@media (max-width: 768px) {
+  .col {
+    grid-template-columns: 1fr; /* Stack all columns vertically on smaller screens */
+    height: auto; /* Adjust height for smaller screens */
+    overflow: visible; /* Allow natural content flow */
   }
 
+  .col1, .col2 {
+    height: auto; /* Remove fixed height */
+    overflow-y: visible; /* Allow full content display */
+  }
+}
 
-  
-
+/* Heading styling */
 h3 {
-margin-bottom: 8px;
-color: #333;
+  margin-bottom: 8px;
+  color: #333;
 }
 
 /* Constrain textarea or input fields within their container */
@@ -50,31 +115,41 @@ input[type="text"] {
   overflow-wrap: break-word; /* Handle long words properly */
 }
 
-/* Parent container adjustments to prevent child overflow */
-.col2 {
-  display: flex;
-  flex-direction: column;
-  gap: 16px; /* Space between items */
-  overflow: hidden; /* Prevent overflowing content */
+/* Styling for Buttons 1 to 6 */
+.button1, .button2, .button3, .button4, .button5, .button6 {
+  background-color: #007bff;
+  color: white;
+  border: 1px solid #0056b3;
+  padding: 10px 20px;
+  font-size: 14px;
+  margin: 5px;
+  transition: background-color 0.3s ease;
 }
 
-button {
-width: 100%;
-margin-bottom: 16px;
-padding: 10px;
-background-color: #007bff;
-color: white;
-border: none;
-border-radius: 4px;
-cursor: pointer;
-font-weight: bold;
-transition: background-color 0.3s ease;
+.button1:hover, .button2:hover, .button3:hover, .button4:hover, .button5:hover, .button6:hover {
+  background-color: #0056b3;
+}
+
+/* Styling for Buttons 7 to 10 (Different style) */
+.button7, .button8, .button9, .button10 {
+  background-color: #28a745;  /* Green */
+  color: white;
+  border: 1px solid #218838;
+  padding: 12px 25px;
+  font-size: 16px;
+  margin: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.button7:hover, .button8:hover, .button9:hover, .button10:hover {
+  background-color: #218838;
 }
 
 button:hover {
-background-color: #0056b3;
+  background-color: #0056b3;
 }
 
+/* Loading spinner styling */
 .loading-container {
   display: flex;
   justify-content: center;
@@ -82,10 +157,58 @@ background-color: #0056b3;
   margin-top: 20px;
 }
 
+/* General styling for all titles */
+.title1, .title2, .title3, .title4 {
+  font-size: 24px; /* Larger, consistent font size */
+  font-weight: 700; /* Stronger emphasis */
+  text-align: left; /* Left-aligned text */
+  letter-spacing: 1.2px; /* Increased spacing for a polished look */
+  text-transform: capitalize; /* Capitalize each word */
+  font-family: 'Poppins', sans-serif; /* Modern and elegant font */
+  margin-bottom: 12px; /* Add spacing below titles */
+  line-height: 1.4; /* Improve readability */
+  border-left: 5px solid #ccc; /* Light gray accent line on the left */
+  padding-left: 12px; /* Space between the accent and the text */
+  transition: transform 0.2s ease-in-out, font-weight 0.3s ease-in-out; /* Add subtle hover animation */
+}
 
+/* Specific styles for each title section */
+.title1 {
+  font-size: 28px; /* Slightly larger for the first title */
+}
 
-@media (max-width: 768px) {
-    .col {
-        grid-template-columns: 1fr; /* Stack all columns */
-    }
+.title2 {
+  font-size: 26px;
+}
+
+.title3 {
+  font-size: 26px;
+}
+
+.title4 {
+  font-size: 26px;
+}
+
+/* Add hover effects for interactivity */
+.title1:hover, .title2:hover, .title3:hover, .title4:hover {
+  transform: translateX(5px); /* Slight shift on hover for dynamism */
+  font-weight: 800; /* Make the title even bolder on hover */
+}
+
+/* Add a subtle shadow for text depth */
+.title1, .title2, .title3, .title4 {
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+textarea {
+  height: auto;
+  overflow: hidden;
+}
+
+.input-field2 {
+  height: 200px; /* Set a fixed height for the input field */
+}
+
+textarea:focus {
+  height: auto;
 }

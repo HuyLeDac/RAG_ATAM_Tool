@@ -22,3 +22,24 @@
     border-top: 1px solid #34495e;
     margin-top: 20px;
 }
+
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Full viewport height */
+    margin: 0;
+  }
+  
+  .header {
+    flex: 0 0 auto; /* Fixed height */
+  }
+  
+  .columns {
+    flex: 1 1 auto; /* Take remaining space */
+    display: flex;
+  }
+  
+  .footer {
+    flex: 0 0 auto; /* Fixed height */
+  }
+  

@@ -130,18 +130,18 @@ def generate_analysis_prompt(context_output, approach, decision, scenario, input
 
     """
 
-    print(template.format(
-        context=context_output,
-        architecture_context=format_json(inputs.architecture_context),
-        architectural_views=format_json(inputs.get_architectural_views_as_list()),
-        quality_criteria=format_json(inputs.quality_criteria),
-        scenario=format_json(scenario),
-        current_approach=approach.get('approach', 'Unknown'),
-        approach_description=approach.get('description', 'No description provided'),
-        decision=decision,
-        scenario_name=scenario.get("scenario", "Unnamed Scenario"),
-        quality_attribute=scenario.get("attribute", "No attribute provided")
-    ))
+    # print(template.format(
+    #     context=context_output,
+    #     architecture_context=format_json(inputs.architecture_context),
+    #     architectural_views=format_json(inputs.get_architectural_views_as_list()),
+    #     quality_criteria=format_json(inputs.quality_criteria),
+    #     scenario=format_json(scenario),
+    #     current_approach=approach.get('approach', 'Unknown'),
+    #     approach_description=approach.get('description', 'No description provided'),
+    #     decision=decision,
+    #     scenario_name=scenario.get("scenario", "Unnamed Scenario"),
+    #     quality_attribute=scenario.get("attribute", "No attribute provided")
+    # ))
 
     return template.format(
         context=context_output,
@@ -228,18 +228,84 @@ def query_multiple_chunks(top_k_results, inputs):
 
     return responses
 
+def query_without_retrieval(inputs):
+    responses = []  # Initialize an empty list to store responses
+
+    for approach in inputs.architectural_approaches['architecturalApproaches']:
+        for decision in approach['architectural decisions']:
+            for scenario in inputs.scenarios['scenarios']:
+                print(f"\n\nAnalyzing: {approach['approach']} - Decision: {decision} - Scenario: {scenario['scenario']}")  # For debugging
+                
+                formatted_prompt = generate_analysis_prompt("", approach, decision, scenario, inputs)
+                max_retries = 3  # Number of retries
+                retry_count = 0
+
+                while retry_count < max_retries:
+                    try:
+                        # Get the model's response
+                        response_text = model.invoke(formatted_prompt)
+
+                        # Attempt to parse the response as JSON
+                        response_dict = json.loads(response_text)
+                        
+                        # Append the response dictionary to the list of responses
+                        responses.append(response_dict)
+
+                        # Display response for debugging purposes
+                        print("---------------------------------------------------------")
+                        print("START OF RESPONSE:\n")
+                        print(json.dumps(response_dict, indent=2))  # Print formatted JSON for clarity
+                        print("\nEND OF RESPONSE")
+                        print("---------------------------------------------------------")
+                        
+                        # Break out of the retry loop on success
+                        break
+                    except json.JSONDecodeError as e:
+                        retry_count += 1
+                        print(f"JSON decoding failed (attempt {retry_count}/{max_retries}): {e}")
+                        print("Response text was:")
+                        print(response_text)  # Log problematic response
+                        if retry_count < max_retries:
+                            print("Retrying...")
+                            time.sleep(1)  # Optional: Add delay between retries
+                        else:
+                            print("Max retries reached. Skipping this input.")
+                            response_dict = {
+                                "error": "Invalid JSON response",
+                                "response_text": response_text,
+                            }
+                            responses.append(response_dict)
+                            break
+
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(RESPONSES_PATH), exist_ok=True)
+
+    # After all responses are generated, store them in a JSON file
+    with open(RESPONSES_PATH, 'w') as json_file:
+        json.dump(responses, json_file, indent=2)
+
+    return responses
+
 def main():
-    # Use argparse to accept a folder name as a command-line argument
+
+    # Check for the --without_retrieval flag
     parser = argparse.ArgumentParser(description="Query Pipeline for Architectural Analysis")
     parser.add_argument("folder_name", type=str, help="The folder containing the input data")
+    parser.add_argument("--without_retrieval", action="store_true", help="Run the pipeline without retrieval")
     args = parser.parse_args()
 
     # Execute the query pipeline
     inputs = get_inputs(args.folder_name)  # Load data from specified folder
-    created_retrieval_query = create_retrieval_query(inputs)  # Summarize input for retrieval
-    top_k_results = retrieval_query(created_retrieval_query)  # Retrieve relevant database docs
-    responses = query_multiple_chunks(top_k_results, inputs)  # Generate prompts and responses
+
+    if args.without_retrieval:
+        responses = query_without_retrieval(inputs)  # Generate prompts and responses without retrieval
+    else:
+        created_retrieval_query = create_retrieval_query(inputs)  # Summarize input for retrieval
+        top_k_results = retrieval_query(created_retrieval_query)  # Retrieve relevant database docs
+        responses = query_multiple_chunks(top_k_results, inputs)  # Generate prompts and responses
+
     print(f"Responses stored in: {RESPONSES_PATH}")  # Print the path to the stored responses
+
 
 # Main Execution: Query Pipeline
 # Loads input data, creates a retrieval query, searches the database, and generates responses

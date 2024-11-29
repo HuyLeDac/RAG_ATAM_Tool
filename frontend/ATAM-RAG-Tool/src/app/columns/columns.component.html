@@ -1,6 +1,7 @@
 <div class="col">
   <!-- Buttons Section -->
   <div class="col1">
+    <!-- Add PDFs Button -->
     <button class="button1" (click)="triggerPdfUpload()">Add PDFs</button>
     <input
       type="file"
@@ -10,15 +11,23 @@
       style="display: none;"
       (change)="addPdf($event)"
     />
-    <br />
+
+    <!-- Add URLs Button -->
     <button class="button2" (click)="addURL()">Add URLs</button>
-    <br />
-    <button class="button3" (click)="uploadInputs()">Add input</button>
-    <br />
+
+    <!-- Upload Input Button -->
+    <button class="button3" (click)="uploadInputs()">Upload input</button>
+
+    <!-- Fetch Results Buttons -->
     <button class="button4" (click)="fetchResults()" [disabled]="loading">
       Fetch Results
     </button>
-    <br />
+
+    <button class="button6" (click)="fetchResultsWithoutQuery()" [disabled]="loading">
+      Fetch Results without RAG
+    </button>
+
+    <!-- Reset Button -->
     <button class="button5" (click)="reset()">Reset</button>
 
     <!-- Loading Spinner -->
@@ -27,37 +36,106 @@
     </div>
   </div>
 
-  <!-- Architecture Context/Approaches Section -->
+  <!-- Architecture Context Section -->
   <div class="col2">
     <h3 class="title1">Architecture Context</h3>
+
+    <!-- System Purpose Input -->
+    <label>Briefly describe the purpose of the system:</label>
     <textarea
       class="input-field"
-      placeholder="Enter architecture context here"
-      [(ngModel)]="architecture_context"
+      placeholder="Enter system purpose here"
+      [(ngModel)]="systemPurpose"
+    ></textarea>
+    <button class="button7" (click)="addSystemPurpose()">Enter</button>
+    <br /><br />
+
+    <!-- System Constraints Input -->
+    <label>Type in the technical constraints of the system:</label>
+    <textarea
+      class="input-field"
+      placeholder="Enter constraint here"
+      [(ngModel)]="systemConstraint"
+    ></textarea>
+    <button class="button8" (click)="addConstraint()">Add Constraint</button>
+    <br /><br />
+
+    <!-- System Interactions Input -->
+    <label>Describe how the system should interact:</label>
+    <textarea
+      class="input-field"
+      placeholder="Enter interaction here"
+      [(ngModel)]="systemInteraction"
+    ></textarea>
+    <button class="button9" (click)="addInteraction()">Add Interaction</button>
+    <br /><br />
+
+    <!-- Current Architecture Context Display -->
+    <label>Current display of the architecture context (manual configuration possible):</label>
+    <textarea
+      class="input-field2"
+      placeholder="Architecture Context in JSON"
+      [ngModel]="architecture_context | json"
     ></textarea>
     <br />
+
+    <!-- Architectural Approaches Section -->
     <h3 class="title2">Architectural Approaches</h3>
     <textarea
-      class="input-field"
+      class="input-field2"
       placeholder="Enter architectural approaches here"
       [(ngModel)]="architectural_approaches"
     ></textarea>
-  </div>
 
-  <!-- Quality Attribute Criteria/Scenarios Section -->
-  <div class="col2">
+    <!-- Quality Attribute Criteria Section -->
     <h3 class="title3">Quality Attribute Criteria</h3>
     <textarea
-      class="input-field"
+      class="input-field2"
       placeholder="Enter quality attribute criteria here"
       [(ngModel)]="quality_criteria"
     ></textarea>
     <br />
+
+    <!-- Scenarios Section -->
     <h3 class="title4">Scenarios</h3>
     <textarea
       class="input-field"
-      placeholder="Enter scenarios here"
-      [(ngModel)]="scenarios"
+      placeholder="Enter scenario name here"
+      [(ngModel)]="scenarioName"
+    ></textarea>
+
+    <textarea
+      class="input-field"
+      placeholder="Enter quality attribute here"
+      [(ngModel)]="scenarioAttribute"
+    ></textarea>
+
+    <textarea
+      class="input-field"
+      placeholder="Enter environment here"
+      [(ngModel)]="scenarioEnvironment"
+    ></textarea>
+
+    <textarea
+      class="input-field"
+      placeholder="Enter stimulus here"
+      [(ngModel)]="scenarioStimulus"
+    ></textarea>
+
+    <textarea
+      class="input-field"
+      placeholder="Enter response here"
+      [(ngModel)]="scenarioResponse"
+    ></textarea>
+
+    <button class="button10" (click)="addScenario()">Add Scenario</button>
+
+    <!-- Current Scenarios Display -->
+    <label>Current scenarios (manual configuration possible):</label>
+    <textarea
+      class="input-field"
+      [value]="formattedScenarios"
     ></textarea>
   </div>
+
 </div>
