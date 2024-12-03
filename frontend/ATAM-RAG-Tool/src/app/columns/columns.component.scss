@@ -52,7 +52,7 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 16px; /* Space between fields */
-  padding-bottom: 300px; /* Add extra padding to the bottom */
+  padding-bottom: 100px; /* Add extra padding to the bottom */
 }
 
 @media (max-width: 768px) {
@@ -132,9 +132,9 @@ input[type="text"] {
 
 /* Styling for Buttons 7 to 10 (Different style) */
 .button7, .button8, .button9, .button10 {
-  background-color: #28a745;  /* Green */
+  background-color: #ffc107;  /* Green */
   color: white;
-  border: 1px solid #218838;
+  border: 1px solid #ffc107;
   padding: 12px 25px;
   font-size: 16px;
   margin: 5px;
@@ -212,3 +212,6 @@ textarea {
 textarea:focus {
   height: auto;
 }
+
+
+

@@ -161,6 +161,7 @@ def get_results_without_retrieval():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 def serialize_architectural_data(data):
     def custom_sort(item):
         # Define the exact order of keys

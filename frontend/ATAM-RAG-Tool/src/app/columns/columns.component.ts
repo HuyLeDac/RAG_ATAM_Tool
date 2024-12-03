@@ -16,10 +16,8 @@ import { LoadingDialogComponent } from '../loading-dialog/loading-dialog.compone
   imports: [HttpClientModule, 
             FormsModule, 
             CommonModule, 
-            MatDialogModule, 
-            AddUrlDialogComponent, 
-            MatProgressSpinnerModule, 
-            LoadingDialogComponent], // Add CommonModule
+            MatDialogModule,  
+            MatProgressSpinnerModule,], 
   templateUrl: './columns.component.html',
   styleUrls: ['./columns.component.scss']
 })
@@ -28,20 +26,34 @@ export class ColumnsComponent implements OnInit {
 
   results: any; // To store fetched results
 
-  architecture_context: any = { "architectureDescription": {}}; // Initialize as an empty object
-  architectural_approaches: any;
-  quality_criteria: any;
-  scenarios: any = '';
+  architecture_context: any = '{ "architectureDescription": {}}'; // Initialize as an empty object
+  architectural_approaches: any = '{"architecturalApproaches": []}';
+  quality_criteria: any = '{ "quality_criteria" : [] }';
+  scenarios: any = '{ "scenarios" : [] }';
 
   systemPurpose: string = '';
   systemConstraint: string = '';
   systemInteraction: string = '';
+
+  approach_name: string = '';
+  approach_description: string = '';
+  architectural_decisions: string = ''; // Current decision input
+  savedDecisions: string[] = []; // List of saved decisions
+  development_view_description: string = '';
+  development_view_diagram: string = '';
+  process_view_description: string = '';
+  process_view_diagram: string = '';
+  physical_view_description: string = '';
+  physical_view_diagram: string = '';
 
   scenarioName: string = '';
   scenarioAttribute: string = '';
   scenarioEnvironment: string = '';
   scenarioStimulus: string = '';
   scenarioResponse: string = '';
+
+  quality_criteria_name: string = '';
+  quality_criteria_question: string = '';
 
   inputsUploaded = false; // Flag to track if inputs have been uploaded
   loading = false; // New loading state
@@ -122,46 +134,60 @@ export class ColumnsComponent implements OnInit {
   }
   
 
-  addSystemPurpose() {
-    if (this.systemPurpose.trim()) {
-      this.architecture_context["architectureDescription"]['systemPurpose'] = this.systemPurpose.trim();
-      this.systemPurpose = ''; // Clear the input field
-      alert('System purpose added successfully!');
-    } else {
-      alert('Please enter a valid system purpose.');
-    }
-  }
+  // Adds system purpose to the architecture context
+addSystemPurpose() {
+  const parsedContext = JSON.parse(this.architecture_context); // Parse the JSON string into an object
 
-  addConstraint() {
-    if (this.systemConstraint.trim()) {
-      if (!this.architecture_context["architectureDescription"]['technicalConstraints']) {
-        this.architecture_context["architectureDescription"]['technicalConstraints'] = [];
-      }
-      this.architecture_context["architectureDescription"]['technicalConstraints'].push(this.systemConstraint.trim());
-      this.systemConstraint = ''; // Clear the input field
-      alert('System constraint added successfully!');
-    } else {
-      alert('Please enter a valid system constraint.');
-    }
+  if (this.systemPurpose.trim()) {
+    parsedContext.architectureDescription['systemPurpose'] = this.systemPurpose.trim();
+    this.systemPurpose = ''; // Clear the input field
+    this.architecture_context = JSON.stringify(parsedContext); // Convert back to a string
+    alert('System purpose added successfully!');
+  } else {
+    alert('Please enter a valid system purpose.');
   }
+}
 
-  addInteraction() {
-    if (this.systemInteraction.trim()) {
-      if (!this.architecture_context["architectureDescription"]['systemInteractions']) {
-        this.architecture_context["architectureDescription"]['systemInteractions'] = [];
-      }
-      this.architecture_context["architectureDescription"]['systemInteractions'].push(this.systemInteraction.trim());
-      this.systemInteraction = ''; // Clear the input field
-      alert('System interaction added successfully!');
-    } else {
-      alert('Please enter a valid system interaction.');
+// Adds system constraint to the architecture context
+addConstraint() {
+  const parsedContext = JSON.parse(this.architecture_context); // Parse the JSON string into an object
+
+  if (this.systemConstraint.trim()) {
+    if (!parsedContext.architectureDescription['technicalConstraints']) {
+      parsedContext.architectureDescription['technicalConstraints'] = [];
     }
+    parsedContext.architectureDescription['technicalConstraints'].push(this.systemConstraint.trim());
+    this.systemConstraint = ''; // Clear the input field
+    this.architecture_context = JSON.stringify(parsedContext); // Convert back to a string
+    alert('System constraint added successfully!');
+  } else {
+    alert('Please enter a valid system constraint.');
   }
+}
+
+// Adds system interaction to the architecture context
+addInteraction() {
+  const parsedContext = JSON.parse(this.architecture_context); // Parse the JSON string into an object
+
+  if (this.systemInteraction.trim()) {
+    if (!parsedContext.architectureDescription['systemInteractions']) {
+      parsedContext.architectureDescription['systemInteractions'] = [];
+    }
+    parsedContext.architectureDescription['systemInteractions'].push(this.systemInteraction.trim());
+    this.systemInteraction = ''; // Clear the input field
+    this.architecture_context = JSON.stringify(parsedContext); // Convert back to a string
+    alert('System interaction added successfully!');
+  } else {
+    alert('Please enter a valid system interaction.');
+  }
+}
+
 
   uploadInputs() {
     // Ensure all fields have values
     if (
       Object.keys(this.architecture_context).length === 0 ||
+      !this.architecture_context?.trim() ||
       !this.architectural_approaches?.trim() ||
       !this.quality_criteria?.trim() ||
       !this.scenarios.trim()
@@ -171,11 +197,12 @@ export class ColumnsComponent implements OnInit {
     }
 
     // Ensure all fields contain valid JSON
-    let approachesJson, criteriaJson, scenariosJson;
+    let approachesJson, criteriaJson, scenariosJson, contextJson;
     try {
       approachesJson = JSON.parse(this.architectural_approaches);
       criteriaJson = JSON.parse(this.quality_criteria);
       scenariosJson = JSON.parse(this.scenarios);
+      contextJson = JSON.parse(this.architecture_context);
     } catch (error) {
       alert('Please ensure all text fields contain valid JSON.');
       return;
@@ -183,7 +210,7 @@ export class ColumnsComponent implements OnInit {
 
     // Prepare the JSON object to send to the backend
     const requestBody = {
-      architecture_context: this.architecture_context,
+      architecture_context: contextJson,
       architectural_approaches: approachesJson,
       quality_criteria: criteriaJson,
       scenarios: scenariosJson,
@@ -206,15 +233,37 @@ export class ColumnsComponent implements OnInit {
   reset() {
     this.results = null;
     this.sharedDataService.updateResults(this.results);
-    this.architecture_context = {"architectureDescription": {}};
-    this.architectural_approaches = '';
-    this.quality_criteria = '';
-    this.scenarios = '';
-    this.inputsUploaded = false;
-
+    this.architecture_context = '{ "architectureDescription": {}}'; // Initialize as an empty object
+    this.architectural_approaches = '{"architecturalApproaches": []}';
+    this.quality_criteria = '{ "quality_criteria" : [] }';
+    this.scenarios = '{ "scenarios" : [] }';
     this.systemPurpose = '';
     this.systemConstraint = '';
     this.systemInteraction = '';
+
+    this.approach_name = '';
+    this.approach_description = '';
+    this.architectural_decisions = ''; // Current decision input
+    this.savedDecisions = []; // List of saved decisions
+    this.development_view_description = '';
+    this.development_view_diagram = '';
+    this.process_view_description = '';
+    this.process_view_diagram = '';
+    this.physical_view_description = '';
+    this.physical_view_diagram = '';
+
+    this.scenarioName = '';
+    this.scenarioAttribute = '';
+    this.scenarioEnvironment = '';
+    this.scenarioStimulus = '';
+    this.scenarioResponse = '';
+  
+    this.quality_criteria_name = '';
+    this.quality_criteria_question = '';
+
+    this.inputsUploaded = false; // Flag to track if inputs have been uploaded
+    this.loading = false; // New loading state
+
   }
 
   fetchResults() {
@@ -321,13 +370,162 @@ export class ColumnsComponent implements OnInit {
     alert('Scenario added successfully!');
   }
 
+  addQualityAttributeCriterion() {
+    if (!this.quality_criteria_name.trim() || !this.quality_criteria_question.trim()) {
+      alert('Please fill out both fields before adding a criterion.');
+      return;
+    }
+  
+    // Parse the existing quality criteria or initialize it
+    if (!this.quality_criteria.trim()) {
+      this.quality_criteria = '{"quality_criteria": []}';
+    }
+  
+    let criteriaJson;
+    try {
+      criteriaJson = JSON.parse(this.quality_criteria);
+    } catch (error) {
+      console.error('Error parsing quality criteria:', error);
+      alert('Invalid quality criteria format. Resetting.');
+      this.quality_criteria = '{"quality_criteria": []}';
+      criteriaJson = { quality_criteria: [] };
+    }
+  
+    // Create the new quality criterion
+    const newCriterion = {
+      name: this.quality_criteria_name.trim(),
+      question: this.quality_criteria_question.trim()
+    };
+  
+    // Add the new criterion to the array
+    criteriaJson.quality_criteria.push(newCriterion);
+  
+    // Update the quality criteria field as a JSON string
+    this.quality_criteria = JSON.stringify(criteriaJson, null, 2);
+  
+    // Clear the input fields
+    this.quality_criteria_name = '';
+    this.quality_criteria_question = '';
+  
+    alert('Quality attribute criterion added successfully!');
+  }
+  
+  
+  saveDecisions() {
+    const decisionsArray = this.architectural_decisions
+      .split('\n')
+      .map((decision) => decision.trim())
+      .filter((decision) => decision); // Remove empty lines
+
+    this.savedDecisions = [...this.savedDecisions, ...decisionsArray];
+    this.architectural_decisions = ''; // Clear the text area after saving
+    alert('Decisions saved successfully!');
+  }
+
+  addArchitecturalApproach() {
+    // Check if required text fields are filled
+    if (
+      !this.approach_name.trim() ||
+      !this.approach_description.trim() ||
+      !this.development_view_description.trim() ||
+      !this.development_view_diagram.trim() ||
+      !this.process_view_description.trim() ||
+      !this.process_view_diagram.trim() ||
+      !this.physical_view_description.trim() ||
+      !this.physical_view_diagram.trim()
+    ) {
+      alert('Please fill out all text fields.');
+      return;
+    }
+  
+    // Check if the architectural decisions list is not empty
+    if (this.savedDecisions.length === 0) {
+      alert('The architectural decisions list cannot be empty.');
+      return;
+    }
+  
+    let approachesJson;
+    try {
+      approachesJson = JSON.parse(this.architectural_approaches);
+    } catch (error) {
+      console.error('Error parsing architectural approaches:', error);
+      alert('Invalid architectural approaches format. Resetting.');
+      this.architectural_approaches = '{"architecturalApproaches": []}';
+      approachesJson = { architecturalApproaches: [] };
+    }
+  
+    const newApproach = {
+      approach: this.approach_name.trim(),
+      description: this.approach_description.trim(),
+      "architectural decisions": this.savedDecisions,
+      "architectural views": [
+        {
+          view: "Development View",
+          description: this.development_view_description.trim(),
+          diagram: this.development_view_diagram.trim(),
+        },
+        {
+          view: "Process View",
+          description: this.process_view_description.trim(),
+          diagram: this.process_view_diagram.trim(),
+        },
+        {
+          view: "Physical View",
+          description: this.physical_view_description.trim(),
+          diagram: this.physical_view_diagram.trim(),
+        },
+      ],
+    };
+  
+    approachesJson.architecturalApproaches.push(newApproach);
+  
+    this.architectural_approaches = JSON.stringify(approachesJson, null, 2);
+  
+    // Clear fields
+    this.approach_name = '';
+    this.approach_description = '';
+    this.savedDecisions = []; // Clear saved decisions
+    this.architectural_decisions = ''; // Clear the decision input field
+    this.development_view_description = '';
+    this.development_view_diagram = '';
+    this.process_view_description = '';
+    this.process_view_diagram = '';
+    this.physical_view_description = '';
+    this.physical_view_diagram = '';
+  
+    alert('Architectural approach added successfully!');
+  }
+  
+
   get formattedScenarios(): string {
     try {
-      return JSON.stringify(JSON.parse(this.scenarios || '{}'), null, 2); // Beautify JSON
+      return JSON.stringify(JSON.parse(this.scenarios || '{ "scenarios" : [] }'), null, 2); // Beautify JSON
     } catch (error) {
       return 'Invalid JSON'; // Handle invalid JSON case
     }
   }  
   
+  get formattedQualityCriteria(): string {
+    try {
+      return JSON.stringify(JSON.parse(this.quality_criteria || '{ "quality_criteria" : [] }'), null, 2); // Beautify JSON
+    } catch (error) {
+      return 'Invalid JSON'; // Handle invalid JSON case
+    }
+  }  
 
+  get formattedApproaches(): string {
+    try {
+      return JSON.stringify(JSON.parse(this.architectural_approaches || '{ "architecturalApproaches" : []}'), null, 2); // Beautify JSON
+    } catch (error) {
+      return 'Invalid JSON'; // Handle invalid JSON case
+    }
+  }
+
+  get formattedArchitectureContext(): string {
+    try {
+      return JSON.stringify(JSON.parse(this.architecture_context) || '{ "architectureDescription": {}}', null, 2); // Beautify JSON
+    } catch (error) {
+      return 'Invalid JSON'; // Handle invalid JSON case
+    }
+  }
 }

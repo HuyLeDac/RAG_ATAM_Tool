@@ -33,28 +33,34 @@ def format_json(data, indent=2):
     return json.dumps(data, indent=indent)
 
 
-# Function: Create retrieval query from inputs
+# Function: Create retrieval query from inputs, specialized for each (scenario, approach, decision) combination.
 #   - `inputs`: Structured input data containing architecture, approaches, decisions, and scenarios.
-# - Converts architecture description and approaches into a formatted string.
-# - Uses `retrieval_model` to generate a summarized query.
+#   - `approach`: The current architectural approach being analyzed.
+#   - `decision`: The current architectural decision being analyzed.
+#   - `scenario`: The current scenario being analyzed.
+# - Converts architecture description, scenario, approach, and decision into a formatted string.
+# - Uses `retrieval_model` to generate a specialized query for retrieval.
 # - Returns a string with key architectural information for similarity search.
-def create_retrieval_query(inputs):
+def create_specialized_retrieval_query(inputs, approach, decision, scenario):
     input_data_str = f"""
     Architecture Context: 
     {format_json(inputs.architecture_context)}
 
-    Architectural Approaches:
-    {format_json(inputs.architectural_approaches)}
+    Scenario: {format_json(scenario)}
+
+    Architectural Approach: {approach['approach']}
+    Architectural Decision: {decision}
     """
 
-    # Generate a summarized retrieval query for database search
+    # Generate a specialized retrieval query for database search
     summarized_query = retrieval_model.invoke(
-        "Summarize the most important keywords points of the architecture. Add the keywords risks, tradeoffs and sensitivity points under the summary:\n " + input_data_str
+        "Summarize the most important keywords points of the architecture, decision, and scenario. "
+        "Add the keywords risks, tradeoffs, and sensitivity points under the summary:\n" + input_data_str
     )
     return summarized_query
 
 
-# Function: Perform retrieval query on the database
+# Function: Perform retrieval query on the database specialized for the specific scenario, approach, and decision
 #   - `query_text`: The formatted query text used for similarity search.
 # - Searches the Chroma database and returns the top `k` relevant documents.
 def retrieval_query(query_text):
@@ -95,7 +101,7 @@ def generate_analysis_prompt(context_output, approach, decision, scenario, input
 
     Task:
     Provide the risks, tradeoffs, and sensitivity points regarding the scenario in the architectural decision: {decision}.
-    Use the input data provided, marking any external knowledge as [LLM KNOWLEDGE]and other data as .
+    Use the input data provided, marking any external knowledge as [LLM KNOWLEDGE] and other sources as [DATABASE SOURCE] from the database.
     </TASK>
 
     -----
@@ -130,19 +136,6 @@ def generate_analysis_prompt(context_output, approach, decision, scenario, input
 
     """
 
-    # print(template.format(
-    #     context=context_output,
-    #     architecture_context=format_json(inputs.architecture_context),
-    #     architectural_views=format_json(inputs.get_architectural_views_as_list()),
-    #     quality_criteria=format_json(inputs.quality_criteria),
-    #     scenario=format_json(scenario),
-    #     current_approach=approach.get('approach', 'Unknown'),
-    #     approach_description=approach.get('description', 'No description provided'),
-    #     decision=decision,
-    #     scenario_name=scenario.get("scenario", "Unnamed Scenario"),
-    #     quality_attribute=scenario.get("attribute", "No attribute provided")
-    # ))
-
     return template.format(
         context=context_output,
         architecture_context=format_json(inputs.architecture_context),
@@ -156,16 +149,14 @@ def generate_analysis_prompt(context_output, approach, decision, scenario, input
         quality_attribute=scenario.get("attribute", "No attribute provided")
     )
 
+
 # Function: Process multiple architectural approaches, decisions, and scenarios.
-#   - `top_k_results`: List of top-k relevant documents retrieved from the database.
 #   - `inputs`: Structured input data containing architecture, approaches, decisions, and scenarios.
-# - Iterates through each approach, decision, and scenario to generate prompts.
-# - Sends prompts to `model` and appends responses with context and sources.
-# - Prints each response for debugging and stores responses for further use.
-# - For each combination of approach, decision, and scenario, generate a prompt and query the model O(n^3).
-def query_multiple_chunks(top_k_results, inputs):
-    # Convert top-k results into context text
-    context_output = "\n\n---\n\n".join([doc.page_content for doc, _ in top_k_results])
+# - For each combination of approach, decision, and scenario, generate a retrieval query, perform the retrieval, 
+#   and then generate a prompt for the model.
+# - Appends the response with context and sources to a list.
+# - Finally, stores the responses in a JSON file.
+def query_specialized_for_each(inputs):
     responses = []  # Initialize an empty list to store responses
 
     for approach in inputs.architectural_approaches['architecturalApproaches']:
@@ -173,7 +164,18 @@ def query_multiple_chunks(top_k_results, inputs):
             for scenario in inputs.scenarios['scenarios']:
                 print(f"\n\nAnalyzing: {approach['approach']} - Decision: {decision} - Scenario: {scenario['scenario']}")  # For debugging
                 
+                # Create specialized retrieval query for this (approach, decision, scenario)
+                retrieval_query_text = create_specialized_retrieval_query(inputs, approach, decision, scenario)
+                
+                # Perform retrieval based on the specialized query
+                top_k_results = retrieval_query(retrieval_query_text)
+                
+                # Convert top-k results into context text
+                context_output = "\n\n---\n\n".join([doc.page_content for doc, _ in top_k_results])
+
+                # Generate the prompt for the model
                 formatted_prompt = generate_analysis_prompt(context_output, approach, decision, scenario, inputs)
+
                 max_retries = 3  # Number of retries
                 retry_count = 0
 
@@ -214,7 +216,7 @@ def query_multiple_chunks(top_k_results, inputs):
                             response_dict = {
                                 "error": "Invalid JSON response",
                                 "response_text": response_text,
-                                "sources": [doc.metadata.get("id") for doc, _ in top_k_results]
+                                "sources": sources
                             }
                             responses.append(response_dict)
                             break
@@ -228,86 +230,18 @@ def query_multiple_chunks(top_k_results, inputs):
 
     return responses
 
-def query_without_retrieval(inputs):
-    responses = []  # Initialize an empty list to store responses
 
-    for approach in inputs.architectural_approaches['architecturalApproaches']:
-        for decision in approach['architectural decisions']:
-            for scenario in inputs.scenarios['scenarios']:
-                print(f"\n\nAnalyzing: {approach['approach']} - Decision: {decision} - Scenario: {scenario['scenario']}")  # For debugging
-                
-                formatted_prompt = generate_analysis_prompt("", approach, decision, scenario, inputs)
-                max_retries = 3  # Number of retries
-                retry_count = 0
-
-                while retry_count < max_retries:
-                    try:
-                        # Get the model's response
-                        response_text = model.invoke(formatted_prompt)
-
-                        # Attempt to parse the response as JSON
-                        response_dict = json.loads(response_text)
-                        
-                        # Append the response dictionary to the list of responses
-                        responses.append(response_dict)
-
-                        # Display response for debugging purposes
-                        print("---------------------------------------------------------")
-                        print("START OF RESPONSE:\n")
-                        print(json.dumps(response_dict, indent=2))  # Print formatted JSON for clarity
-                        print("\nEND OF RESPONSE")
-                        print("---------------------------------------------------------")
-                        
-                        # Break out of the retry loop on success
-                        break
-                    except json.JSONDecodeError as e:
-                        retry_count += 1
-                        print(f"JSON decoding failed (attempt {retry_count}/{max_retries}): {e}")
-                        print("Response text was:")
-                        print(response_text)  # Log problematic response
-                        if retry_count < max_retries:
-                            print("Retrying...")
-                            time.sleep(1)  # Optional: Add delay between retries
-                        else:
-                            print("Max retries reached. Skipping this input.")
-                            response_dict = {
-                                "error": "Invalid JSON response",
-                                "response_text": response_text,
-                            }
-                            responses.append(response_dict)
-                            break
-
-    # Ensure the directory exists
-    os.makedirs(os.path.dirname(RESPONSES_PATH), exist_ok=True)
-
-    # After all responses are generated, store them in a JSON file
-    with open(RESPONSES_PATH, 'w') as json_file:
-        json.dump(responses, json_file, indent=2)
-
-    return responses
-
-def main():
-
-    # Check for the --without_retrieval flag
-    parser = argparse.ArgumentParser(description="Query Pipeline for Architectural Analysis")
-    parser.add_argument("folder_name", type=str, help="The folder containing the input data")
-    parser.add_argument("--without_retrieval", action="store_true", help="Run the pipeline without retrieval")
+# Main Function
+if __name__ == "__main__":
+    # Argument parsing
+    parser = argparse.ArgumentParser(description="Query and analyze architecture.")
+    parser.add_argument("folder_name", type=str, help="Folder name to load inputs.")
     args = parser.parse_args()
 
-    # Execute the query pipeline
-    inputs = get_inputs(args.folder_name)  # Load data from specified folder
+    # Load input data
+    inputs = get_inputs(args.folder_name)
 
-    if args.without_retrieval:
-        responses = query_without_retrieval(inputs)  # Generate prompts and responses without retrieval
-    else:
-        created_retrieval_query = create_retrieval_query(inputs)  # Summarize input for retrieval
-        top_k_results = retrieval_query(created_retrieval_query)  # Retrieve relevant database docs
-        responses = query_multiple_chunks(top_k_results, inputs)  # Generate prompts and responses
+    # Query specialized for each approach, decision, and scenario combination
+    responses = query_specialized_for_each(inputs)
 
-    print(f"Responses stored in: {RESPONSES_PATH}")  # Print the path to the stored responses
-
-
-# Main Execution: Query Pipeline
-# Loads input data, creates a retrieval query, searches the database, and generates responses
-if __name__ == "__main__":
-    main()
+    print("Responses saved in:", RESPONSES_PATH)

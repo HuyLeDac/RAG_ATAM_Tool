@@ -1,12 +1,53 @@
 <footer class="footer-container">
     <div class="footer-content">
-        <h3>Results</h3>
-        <div *ngIf="results; else noResults">
-        <pre>{{ results | json }}</pre>
+      <h3>Results</h3>
+      <div *ngIf="results?.length > 0; else noResults">
+        <div *ngFor="let result of results; let i = index" class="result-item">
+          <button
+            class="btn btn-primary toggle-button"
+            (click)="toggleTable(i)"
+          >
+          Approach: {{ result.architecturalApproach }} - Scenario: {{ result.scenario.name }} - Decision: {{ result.architecturalDecision }} 
+          </button>
+          <div *ngIf="expandedTables[i]" class="table-container">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Details</th>
+                  <th>Source</th>
+                </tr>
+              </thead>
+              <tbody>
+                <ng-container *ngFor="let risk of result.risks">
+                  <tr>
+                    <td>Risk</td>
+                    <td>{{ risk.details }}</td>
+                    <td>{{ risk.source }}</td>
+                  </tr>
+                </ng-container>
+                <ng-container *ngFor="let tradeoff of result.tradeoffs">
+                  <tr>
+                    <td>Tradeoff</td>
+                    <td>{{ tradeoff.details }}</td>
+                    <td>{{ tradeoff.source }}</td>
+                  </tr>
+                </ng-container>
+                <ng-container *ngFor="let sensitivity of result.sensitivityPoints">
+                  <tr>
+                    <td>Sensitivity</td>
+                    <td>{{ sensitivity.details }}</td>
+                    <td>{{ sensitivity.source }}</td>
+                  </tr>
+                </ng-container>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <ng-template #noResults>
+      </div>
+      <ng-template #noResults>
         <p>No results available. Please run the analysis.</p>
-        </ng-template>
+      </ng-template>
     </div>
-</footer>
+  </footer>
   

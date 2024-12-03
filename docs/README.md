@@ -53,13 +53,15 @@ Rough sequence diagram of the creation/update of the database: <br>
 
 ## Usage
 
+Run **./run.sh** OR
+
 1. Run Python server
 
     ```bash
     python backend/app.py
     ```
 
-1. Run Angular App Locally
+1. Run Angular App Locally on a different terminal 
 
     ```bash
     cd frontend/ATAM-RAG-Tool

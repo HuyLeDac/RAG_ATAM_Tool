@@ -16,13 +16,12 @@
     <button class="button2" (click)="addURL()">Add URLs</button>
 
     <!-- Upload Input Button -->
-    <button class="button3" (click)="uploadInputs()">Upload input</button>
+    <button class="button3" (click)="uploadInputs()">Upload Input</button>
 
     <!-- Fetch Results Buttons -->
     <button class="button4" (click)="fetchResults()" [disabled]="loading">
       Fetch Results
     </button>
-
     <button class="button6" (click)="fetchResultsWithoutQuery()" [disabled]="loading">
       Fetch Results without RAG
     </button>
@@ -41,8 +40,9 @@
     <h3 class="title1">Architecture Context</h3>
 
     <!-- System Purpose Input -->
-    <label>Briefly describe the purpose of the system:</label>
+    <label for="system-purpose">Briefly describe the purpose of the system:</label>
     <textarea
+      id="system-purpose"
       class="input-field"
       placeholder="Enter system purpose here"
       [(ngModel)]="systemPurpose"
@@ -51,8 +51,9 @@
     <br /><br />
 
     <!-- System Constraints Input -->
-    <label>Type in the technical constraints of the system:</label>
+    <label for="system-constraints">Type in the technical constraints of the system:</label>
     <textarea
+      id="system-constraints"
       class="input-field"
       placeholder="Enter constraint here"
       [(ngModel)]="systemConstraint"
@@ -61,8 +62,9 @@
     <br /><br />
 
     <!-- System Interactions Input -->
-    <label>Describe how the system should interact:</label>
+    <label for="system-interactions">Describe how the system should interact:</label>
     <textarea
+      id="system-interactions"
       class="input-field"
       placeholder="Enter interaction here"
       [(ngModel)]="systemInteraction"
@@ -71,71 +73,187 @@
     <br /><br />
 
     <!-- Current Architecture Context Display -->
-    <label>Current display of the architecture context (manual configuration possible):</label>
+    <label for="architecture-context-display">Current architecture context (editable):</label>
     <textarea
+      id="architecture-context-display"
       class="input-field2"
       placeholder="Architecture Context in JSON"
-      [ngModel]="architecture_context | json"
+      
+      [(ngModel)]="architecture_context"
     ></textarea>
     <br />
 
     <!-- Architectural Approaches Section -->
     <h3 class="title2">Architectural Approaches</h3>
+
+    <!-- Approach Details -->
+    <label for="approach-name">Approach Name:</label>
     <textarea
+      id="approach-name"
+      class="input-field"
+      placeholder="Enter approach name"
+      [(ngModel)]="approach_name"
+    ></textarea>
+
+    <label for="approach-description">Approach Description:</label>
+    <textarea
+      id="approach-description"
+      class="input-field"
+      placeholder="Enter approach description"
+      [(ngModel)]="approach_description"
+    ></textarea>
+
+    <label for="architectural-decisions">Architectural Decisions:</label>
+    <textarea
+      id="architectural-decisions"
+      class="input-field"
+      placeholder="Enter each decision on a new line"
+      [(ngModel)]="architectural_decisions"
+    ></textarea>
+    <button (click)="saveDecisions()">Save Decisions</button>
+
+    <!-- Display Saved Decisions -->
+    <div *ngIf="savedDecisions.length > 0">
+      <strong>Saved Decisions:</strong>
+      <ul>
+        <li *ngFor="let decision of savedDecisions">{{ decision }}</li>
+      </ul>
+    </div>
+
+    <!-- Architectural Views -->
+    <h4>Development View (Component Diagram)</h4>
+    <label for="development-view-description">Description:</label>
+    <textarea
+      id="development-view-description"
+      class="input-field"
+      placeholder="Enter description"
+      [(ngModel)]="development_view_description"
+    ></textarea>
+    <label for="development-view-diagram">Diagram:</label>
+    <textarea
+      id="development-view-diagram"
+      class="input-field"
+      placeholder="Enter PlantUML Component Diagram"
+      [(ngModel)]="development_view_diagram"
+    ></textarea>
+
+    <h4>Process View (Sequence Diagram)</h4>
+    <label for="process-view-description">Description:</label>
+    <textarea
+      id="process-view-description"
+      class="input-field"
+      placeholder="Enter description"
+      [(ngModel)]="process_view_description"
+    ></textarea>
+    <label for="process-view-diagram">Diagram:</label>
+    <textarea
+      id="process-view-diagram"
+      class="input-field"
+      placeholder="Enter PlantUML Sequence Diagram"
+      [(ngModel)]="process_view_diagram"
+    ></textarea>
+
+    <h4>Physical View (Deployment Diagram)</h4>
+    <label for="physical-view-description">Description:</label>
+    <textarea
+      id="physical-view-description"
+      class="input-field"
+      placeholder="Enter description"
+      [(ngModel)]="physical_view_description"
+    ></textarea>
+    <label for="physical-view-diagram">Diagram:</label>
+    <textarea
+      id="physical-view-diagram"
+      class="input-field"
+      placeholder="Enter PlantUML Deployment Diagram"
+      [(ngModel)]="physical_view_diagram"
+    ></textarea>
+    <button class="button9" (click)="addArchitecturalApproach()">Add Approach</button>
+
+    <!-- Display Current Approaches -->
+    <label for="architectural-approaches-display">Current Architectural Approaches:</label>
+    <textarea
+      id="architectural-approaches-display"
       class="input-field2"
-      placeholder="Enter architectural approaches here"
+      
       [(ngModel)]="architectural_approaches"
     ></textarea>
+    <br />
 
     <!-- Quality Attribute Criteria Section -->
     <h3 class="title3">Quality Attribute Criteria</h3>
+    <label for="quality-attribute-name">Quality Attribute:</label>
     <textarea
+      id="quality-attribute-name"
+      class="input-field"
+      placeholder="Enter quality attribute"
+      [(ngModel)]="quality_criteria_name"
+    ></textarea>
+    <label for="quality-attribute-question">Criterion:</label>
+    <textarea
+      id="quality-attribute-question"
+      class="input-field"
+      placeholder="Enter question/criteria"
+      [(ngModel)]="quality_criteria_question"
+    ></textarea>
+    <button class="button9" (click)="addQualityAttributeCriterion()">Add Criterion</button>
+
+    <!-- Current Quality Criteria -->
+    <label for="quality-criteria-display">Current Quality Criteria:</label>
+    <textarea
+      id="quality-criteria-display"
       class="input-field2"
-      placeholder="Enter quality attribute criteria here"
+      
       [(ngModel)]="quality_criteria"
     ></textarea>
     <br />
 
     <!-- Scenarios Section -->
     <h3 class="title4">Scenarios</h3>
+    <label for="scenario-name">Scenario Name:</label>
     <textarea
+      id="scenario-name"
       class="input-field"
-      placeholder="Enter scenario name here"
+      placeholder="Enter scenario name"
       [(ngModel)]="scenarioName"
     ></textarea>
-
+    <label for="scenario-attribute">Quality Attribute:</label>
     <textarea
+      id="scenario-attribute"
       class="input-field"
-      placeholder="Enter quality attribute here"
+      placeholder="Enter quality attribute"
       [(ngModel)]="scenarioAttribute"
     ></textarea>
-
+    <label for="scenario-environment">Environment:</label>
     <textarea
+      id="scenario-environment"
       class="input-field"
-      placeholder="Enter environment here"
+      placeholder="Enter environment"
       [(ngModel)]="scenarioEnvironment"
     ></textarea>
-
+    <label for="scenario-stimulus">Stimulus:</label>
     <textarea
+      id="scenario-stimulus"
       class="input-field"
-      placeholder="Enter stimulus here"
+      placeholder="Enter stimulus"
       [(ngModel)]="scenarioStimulus"
     ></textarea>
-
+    <label for="scenario-response">Response:</label>
     <textarea
+      id="scenario-response"
       class="input-field"
-      placeholder="Enter response here"
+      placeholder="Enter response"
       [(ngModel)]="scenarioResponse"
     ></textarea>
-
     <button class="button10" (click)="addScenario()">Add Scenario</button>
 
-    <!-- Current Scenarios Display -->
-    <label>Current scenarios (manual configuration possible):</label>
+    <!-- Display Current Scenarios -->
+    <label for="scenarios-display">Current Scenarios:</label>
     <textarea
-      class="input-field"
-      [value]="formattedScenarios"
+      id="scenarios-display"
+      class="input-field2"
+      
+      [(ngModel)]="scenarios"
     ></textarea>
   </div>
-
 </div>
