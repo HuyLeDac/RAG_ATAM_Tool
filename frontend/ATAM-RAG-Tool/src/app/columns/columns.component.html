@@ -29,6 +29,9 @@
     <!-- Reset Button -->
     <button class="button5" (click)="reset()">Reset</button>
 
+    <!-- Manage RAG Database Button -->
+    <button class="button11" (click)="manageRagDatabase()">Manage RAG Database</button>
+
     <!-- Loading Spinner -->
     <div *ngIf="loading" class="loading-container">
       <mat-spinner></mat-spinner>
@@ -81,7 +84,8 @@
       
       [(ngModel)]="architecture_context"
     ></textarea>
-    <br />
+    <br /><br />
+    <div class="divider"></div>
 
     <!-- Architectural Approaches Section -->
     <h3 class="title2">Architectural Approaches</h3>
@@ -121,7 +125,7 @@
     </div>
 
     <!-- Architectural Views -->
-    <h4>Development View (Component Diagram)</h4>
+    <h4 class="diagram-header">Development View (Component Diagram)</h4>
     <label for="development-view-description">Description:</label>
     <textarea
       id="development-view-description"
@@ -137,7 +141,7 @@
       [(ngModel)]="development_view_diagram"
     ></textarea>
 
-    <h4>Process View (Sequence Diagram)</h4>
+    <h4 class="diagram-header">Process View (Sequence Diagram)</h4>
     <label for="process-view-description">Description:</label>
     <textarea
       id="process-view-description"
@@ -153,7 +157,7 @@
       [(ngModel)]="process_view_diagram"
     ></textarea>
 
-    <h4>Physical View (Deployment Diagram)</h4>
+    <h4 class="diagram-header">Physical View (Deployment Diagram)</h4>
     <label for="physical-view-description">Description:</label>
     <textarea
       id="physical-view-description"
@@ -178,7 +182,8 @@
       
       [(ngModel)]="architectural_approaches"
     ></textarea>
-    <br />
+    <br /><br />
+    <div class="divider"></div>
 
     <!-- Quality Attribute Criteria Section -->
     <h3 class="title3">Quality Attribute Criteria</h3>
@@ -206,7 +211,8 @@
       
       [(ngModel)]="quality_criteria"
     ></textarea>
-    <br />
+    <br /><br />
+    <div class="divider"></div>
 
     <!-- Scenarios Section -->
     <h3 class="title4">Scenarios</h3>

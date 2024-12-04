@@ -97,11 +97,13 @@ def generate_analysis_prompt(context_output, approach, decision, scenario, input
     -----
 
     <TASK>
-    We are conducting a qualitative analysis based on ATAM.
+    We are conducting a qualitative analysis based on ATAM. You are given multiple architectural view in PlantUML format.
 
     Task:
     Provide the risks, tradeoffs, and sensitivity points regarding the scenario in the architectural decision: {decision}.
     Use the input data provided, marking any external knowledge as [LLM KNOWLEDGE] and other sources as [DATABASE SOURCE] from the database.
+    For each risk/tradeoff/sensitivity point, provide a point for each view (3 in total).
+    Consider the technical constraints from the architecture context.
     </TASK>
 
     -----

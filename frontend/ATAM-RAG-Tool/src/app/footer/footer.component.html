@@ -7,9 +7,10 @@
             class="btn btn-primary toggle-button"
             (click)="toggleTable(i)"
           >
-          Approach: {{ result.architecturalApproach }} - Scenario: {{ result.scenario.name }} - Decision: {{ result.architecturalDecision }} 
+          <b>Approach:</b> {{ result.architecturalApproach }} - <b>Scenario:</b> {{ result.scenario.name }} (<b>Quality attribute:</b> {{ result.scenario.qualityAttribute }}) - <b>Decision:</b> {{ result.architecturalDecision }} 
           </button>
           <div *ngIf="expandedTables[i]" class="table-container">
+            
             <table class="table table-striped">
               <thead>
                 <tr>

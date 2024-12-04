@@ -73,8 +73,22 @@ Run **./run.sh** OR
 
 1. Type in all necessary inputs needed for the analysis:
     - "Add PDFs/URLs": You can add PDFs/URLs which can be helpful for the architecture analysis
-    - "Add input": After adding the contents, you can press "Add input". The contents will then be added to the server.
+    - **"Upload input":** After adding the contents, you can press "Upload input". The contents will then be added to the server in a JSON format.
+        - **Architecture Context:** Here you textually provide the systems purpose, their technical constrints, and main interactions of the product.
+        - **Architectural Approaches:**
+            - Approach Name: Name of the approach/style.
+            - Approach Description: Textual description on how to implement the architectural approach/style into the new product.
+            - Architectural decisions: Add major decisions of architectural layout.
+            - Different views: You can add three different views in PlantUML syntax.
+        - **Quality Attribute Criteria:** Add the name and all necessary criterion/questions to define the quality attribute.
+        - **Scenarios: 
+            - Scenario Name: Title of the scenario.
+            - Quality Attribute: Which quality attribute the scenario represents.
+            - Environment: Under which conditions does the scenario occur?
+            - Stimulus: What is the trigger of the scenario event?
+            - Response: How should the system respond to the trigger?
     - "Fetch Results":  This button starts the analysis. The response will then be added to the Footer when finished.
+        - You can also fetch results without using the RAG database with "Fetch results without RAG"
 
 ## Requirements
 
@@ -589,6 +603,10 @@ Run **./run.sh** OR
     **TODO**
 
 ## Updates
+
+### Update 12.03.2024
+
+- Website can now display results in a table
 
 ### Update 13.11.2024
 

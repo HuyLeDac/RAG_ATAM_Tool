@@ -23,11 +23,14 @@ import { LoadingDialogComponent } from '../loading-dialog/loading-dialog.compone
 })
 
 export class ColumnsComponent implements OnInit {
+manageRagDatabase() {
+throw new Error('Method not implemented.');
+}
 
   results: any; // To store fetched results
 
   architecture_context: any = '{ "architectureDescription": {}}'; // Initialize as an empty object
-  architectural_approaches: any = '{"architecturalApproaches": []}';
+  architectural_approaches: any = '{ "architecturalApproaches": [] }';
   quality_criteria: any = '{ "quality_criteria" : [] }';
   scenarios: any = '{ "scenarios" : [] }';
 
@@ -60,8 +63,18 @@ export class ColumnsComponent implements OnInit {
 
   constructor(private http: HttpClient, private sharedDataService: SharedDataService, private dialog: MatDialog) {}
 
+  
   ngOnInit() {
-    // Initialization logic
+    this.http.post('http://127.0.0.1:5000/', {}).subscribe(
+      (response) => {
+        console.log('Server active:', response);
+        alert('Server active!');
+      },
+      (error) => {
+        console.error('Error checking server status:', error);
+        alert('An error occurred while checking the server status.');
+      }
+    );
   }
 
   addURL() {

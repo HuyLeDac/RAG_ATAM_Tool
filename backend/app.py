@@ -12,7 +12,7 @@ CORS(app)
 INPUT_DIR = "inputs/temp"
 os.makedirs(INPUT_DIR, exist_ok=True)
 
-@app.route('/')
+@app.route('/', methods=['POST'])
 def root():
     # Clear INPUT_DIR contents
     for file in os.listdir(INPUT_DIR):
@@ -22,7 +22,8 @@ def root():
     if os.path.exists(RESPONSES_PATH):
         with open(RESPONSES_PATH, 'w') as file:
             file.write(json.dumps([]))
-    return jsonify({"message": "Server active!"})
+
+    return jsonify({"message": "Server active!"}), 200
 
 @app.route('/upload-inputs', methods=['POST'])
 def upload_inputs():
