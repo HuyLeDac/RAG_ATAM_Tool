@@ -53,7 +53,14 @@ Rough sequence diagram of the creation/update of the database: <br>
 
 ## Usage
 
-Run **./run.sh** OR
+Run and open [localhost website](http://localhost:4200/) on port 4200 with
+
+```bash
+chmod +x run.sh
+./run.sh
+```
+
+**OR**
 
 1. Run Python server
 
@@ -61,7 +68,7 @@ Run **./run.sh** OR
     python backend/app.py
     ```
 
-1. Run Angular App Locally on a different terminal 
+1. Run Angular App Locally on a different terminal
 
     ```bash
     cd frontend/ATAM-RAG-Tool
