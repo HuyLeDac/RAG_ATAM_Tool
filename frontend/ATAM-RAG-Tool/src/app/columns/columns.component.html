@@ -15,6 +15,13 @@
     <!-- Add URLs Button -->
     <button class="button2" (click)="addURL()">Add URLs</button>
 
+    <!-- List PDFs Button -->
+    <button class="button12" (click)="listAllPdfs()">List all PDFs in the database</button>
+    <!-- List URLs Button -->
+    <button class="button13" (click)="listAllUrls()">List all URLs in the database</button>
+
+    <div class="divider"></div>
+
     <!-- Upload Input Button -->
     <button class="button3" (click)="uploadInputs()">Upload Input</button>
 
@@ -25,12 +32,13 @@
     <button class="button6" (click)="fetchResultsWithoutQuery()" [disabled]="loading">
       Fetch Results without RAG
     </button>
+    <div class="divider"></div>
 
     <!-- Reset Button -->
     <button class="button5" (click)="reset()">Reset</button>
 
     <!-- Manage RAG Database Button -->
-    <button class="button11" (click)="manageRagDatabase()">Manage RAG Database</button>
+    <button class="button11" (click)="openReadme()">Help</button>
 
     <!-- Loading Spinner -->
     <div *ngIf="loading" class="loading-container">

@@ -116,7 +116,7 @@ input[type="text"] {
 }
 
 /* Styling for Buttons 1 to 6 */
-.button1, .button2, .button3, .button4, .button5, .button6 {
+.button1, .button2, .button3, .button4, .button5, .button6, .button11{
   background-color: #007bff;
   color: white;
   border: 1px solid #0056b3;
@@ -125,7 +125,7 @@ input[type="text"] {
   transition: background-color 0.3s ease;
 }
 
-.button1:hover, .button2:hover, .button3:hover, .button4:hover, .button5:hover, .button6:hover {
+.button1:hover, .button2:hover, .button3:hover, .button4:hover, .button5:hover, .button6:hover, .button11:hover{
   background-color: #0056b3;
 }
 
@@ -141,7 +141,7 @@ input[type="text"] {
   transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover animations */
 }
 
-.button7:hover, .button8:hover, .button9:hover, .button10:hover {
+.button7:hover, .button8:hover, .button9:hover, .button10:hover{
   background-color: #574bfa; /* A deeper purple on hover */
   transform: scale(1.05); /* Slight zoom effect */
 }
@@ -155,21 +155,6 @@ button:hover {
   display: grid;
   grid-template-rows: 1fr auto; /* Content takes space, button sits at the bottom */
   height: 100%; /* Ensure the container spans full height */
-}
-
-.button11 {
-  align-self: end; /* Aligns the button at the bottom of the grid */
-  background-color: #ff5733; /* Example color */
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
-}
-
-.button11:hover {
-  background-color: #e74c3c; /* Darker color on hover */
 }
 
 /* Loading spinner styling */

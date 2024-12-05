@@ -37,7 +37,7 @@ def save_to_pdf(data, output_dir="data"):
         return
 
     # Sanitize the filename based on the URL
-    sanitized_url = data['url'].replace("https://", "").replace("http://", "").replace("/", "_")
+    sanitized_url = data['url'].replace("https://", "").replace("http://", "").replace("/", "_").replace("#", "_")
     pdf_filename = os.path.join(output_dir, f"{sanitized_url}.pdf")
 
     # Check if the PDF already exists

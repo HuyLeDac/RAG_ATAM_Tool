@@ -1,0 +1,26 @@
+<div class="dialog-container">
+    <h2 mat-dialog-title>List of PDF Files</h2>
+  
+    <div *ngIf="loading" class="loading-spinner">
+      <mat-spinner></mat-spinner>
+    </div>
+  
+    <div *ngIf="!loading">
+      <ul *ngIf="pdfFiles.length > 0; else noFiles">
+        <li *ngFor="let pdf of pdfFiles" class="pdf-item">
+          <span>{{ pdf }}</span>
+          <button mat-button color="primary" (click)="downloadPdf(pdf)">Download</button>
+          <button mat-button color="warn" (click)="deletePdf(pdf)">Delete</button>
+        </li>
+      </ul>
+  
+      <ng-template #noFiles>
+        <p>No PDF files found.</p>
+      </ng-template>
+    </div>
+  
+    <div class="dialog-actions">
+      <button mat-button (click)="closeDialog()">Close</button>
+    </div>
+  </div>
+  

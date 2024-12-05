@@ -69,10 +69,10 @@ Run **./run.sh** OR
     ```
 
 1. Open [localhost website](http://localhost:4200/) on port 4200. It should look like this:
-    ![Website layout](readme_figures/website.png)
+    ![Website layout](readme_figures/webpage.png)
 
 1. Type in all necessary inputs needed for the analysis:
-    - "Add PDFs/URLs": You can add PDFs/URLs which can be helpful for the architecture analysis
+    - **"Add PDFs/URLs":** You can add PDFs/URLs which can be helpful for the architecture analysis
     - **"Upload input":** After adding the contents, you can press "Upload input". The contents will then be added to the server in a JSON format.
         - **Architecture Context:** Here you textually provide the systems purpose, their technical constrints, and main interactions of the product.
         - **Architectural Approaches:**
@@ -81,13 +81,13 @@ Run **./run.sh** OR
             - Architectural decisions: Add major decisions of architectural layout.
             - Different views: You can add three different views in PlantUML syntax.
         - **Quality Attribute Criteria:** Add the name and all necessary criterion/questions to define the quality attribute.
-        - **Scenarios: 
+        - **Scenarios**: 
             - Scenario Name: Title of the scenario.
             - Quality Attribute: Which quality attribute the scenario represents.
             - Environment: Under which conditions does the scenario occur?
             - Stimulus: What is the trigger of the scenario event?
             - Response: How should the system respond to the trigger?
-    - "Fetch Results":  This button starts the analysis. The response will then be added to the Footer when finished.
+    - **"Fetch Results":**  This button starts the analysis. The response will then be added to the Footer when finished.
         - You can also fetch results without using the RAG database with "Fetch results without RAG"
 
 ## Requirements
@@ -108,14 +108,14 @@ Run **./run.sh** OR
 - **How will they be generated?** <br>
     Manual or automatic? Use LLMs to generate scenarios? Or predefine it? *TODO*
 - **How do you envision RAG (Retrieval Augmented Generation) being used in this analysis?** <br>
-    Fetch documents, past cases, or architectural frameworks during analysis? *TODO*
+    As many styles as possible (by gathering enough data)
 
 ### Data Input
 
 - **What data will the prototype require?** <br>
 
     1. *Scenarios and their respective quality attribute*
-    1. *Architecture description*
+    1. *Architecture description/context*
     1. *Quality criteria*
     1. *Architectural approaches*
 - **How will this data be structured (Format)?**
@@ -335,7 +335,7 @@ Run **./run.sh** OR
         @enduml
         ----------------------------------------
 
-        UML Component Diagram as Deployment View
+        UML Component Diagram as Development View
         @startuml
         package "Web Application" {
             component "User Interface" as UI
@@ -546,24 +546,17 @@ Run **./run.sh** OR
 
 ### System components & architecture
 
-- **What are the major components of the prototype?** <br>
-    Frontend: React or Vue.js for input<br>
-    Backend: python server using flask? LLM processing using ollama library, <br>
-  - RAG database 
-  - LLM (Llama 3.1:70b or 8b)
+- **What are the major components of the prototype?**
+  - Frontend: Angular
+  - Backend: Flask Server, Ollama, Langchain
+  - RAG database: ChromaDB
+  - LLM (Llama 3.1:70b, 8b, or nemotron)
+  - Retrieval model: mistral
   - temporary input folder while there aren't any existing frontend applications 
-  - information retriver 
-  - utils for (error handling, logging, etc.)
-  - an app handling http requests
 - **What kind of information should the database contain?**
-    homogeneous/heterogeneous? <br>
-    Architecture Patterns and Styles <br>
-    Quality Attributes and Impact <br>
-    Tradeoff Points <br>
-    Risk Catalog <br>
-    Sensitivity Points <br>
-    Architectural Decisions Repository <br>
-    Real-World Case Studies  
+  - DataType: PDFs
+  - Scientific articles + webpages mentioning risks, tradeoffs and sensitivity points of different architectural styles/decisions
+  - Will be saved in data
 
 ### Functional requirements
 

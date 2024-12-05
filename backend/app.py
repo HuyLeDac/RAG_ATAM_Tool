@@ -1,12 +1,21 @@
-from flask import Flask, request, jsonify, send_file
-from flask_cors import CORS  # For communication with Angular
+from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
+from langchain_chroma import Chroma  # For communication with Angular
+from get_embedding_function import get_embedding_function
+from create_database import DATABASE_PATH
 from query import RESPONSES_PATH
+from data_manager import PDFManager
 import os
 import json
 import subprocess
+import shutil
+import urllib
 
 app = Flask(__name__)
 CORS(app)
+
+# pdf manager
+pdf_manager = PDFManager("data")
 
 # Directory setup
 INPUT_DIR = "inputs/temp"
@@ -56,8 +65,7 @@ def upload_inputs():
 
     return jsonify({"message": "Inputs uploaded and saved successfully."}), 200
 
-
-# Endpoint to receive uploaded PDF files
+# Endpoint to upload a PDF file
 @app.route('/upload-pdf', methods=['POST'])
 def upload_pdf():
     # Check if a file was part of the request
@@ -74,17 +82,74 @@ def upload_pdf():
     if not file.filename.endswith('.pdf'):
         return jsonify({"error": "Invalid file type, only PDF files are allowed."}), 400
     
-    # Directory where the PDF will be saved
-    pdf_dir = os.path.join("data")
-    os.makedirs(pdf_dir, exist_ok=True)
-    
-    # Save the file with a unique name (e.g., with timestamp or original name)
-    pdf_path = os.path.join(pdf_dir, file.filename)
-    file.save(pdf_path)
-    
-    return jsonify({"message": f"PDF uploaded successfully and saved to {pdf_path}."}), 200
+    try:
+        # Save the PDF using PDFManager
+        pdf_manager.add_pdf(file.filename, file.read())
+        return jsonify({"message": f"PDF uploaded successfully and saved as {file.filename}."}), 200
+    except Exception as e:
+        return jsonify({"error": f"Failed to upload PDF: {str(e)}"}), 500
 
-    
+@app.route('/delete-pdf/<pdf_name>', methods=['POST'])
+def delete_pdf(pdf_name: str):
+    try:
+        # Step 1: Delete the PDF file from the filesystem
+        pdf_path = os.path.join(os.path.dirname(__file__), 'data', pdf_name)
+        pdf_path_fixed = urllib.parse.unquote(pdf_path)
+        
+        if os.path.exists(pdf_path_fixed):
+            os.remove(pdf_path_fixed)
+            print(f"PDF '{pdf_name}' deleted.")
+        else:
+            print(f"Error: PDF '{pdf_name}' not found.")
+            return jsonify({"error": f"PDF '{pdf_name}' not found."}), 404
+
+        # Step 2: Clear the Chroma database
+        # TODO: optimize this process
+        directory_path = DATABASE_PATH
+        try:
+            if os.path.exists(directory_path):
+                # Remove all files and subdirectories in the directory
+                shutil.rmtree(directory_path)
+                # Recreate the directory after removing it
+                os.makedirs(directory_path)
+                print(f"Successfully cleared the contents of {directory_path}.")
+            else:
+                print(f"Directory {directory_path} does not exist.")
+        except Exception as e:
+            print(f"Error clearing directory {directory_path}: {str(e)}")
+
+        # Step 3: Recreate the database
+        print("Recreating the database...")
+        subprocess.run(['python', 'web_scraper.py'], check=True)
+        subprocess.run(['python', 'create_database.py', 'data/inputs'], check=True)
+
+        # Step 4: Get the updated list of PDFs after deletion
+        pdf_files = pdf_manager.get_all_pdfs()
+
+        return jsonify({
+            "message": "PDF and chunks deleted, and the database has been recreated successfully.",
+            "updated_pdf_files": pdf_files
+        }), 200
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error during subprocess execution: {e}")
+        return jsonify({"error": "Failed to recreate the database."}), 500
+    except Exception as e:
+        print(f"Unexpected error occurred: {str(e)}")
+        return jsonify({"error": f"Failed to clear the database: {str(e)}"}), 500
+
+# Endpoint to list all PDF files
+@app.route('/list-pdfs', methods=['GET'])
+def list_pdfs():
+    try:
+        # Get the list of all PDFs from PDFManager
+        pdf_files = pdf_manager.get_all_pdfs()
+        if not pdf_files:
+            return jsonify({"message": "No PDF files found in the directory."}), 200
+        return jsonify({"pdf_files": pdf_files}), 200
+    except Exception as e:
+        return jsonify({"error": f"Failed to list PDF files: {str(e)}"}), 500
+
 
 # Endpoint to receive a URL for processing
 @app.route('/upload-url', methods=['POST'])
@@ -111,6 +176,9 @@ def upload_url():
 
     return jsonify({"message": "URL uploaded and saved successfully."}), 200
 
+@app.route('/download/<filename>', methods=['GET'])
+def download_file(filename):
+    return send_from_directory("data", filename, as_attachment=True)
 
 # Endpoint to retrieve the results after processing
 @app.route('/get-results', methods=['GET'])
@@ -162,6 +230,45 @@ def get_results_without_retrieval():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/get-urls', methods=['GET'])
+def get_urls():
+    url_file_path = os.path.join("data", "URLs.txt")
+    
+    if not os.path.exists(url_file_path):
+        return jsonify({"error": "URLs file not found"}), 404
+
+    try:
+        with open(url_file_path, 'r') as url_file:
+            urls = url_file.readlines()
+        urls = [url.strip() for url in urls]
+        return jsonify({"urls": urls}), 200
+    except Exception as e:
+        return jsonify({"error": f"Failed to read URLs file: {str(e)}"}), 500
+
+@app.route('/update-urls', methods=['POST'])
+def update_urls():
+    # Get the incoming JSON data from the request body
+    data = request.get_json()
+
+    # Ensure the URLs field is present
+    if "urls" not in data:
+        return jsonify({"error": "Missing field: urls"}), 400
+
+    urls = data["urls"]
+
+    # Directory for storing URLs
+    url_dir = os.path.join("data")
+    os.makedirs(url_dir, exist_ok=True)
+
+    # Path to the URLs file
+    url_file_path = os.path.join(url_dir, "URLs.txt")
+
+    # Write the URLs to the file, overwriting any existing content
+    with open(url_file_path, 'w') as url_file:
+        for url in urls:
+            url_file.write(url + "\n")
+
+    return jsonify({"message": "URLs updated successfully."}), 200
 
 def serialize_architectural_data(data):
     def custom_sort(item):
@@ -181,6 +288,10 @@ def serialize_architectural_data(data):
     ordered_data = [custom_sort(item) for item in data]
     return json.dumps(ordered_data, indent=2)
 
+@app.route('/get-pdfs', methods=['GET'])
+def get_pdfs():
+    pdfs = pdf_manager.get_all_pdfs()
+    return jsonify(pdfs), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

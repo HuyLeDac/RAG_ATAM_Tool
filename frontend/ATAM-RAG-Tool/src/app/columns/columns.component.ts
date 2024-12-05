@@ -8,7 +8,8 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AddUrlDialogComponent } from '../add-url-dialog/add-url-dialog.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LoadingDialogComponent } from '../loading-dialog/loading-dialog.component';
-
+import { PdfListDialogComponent } from '../pdf-list-dialog/pdf-list-dialog.component';
+import { UrlListDialogComponent } from '../url-list-dialog/url-list-dialog.component';
 
 @Component({
   selector: 'app-columns',
@@ -23,9 +24,6 @@ import { LoadingDialogComponent } from '../loading-dialog/loading-dialog.compone
 })
 
 export class ColumnsComponent implements OnInit {
-manageRagDatabase() {
-throw new Error('Method not implemented.');
-}
 
   results: any; // To store fetched results
 
@@ -144,6 +142,20 @@ throw new Error('Method not implemented.');
   triggerPdfUpload() {
     const fileInput = document.getElementById('pdfUpload') as HTMLInputElement;
     if (fileInput) fileInput.click();
+  }
+
+  listAllPdfs(): void {
+    this.dialog.open(PdfListDialogComponent, {
+      width: '700px',
+      height: '500px'
+    });
+  }
+
+  listAllUrls(): void {
+    this.dialog.open(UrlListDialogComponent, {
+      width: '700px',
+      height: '500px'
+    });
   }
   
 
@@ -276,6 +288,17 @@ addInteraction() {
 
     this.inputsUploaded = false; // Flag to track if inputs have been uploaded
     this.loading = false; // New loading state
+
+    this.http.post('http://127.0.0.1:5000/', {}).subscribe(
+      (response) => {
+        console.log('Server active:', response);
+        alert('Successful reset!');
+      },
+      (error) => {
+        console.error('Error checking server status:', error);
+        alert('An error occurred while checking the server status.');
+      }
+    );
 
   }
 
@@ -508,37 +531,11 @@ addInteraction() {
   
     alert('Architectural approach added successfully!');
   }
-  
 
-  get formattedScenarios(): string {
-    try {
-      return JSON.stringify(JSON.parse(this.scenarios || '{ "scenarios" : [] }'), null, 2); // Beautify JSON
-    } catch (error) {
-      return 'Invalid JSON'; // Handle invalid JSON case
-    }
-  }  
-  
-  get formattedQualityCriteria(): string {
-    try {
-      return JSON.stringify(JSON.parse(this.quality_criteria || '{ "quality_criteria" : [] }'), null, 2); // Beautify JSON
-    } catch (error) {
-      return 'Invalid JSON'; // Handle invalid JSON case
-    }
-  }  
-
-  get formattedApproaches(): string {
-    try {
-      return JSON.stringify(JSON.parse(this.architectural_approaches || '{ "architecturalApproaches" : []}'), null, 2); // Beautify JSON
-    } catch (error) {
-      return 'Invalid JSON'; // Handle invalid JSON case
-    }
+  openReadme() {
+    const repoUrl = 'https://github.com/HuyLeDac/RAG_ATAM_Tool'; // Replace with your GitHub repo URL
+    window.open(`${repoUrl}/blob/main/docs/README.md`, '_blank');
   }
 
-  get formattedArchitectureContext(): string {
-    try {
-      return JSON.stringify(JSON.parse(this.architecture_context) || '{ "architectureDescription": {}}', null, 2); // Beautify JSON
-    } catch (error) {
-      return 'Invalid JSON'; // Handle invalid JSON case
-    }
-  }
+  
 }

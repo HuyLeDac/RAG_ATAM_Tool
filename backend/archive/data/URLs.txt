@@ -1,3 +1,5 @@
+https://www.linkedin.com/advice/0/what-some-common-security-risks-challenges
+https://www.redhat.com/en/blog/circuit-breaker-architecture-pattern
 https://www.redhat.com/en/blog/5-essential-patterns-software-architecture#client-server
 https://www.redhat.com/en/blog/pros-and-cons-cqrs
 https://www.redhat.com/en/blog/5-essential-patterns-software-architecture#controller-reonder
