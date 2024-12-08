@@ -2,21 +2,23 @@
 
 An ATAM framework which semi-automatically analyses tradeoffs, risks and sensitivity points using Retrival Augmented Generation (RAG), focusing on qualitative analyses.
 
-### Concept Design
+The tool focuses on the analysis steps of ATAM using given inputs by the user to facilitate 
 
+### Visual concept of the tool
+
+![ATAM process](readme_figures/ATAM_process.png)
 ![General Idea](readme_figures/general_idea.png)
 ![RAG Figure](readme_figures/RAG_sketch.png)
-
-Rough sequence diagram of the creation/update of the database: <br>
-![create_databse](readme_figures/create_database_sequence.png)
 
 ## Installation (Only compatible with Unix systems)
 
 **Prerequisities:**
 
 - [Ollama](https://ollama.com/download) with the Llama 3.1 70b or nemotron model (Click [here](https://medium.com/@gabrielrodewald/running-models-with-ollama-step-by-step-60b6f6125807) and follow the instructions)
+  - For local users who aren't using the GPU server have to ensure that the PC fulfills all the necessary hardware requirements to run the models
 - [Python](https://www.python.org/downloads/)  
 - [Node.js](https://nodejs.org/en)
+- [Angular](https://angular.dev/)
 
 **For ESE GPU Server:**
 
@@ -80,7 +82,9 @@ chmod +x run.sh
 
 1. Type in all necessary inputs needed for the analysis:
     - **"Add PDFs/URLs":** You can add PDFs/URLs which can be helpful for the architecture analysis
-    - **"Upload input":** After adding the contents, you can press "Upload input". The contents will then be added to the server in a JSON format.
+        - **List all PDFs/URLs:** If you want, you can delete/download the PDFs/URLs
+    - **"Upload input":** After adding the contents, you can press "Upload input". The contents will then be added to the server in a JSON format <br>
+    (*Optional:* you can modify the JSON manually).
         - **Architecture Context:** Here you textually provide the systems purpose, their technical constrints, and main interactions of the product.
         - **Architectural Approaches:**
             - Approach Name: Name of the approach/style.
@@ -88,16 +92,284 @@ chmod +x run.sh
             - Architectural decisions: Add major decisions of architectural layout.
             - Different views: You can add three different views in PlantUML syntax.
         - **Quality Attribute Criteria:** Add the name and all necessary criterion/questions to define the quality attribute.
-        - **Scenarios**: 
+        - **Scenarios (Use Case, Growth, Exploratory)**: 
             - Scenario Name: Title of the scenario.
             - Quality Attribute: Which quality attribute the scenario represents.
             - Environment: Under which conditions does the scenario occur?
             - Stimulus: What is the trigger of the scenario event?
             - Response: How should the system respond to the trigger?
     - **"Fetch Results":**  This button starts the analysis. The response will then be added to the Footer when finished.
-        - You can also fetch results without using the RAG database with "Fetch results without RAG"
+        - You can also fetch results without using the RAG database with **"Fetch results without RAG"**
 
-## Requirements
+1. After some while, the results at the footer as toggable tables. <br>
+
+<details>
+  <summary><b>Example inputs</b></summary>
+
+**Architecture concept:**
+
+  ```json
+  {
+    "architectureDescription": {
+        "systemPurpose": "The London Ambulance Service (LAS) Computer-Aided Dispatch (CAD) system was intended to automate the dispatch of ambulances by assisting with receiving emergency calls, tracking ambulance locations using Automatic Vehicle Location System (AVLS), and dispatching ambulances based on resource availability. The system was designed to replace a manual dispatch process and improve response time and resource allocation.",
+        "technicalConstraints": [
+            "The CAD system required integration with Automatic Vehicle Location System (AVLS) for real-time tracking of ambulances.",
+            "Mobile Data Terminals (MDTs) were used for communication with ambulances, which required reliable and clear data input from field personnel.",
+            "The system needed to handle high volumes of calls without performance degradation and maintain an accurate and up-to-date database of ambulance statuses and locations.",
+            "A backup server was included in the design but was inadequately tested, leading to failures in emergency situations."
+        ],
+        "systemInteractions": [
+            "Receives emergency calls from the public and records necessary information for dispatching.",
+            "Communicates with ambulance crews through MDTs, requiring field personnel to input status updates accurately and in sequence.",
+            "Tracks real-time location and status of ambulances using AVLS to make optimal dispatch decisions.",
+            "Manages and displays exception messages, alerts, and system notifications to dispatch operators."
+        ]
+    }
+}
+  ```
+
+**Architectural approaches:**
+
+```json
+{
+    "architecturalApproaches": [
+        {
+            "approach": "Layered Architecture with Fault Tolerance",
+            "description": "Organize the system into separate layers (e.g., User Interface, Application, and Data), ensuring fault tolerance mechanisms (e.g., failover systems, redundant components) are included to prevent system-wide failures during high-demand periods.",
+            "architectural decisions": [
+                "Implement a clear separation of concerns between layers.",
+                "Introduce fault-tolerant mechanisms to prevent cascading failures.",
+                "Use redundant components for high-availability services."
+            ],
+            "architectural views": [
+                {
+                    "view": "Development View",
+                    "description": "Shows the key components of the system, focusing on the layered approach and fault tolerance between components.",
+                    "diagram": "@startuml\npackage LondonAmbulanceSystem {\n  [UI Layer] --> [Application Layer] : communicates\n  [Application Layer] --> [Data Layer] : accesses data\n  [Application Layer] --> [Dispatch Service] : manages dispatch\n  [Dispatch Service] --> [Backup System] : failover\n  [Data Layer] --> [Database] : stores data\n}\n@enduml"
+                },
+                {
+                    "view": "Process View",
+                    "description": "Illustrates the flow of requests between layers and highlights the failover processes during high-demand periods.",
+                    "diagram": "@startuml\nparticipant User\nparticipant UI_Layer\nparticipant Application_Layer\nparticipant Data_Layer\nparticipant Dispatch_Service\nparticipant Backup_System\nUser -> UI_Layer : request dispatch\nUI_Layer -> Application_Layer : route request\nApplication_Layer -> Dispatch_Service : dispatch ambulance\nDispatch_Service -> Backup_System : check failover\nDispatch_Service --> Data_Layer : fetch location\nData_Layer --> Dispatch_Service : return location\n@enduml"
+                },
+                {
+                    "view": "Physical View",
+                    "description": "Defines the physical structure of the layers, including the redundancies and backup systems.",
+                    "diagram": "@startuml\nentity Dispatch_Service {\n  * service_id : int\n  * location : string\n  * status : string\n}\nentity Backup_System {\n  * backup_id : int\n  * status : string\n}\nDispatch_Service --> Backup_System : failover\n@enduml"
+                }
+            ]
+        },
+        {
+            "approach": "Scalable and Distributed Architecture",
+            "description": "Use a distributed system to scale horizontally and ensure the system can handle high loads, especially during peak times. Load balancing and cloud-based infrastructure should be leveraged to provide scalability.",
+            "architectural decisions": [
+                "Use cloud infrastructure for scalability.",
+                "Implement load balancing across servers.",
+                "Employ microservices to scale individual components based on demand."
+            ],
+            "architectural views": [
+                {
+                    "view": "Development View",
+                    "description": "Illustrates the components of the system as microservices, showing how they interact and scale independently.",
+                    "diagram": "@startuml\npackage LondonAmbulanceSystem {\n  [Dispatch Service] --> [Cloud Load Balancer] : routes requests\n  [Dispatch Service] --> [Cloud Servers] : scales services\n  [Dispatch Service] --> [Database] : accesses data\n  [Backup System] --> [Cloud Servers] : backup scaling\n}\n@enduml"
+                },
+                {
+                    "view": "Process View",
+                    "description": "Shows how requests are handled through load balancing and distributed across servers.",
+                    "diagram": "@startuml\nparticipant User\nparticipant Cloud_LB\nparticipant Dispatch_Service\nparticipant Cloud_Servers\nUser -> Cloud_LB : send request\nCloud_LB -> Dispatch_Service : route request\nDispatch_Service -> Cloud_Servers : scale service\nDispatch_Service --> Database : fetch data\n@enduml"
+                },
+                {
+                    "view": "Physical View",
+                    "description": "Shows the physical deployment of microservices across distributed cloud servers.",
+                    "diagram": "@startuml\nentity Dispatch_Service {\n  * service_id : int\n  * status : string\n}\nentity Cloud_Servers {\n  * server_id : int\n  * load_balance : boolean\n}\nDispatch_Service --> Cloud_Servers : runs on\n@enduml"
+                }
+            ]
+        },
+        {
+            "approach": "Fault-Tolerant and High-Availability Systems",
+            "description": "Design the system with built-in redundancy and fault tolerance to ensure high availability, using techniques like data replication, load balancing, and automatic failover during outages.",
+            "architectural decisions": [
+                "Implement automatic failover systems to ensure service continuity during failures.",
+                "Use data replication across multiple nodes for high availability.",
+                "Monitor system health to trigger failover or backup systems."
+            ],
+            "architectural views": [
+                {
+                    "view": "Development View",
+                    "description": "Shows components responsible for fault tolerance, like failover systems, backup servers, and redundant services.",
+                    "diagram": "@startuml\npackage LondonAmbulanceSystem {\n  [Main Service] --> [Primary Database] : stores data\n  [Backup System] --> [Primary Database] : replicates data\n  [Main Service] --> [Failover System] : uses for backup\n  [Failover System] --> [Backup Database] : access backup\n}\n@enduml"
+                },
+                {
+                    "view": "Process View",
+                    "description": "Illustrates how the system handles failovers during failures, showing the switching process from primary to backup services.",
+                    "diagram": "@startuml\nparticipant User\nparticipant Main_Service\nparticipant Failover_System\nparticipant Backup_Service\nUser -> Main_Service : request service\nMain_Service -> Backup_Service : failover request\nFailover_System --> Backup_Service : trigger failover\n@enduml"
+                },
+                {
+                    "view": "Physical View",
+                    "description": "Shows the physical infrastructure and redundant components that enable high availability and fault tolerance.",
+                    "diagram": "@startuml\nentity Main_Service {\n  * service_id : int\n  * status : string\n}\nentity Failover_System {\n  * failover_id : int\n  * status : string\n}\nentity Backup_Service {\n  * service_id : int\n  * status : string\n}\nMain_Service --> Failover_System : uses\nFailover_System --> Backup_Service : triggers failover\n@enduml"
+                }
+            ]
+        }
+    ]
+}
+```
+
+**Quality attribute criteria:**
+
+```json
+{
+    "quality_criteria": [
+        {
+            "attribute": "Reliability",
+            "questions": [
+                {
+                    "question": "How does the architecture ensure continuous system operation under high load?"
+                },
+                {
+                    "question": "What mechanisms are in place to detect and recover from failures in critical components, such as the vehicle locating system (AVLS) or dispatch system?"
+                },
+                {
+                    "question": "How is data accuracy maintained, particularly regarding ambulance location and status?"
+                }
+            ]
+        },
+        {
+            "attribute": "Performance",
+            "questions": [
+                {
+                    "question": "How does the architecture handle incoming calls and resource allocation requests to ensure minimal delay in response time?"
+                },
+                {
+                    "question": "What strategies are implemented to prevent message queue overflow and to handle large numbers of exception messages?"
+                },
+                {
+                    "question": "How does the system handle the performance of dispatch decisions when there is a spike in calls or a backlog of pending messages?"
+                }
+            ]
+        },
+        {
+            "attribute": "Usability",
+            "questions": [
+                {
+                    "question": "Is the user interface for dispatch operators and ambulance crews intuitive and easy to use, particularly under stressful, high-pressure conditions?"
+                },
+                {
+                    "question": "What steps are taken to ensure that operators and ambulance crews can quickly enter status information without errors?"
+                },
+                {
+                    "question": "How does the system provide feedback to users to prevent repeated or incorrect entries?"
+                }
+            ]
+        },
+        {
+            "attribute": "Availability",
+            "questions": [
+                {
+                    "question": "What failover and backup mechanisms are in place to ensure system availability, especially in the event of a primary system failure?"
+                },
+                {
+                    "question": "How frequently are backup systems tested to ensure they will function effectively in a real emergency?"
+                },
+                {
+                    "question": "What is the process for recovering from a full system failure, and how does this minimize downtime?"
+                }
+            ]
+        },
+        {
+            "attribute": "Scalability",
+            "questions": [
+                {
+                    "question": "How does the system scale to accommodate surges in emergency call volumes, particularly during peak times or incidents that generate many calls?"
+                },
+                {
+                    "question": "What strategies are implemented to ensure the dispatching system can handle high volumes of requests without slowing down?"
+                },
+                {
+                    "question": "What provisions are made to increase system resources dynamically if the demand exceeds current capacity?"
+                }
+            ]
+        },
+        {
+            "attribute": "Maintainability",
+            "questions": [
+                {
+                    "question": "How easily can the system be modified to adapt to new requirements, such as changes in dispatch protocols or technology updates (e.g., vehicle tracking enhancements)?"
+                },
+                {
+                    "question": "What processes are in place to handle bug fixes and improvements without impacting system reliability or availability?"
+                },
+                {
+                    "question": "How modular is the system, and how easily can individual components be updated or replaced without major changes to the rest of the system?"
+                }
+            ]
+        }
+    ]
+}
+```
+
+**Scenarios:**
+
+```json
+{
+    "scenarios": [
+        {
+            "scenario": "Call Processing and Dispatching",
+            "attribute": "Performance",
+            "environment": "Dispatch System",
+            "stimulus": "A call is received, and an ambulance must be dispatched based on location and availability.",
+            "response": "The system processes the call and dispatches an appropriate ambulance with minimal delay, ensuring timely response."
+        },
+        {
+            "scenario": "Exception Handling",
+            "attribute": "Reliability",
+            "environment": "Dispatch System",
+            "stimulus": "Multiple exceptions occur due to failed updates or message overload.",
+            "response": "The system flags the exceptions, notifies operators, and ensures that the queue does not overflow, allowing for prompt resolution."
+        },
+        {
+            "scenario": "Vehicle Location Update",
+            "attribute": "Performance",
+            "environment": "Vehicle Tracking System (AVLS)",
+            "stimulus": "An ambulance moves to a new location.",
+            "response": "The system updates the ambulance's location in real-time and ensures that dispatch decisions are based on accurate information."
+        },
+        {
+            "scenario": "Manual Dispatch Mode",
+            "attribute": "Usability",
+            "environment": "Dispatch System",
+            "stimulus": "The automated dispatch system fails, and operators must manually dispatch ambulances.",
+            "response": "Operators are able to manually dispatch ambulances with minimal error and confusion, relying on a simple and clear interface."
+        },
+        {
+            "scenario": "High Call Volume",
+            "attribute": "Scalability",
+            "environment": "Dispatch System",
+            "stimulus": "The system experiences a surge in incoming calls due to a major incident or high traffic volume.",
+            "response": "The system scales up by prioritizing calls and dispatching available resources, maintaining response times even under load."
+        },
+        {
+            "scenario": "System Recovery from Failure",
+            "attribute": "Availability",
+            "environment": "Dispatch System",
+            "stimulus": "The primary dispatch system experiences a failure (e.g., server crash).",
+            "response": "The backup system kicks in immediately to continue dispatch operations with minimal disruption to service."
+        },
+        {
+            "scenario": "Data Synchronization",
+            "attribute": "Reliability",
+            "environment": "Mobile Data Terminals (MDTs)",
+            "stimulus": "An ambulance unit updates its status or location.",
+            "response": "The system ensures the updates are synchronized across all relevant components, maintaining an accurate and consistent database."
+        }
+    ]
+}
+```
+</details>
+
+<details>
+<summary><b>For developers</b></summary>
+## Requirements (For developers)
 
 ### Objectives
 
@@ -106,14 +378,14 @@ chmod +x run.sh
 - **Who will use this prototype?** <br>
     Software architects/engineers, need proper knowledge about ATAM and Software Architecture.
 - **What kind of architectural decisions/layouts are you focusing on?** <br>
-    *TODO*
+    All patterns.
 
 ### Context and Scenarios
 
 - **What types of scenarios will the prototype analyze?** <br>
     According ATAM paper (Use Case, Growth, Exploratory)
 - **How will they be generated?** <br>
-    Manual or automatic? Use LLMs to generate scenarios? Or predefine it? *TODO*
+    User has to manually create them.
 - **How do you envision RAG (Retrieval Augmented Generation) being used in this analysis?** <br>
     As many styles as possible (by gathering enough data)
 
@@ -125,6 +397,7 @@ chmod +x run.sh
     1. *Architecture description/context*
     1. *Quality criteria*
     1. *Architectural approaches*
+
 - **How will this data be structured (Format)?**
 
     1. *Architecture context:*
@@ -485,64 +758,46 @@ chmod +x run.sh
     -----
 
     <TASK>
-    We are conducting a qualitative analysis based on ATAM.
+    We are conducting a qualitative analysis based on ATAM. You are given multiple architectural view in PlantUML format.
 
     Task:
-    Provide the risks, tradeoffs, and sensitivity points for the scenario in the architectural decision: {decision}.
-    Use the input data provided, marking any external knowledge as [LLM KNOWLEDGE].
+    Provide the risks, tradeoffs, and sensitivity points regarding the scenario in the architectural decision: {decision}.
+    Use the input data provided, marking any external knowledge as [LLM KNOWLEDGE] and sources from the context section as [DATABASE SOURCE].
+    For each risk/tradeoff/sensitivity point, provide a point for each architectural view (3 in total).
+    Consider the technical constraints from the architecture context.
     </TASK>
 
     -----
-    Format response as. Don't use any other formats:
-
-    # Architectural Approach: {current_approach}
-    ## Scenario: {scenario_name}; Quality Attribute: {quality_attribute}
-    ### Architectural Decision: {decision}
-
-    #### Risks: [LLM KNOWLEDGE/DATABASE SOURCE](enter risks)
-    - (enter risks)
-
-    #### Tradeoffs: [LLM KNOWLEDGE/DATABASE SOURCE](enter tradeoffs)
-    - (enter tradeoffs)
-
-    #### Sensitivity Points: [LLM KNOWLEDGE/DATABASE SOURCE](enter sensitivity points)
-    - (enter sensitivity points)
-    """
+    Format response as json format. Don't use any other formats and especially don't add any additional characters or spaces:
+    
+    {{
+     "architecturalApproach": "{current_approach}",
+     "scenario": {{
+         "name": "{scenario_name}",
+         "qualityAttribute": "{quality_attribute}"
+     }},
+     "architecturalDecision": "{decision}",
+     "risks": [
+         {{
+         "source": "[LLM KNOWLEDGE/DATABASE SOURCE]",
+         "details": "(enter risks)"
+         }}
+     ],
+     "tradeoffs": [
+         {{
+         "source": "[LLM KNOWLEDGE/DATABASE SOURCE]",
+         "details": "(enter tradeoffs)"
+         }}
+     ],
+     "sensitivityPoints": [
+         {{
+         "source": "[LLM KNOWLEDGE/DATABASE SOURCE]",
+         "details": "(enter sensitivity points)"
+         }}
+     ]
+    }}
     ```
 
-- How does the output look like?
-
-    ```python
-    """
-    Analyzing: Microservices Architecture - Implement service discovery for dynamic service registration. - Password Reset
-    ---------------------------------------------------------
-    START OF RESPONSE:
-
-    # Architectural Approach: Microservices Architecture
-    ## Scenario: Password Reset; Quality Attribute: Modifiability
-    ### Architectural Decision: Implement service discovery for dynamic service registration.
-
-    #### Risks: [LLM KNOWLEDGE]
-    - **Increased Complexity**: Adding a service discovery mechanism can introduce additional complexity to the system, potentially leading to longer development and debugging times.
-    - **Security Vulnerabilities**: If not properly secured, dynamic service registration can expose the system to security risks, such as unauthorized service registrations or man-in-the-middle attacks.
-    - **Dependence on Discovery Service Uptime**: The overall system's availability may become dependent on the uptime of the service discovery mechanism, introducing a potential single point of failure.
-
-    #### Tradeoffs: [DATABASE SOURCE - Input Data Quality Criteria]
-    - **Modifiability vs. Complexity**: Enhancing modifiability through dynamic service registration may trade off with increased system complexity.
-    - **Scalability vs. Security**: Allowing for dynamic registrations can improve scalability but may compromise security if not properly implemented, as noted in the quality criteria questions related to security.
-    - **Performance Optimization**: The decision might also involve trading off some performance optimization (e.g., slightly slower initial service discovery) for the benefit of easier modification and scaling.
-
-    #### Sensitivity Points: [LLM KNOWLEDGE]
-    - **Service Registration Validation Mechanisms**: How robust are the validation mechanisms for new service registrations? Weak validations could lead to security breaches.
-    - **Discovery Service Scalability**: Can the service discovery mechanism scale in tandem with the growing number of services, or will it become a bottleneck?
-    - **Monitoring and Logging Implementations**: Are comprehensive monitoring and logging tools in place to quickly identify and respond to issues arising from dynamic service registrations?
-
-    Sources: ['backend/data/www.linkedin.com_advice_0_what-some-common-security-risks-challenges.pdf:1:1', 'backend/data/www.linkedin.com_advice_0_what-some-common-security-risks-challenges.pdf:23:0', 'backend/data/www.linkedin.com_advice_0_what-some-common-security-risks-challenges.pdf:3:2', 'backend/data/A_REVIEW_ON_SOFTWARE_ARCHITECTURAL_PATTERNS.pdf:4:9']
-
-    END OF RESPONSE
-    ---------------------------------------------------------
-    """
-    ```
 
 ### Decision Analysis
 
@@ -558,8 +813,11 @@ chmod +x run.sh
   - Backend: Flask Server, Ollama, Langchain
   - RAG database: ChromaDB
   - LLM (Llama 3.1:70b, 8b, or nemotron)
-  - Retrieval model: mistral
-  - temporary input folder while there aren't any existing frontend applications 
+  - Retrieval model:
+    - mistral for retrieval prompt generation
+    - nomic-embed-text for embedding
+  - temporary input folder while there aren't any existing frontend applications
+  - temporary responses folder where the results will be stored.
 - **What kind of information should the database contain?**
   - DataType: PDFs
   - Scientific articles + webpages mentioning risks, tradeoffs and sensitivity points of different architectural styles/decisions
@@ -581,7 +839,7 @@ chmod +x run.sh
     - LLM should classify results by quality attribute and provide analysis reports for each attribute individually.
 
 1. Identification of Trade-offs, Risks, and Sensitivity Points
-    - The tool should semi-automatically identify and display trade-offs, risks, and sensitivity points based on architecture and quality attribute inputs.
+    - The tool should automatically identify and display trade-offs, risks, and sensitivity points based on architecture and quality attribute inputs.
     - It should provide visual summaries of identified risks, trade-offs, and sensitivity points for quick review.
 
 1. User Interface and Interaction
@@ -592,9 +850,10 @@ chmod +x run.sh
 1. Report Generation
     - Generate a comprehensive report that includes detailed analysis on architectural decisions, quality attributes, trade-offs, risks, and sensitivity points.
     - Support export options for the report (e.g., PDF, text).
+    - Visualized as a table
 
 1. Database Management
-    - The system should manage and update a RAG database, including real-world case studies, architectural patterns, and decisions.
+    - The system should manage and update a RAG database, including PDFs (scientific articles)
     - Provide mechanisms for adding new data and removing or modifying outdated data entries.
 
 ### Success  Metrics
@@ -604,7 +863,12 @@ chmod +x run.sh
 
 ## Updates
 
-### Update 12.03.2024
+### Update 08.12.2024
+
+- Added code commenting in backend
+- You can now delete PDFs/URLs from the frontend and their respective chunks in the ChromaDB
+
+### Update 03.12.2024
 
 - Website can now display results in a table
 
@@ -633,6 +897,7 @@ chmod +x run.sh
 - Too many architectural approaches in one prompt is difficult for the LLM to process
   - Generates completely different outputs compared to the prompt.
 
+<details>
 
 ## License
 

@@ -116,35 +116,58 @@ input[type="text"] {
 }
 
 /* Styling for Buttons 1 to 6 */
-.button1, .button2, .button3, .button4, .button5, .button6, .button11{
+.button1, .button2, .button3, .button4, .button5, .button6, .button11 {
   background-color: #007bff;
   color: white;
-  border: 1px solid #0056b3;
+  border: 1px solid transparent; /* Use a transparent border initially */
   padding: 10px 20px;
   font-size: 14px;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth hover animations */
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for a modern look */
 }
 
-.button1:hover, .button2:hover, .button3:hover, .button4:hover, .button5:hover, .button6:hover, .button11:hover{
+.button1:hover, .button2:hover, .button3:hover, .button4:hover, .button5:hover, .button6:hover, .button11:hover {
   background-color: #0056b3;
+  border-color: #0056b3; /* Change border color on hover to match the background */
 }
 
 /* Styling for Buttons 7 to 10 (Modern aesthetic style) */
 .button7, .button8, .button9, .button10 {
   background-color: #6c63ff; /* Soft purple for a modern look */
   color: white;
-  border: 1px solid #574bfa; /* Slightly darker purple for contrast */
+  border: 1px solid transparent; /* Use a transparent border initially */
   padding: 12px 25px;
   font-size: 16px;
   margin: 5px;
   border-radius: 6px; /* Subtle rounded corners for a polished look */
-  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth hover animations */
+  transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth hover animations */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for a modern look */
 }
 
-.button7:hover, .button8:hover, .button9:hover, .button10:hover{
+.button7:hover, .button8:hover, .button9:hover, .button10:hover {
   background-color: #574bfa; /* A deeper purple on hover */
-  transform: scale(1.05); /* Slight zoom effect */
+  border-color: #574bfa; /* Change border color on hover to match the background */
 }
+
+/* Styling for Buttons 12 and 13 (Soft violet color) */
+.button12, .button13 {
+  background-color: #6c63ff;
+  color: white;
+  border: 1px solid transparent; /* Use a transparent border initially */
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease; /* Smooth hover animations */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for a modern look */
+}
+
+.button12:hover, .button13:hover {
+  background-color: #4e3dc3; /* Darker violet on hover */
+  transform: scale(1.05);
+  border-color: #4e3dc3; /* Change border color on hover to match the background */
+}
+
 
 
 button:hover {

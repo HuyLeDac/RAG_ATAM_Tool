@@ -6,31 +6,38 @@ from get_embedding_function import get_embedding_function
 from create_database import DATABASE_PATH
 from query import RESPONSES_PATH
 from data_manager import PDFManager
-from text_splitter import get_chunks
 import os
 import json
 import subprocess
-import shutil
 import urllib
 
 
+# Initialize the Flask app
 app = Flask(__name__)
 CORS(app)
 
-# pdf manager
+# Initialize PDF manager with the data directory
 pdf_manager = PDFManager("data")
 
-# Directory setup
+# Directory setup for temporary inputs
 INPUT_DIR = "inputs/temp"
 os.makedirs(INPUT_DIR, exist_ok=True)
 
 @app.route('/', methods=['POST'])
 def root():
-    # Clear INPUT_DIR contents
+    """
+    Root endpoint to clear temporary directories and check server status.
+
+    1. Clears the INPUT_DIR by deleting all its contents.
+    2. Clears the RESPONSES_PATH file by overwriting it with an empty JSON array.
+    3. Returns a message indicating the server is active.
+
+    Returns:
+        JSON response with status message and HTTP status code.
+    """
     for file in os.listdir(INPUT_DIR):
         os.remove(os.path.join(INPUT_DIR, file))
 
-    # Clear RESPONSES_PATH content
     if os.path.exists(RESPONSES_PATH):
         with open(RESPONSES_PATH, 'w') as file:
             file.write(json.dumps([]))
@@ -39,16 +46,28 @@ def root():
 
 @app.route('/upload-inputs', methods=['POST'])
 def upload_inputs():
+    """
+    Endpoint to upload architectural analysis inputs.
+
+    1. Clears the INPUT_DIR to ensure it's empty.
+    2. Accepts JSON data containing architecture context, approaches, quality criteria, and scenarios.
+    3. Validates required fields and saves each to a separate JSON file in INPUT_DIR.
+
+    Returns:
+        JSON response indicating success or an error if validation fails.
+    """
     temp_dir = INPUT_DIR
 
-    # clear the temp directory
+    # Clear the temporary directory
     for file in os.listdir(temp_dir):
         os.remove(os.path.join(temp_dir, file))
+    
+    # Clear the responses file
+    with open(RESPONSES_PATH, 'w') as file:
+        file.write(json.dumps([]))
 
-    # Get the incoming JSON data from the request body
     data = request.get_json()
 
-    # Ensure all required fields are present
     required_fields = [
         "architecture_context",
         "architectural_approaches",
@@ -59,34 +78,36 @@ def upload_inputs():
         if field not in data:
             return jsonify({"error": f"Missing field: {field}"}), 400
 
-    # Save the JSON data to temporary files (you can write each field as its own JSON file)
+    # Save each field as its own JSON file
     os.makedirs(temp_dir, exist_ok=True)
-
     for field in required_fields:
         with open(os.path.join(temp_dir, f"{field}.json"), 'w') as file:
             json.dump(data[field], file)
 
     return jsonify({"message": "Inputs uploaded and saved successfully."}), 200
 
-# Endpoint to upload a PDF file
 @app.route('/upload-pdf', methods=['POST'])
 def upload_pdf():
-    # Check if a file was part of the request
+    """
+    Endpoint to upload a PDF file.
+
+    1. Validates that a file is included in the request and is a PDF.
+    2. Uses PDFManager to save the file to the data directory.
+
+    Returns:
+        JSON response indicating success or an error if validation fails.
+    """
     if 'pdf' not in request.files:
         return jsonify({"error": "No file part"}), 400
     
     file = request.files['pdf']
-    
-    # If no file was selected
     if file.filename == '':
         return jsonify({"error": "No selected file"}), 400
-    
-    # Ensure it's a PDF file
+
     if not file.filename.endswith('.pdf'):
         return jsonify({"error": "Invalid file type, only PDF files are allowed."}), 400
-    
+
     try:
-        # Save the PDF using PDFManager
         pdf_manager.add_pdf(file.filename, file.read())
         return jsonify({"message": f"PDF uploaded successfully and saved as {file.filename}."}), 200
     except Exception as e:
@@ -94,52 +115,43 @@ def upload_pdf():
 
 @app.route('/delete-pdf/<pdf_name>', methods=['POST'])
 def delete_pdf(pdf_name: str):
+    """
+    Endpoint to delete a PDF file and its associated chunks in the database.
+
+    1. Deletes the PDF file from the data directory.
+    2. Removes all database chunks associated with the deleted file.
+    3. Returns the updated list of PDFs.
+
+    Args:
+        pdf_name (str): The name of the PDF file to delete.
+
+    Returns:
+        JSON response with the updated list of PDFs or an error if deletion fails.
+    """
     try:
-        # Step 1: Delete the PDF file from the filesystem
+        # Delete PDF from the filesystem
         pdf_path = os.path.join(os.path.dirname(__file__), 'data', pdf_name)
         pdf_path_fixed = urllib.parse.unquote(pdf_path)
         
         if os.path.exists(pdf_path_fixed):
             pdf_manager.delete_pdf(pdf_path_fixed)
-            print(f"PDF '{pdf_name}' deleted.")
         else:
-            print(f"Error: PDF '{pdf_name}' not found.")
             return jsonify({"error": f"PDF '{pdf_name}' not found."}), 404
 
-        # Step 2: Clear all chunks related to the PDF in the database
-        try:
+        # Remove chunks from the database
+        db = Chroma(
+            persist_directory=DATABASE_PATH,
+            embedding_function=get_embedding_function()
+        )
+        results = db.get(include=["metadatas"])
+        filtered_metadatas = [
+            metadata for metadata in results.get("metadatas", [])
+            if str(metadata.get("source")) == "data/" + pdf_name
+        ]
+        for metadata in filtered_metadatas:
+            db.delete(metadata.get("id"))
 
-            db = Chroma(
-                persist_directory=DATABASE_PATH,
-                embedding_function=get_embedding_function()
-            )
-
-            print(f"Clearing chunks related to '{pdf_name}' from the database...")
-
-            # TODO: Implement the deletion of chunks related to the PDF
-            # Assume 'results' contains the output of db.get(include=["metadatas"])
-            results = db.get(include=["metadatas"])
-
-            # Extract the 'metadatas' field
-            metadatas = results.get("metadatas", [])
-
-            # Print the sources
-            filtered_metadatas = [metadata for metadata in metadatas if str(metadata.get("source")) == "data/" + pdf_name]
-            print(f"Filtered metadatas: {filtered_metadatas}")
-
-            # Delete the chunks related to the filtered metadatas
-            for metadata in filtered_metadatas:
-                db.delete(metadata.get("id"))
-            
-            print(f"Number of filtered metadatas: {len(filtered_metadatas)}")
-            print(f"Chunks related to '{pdf_name}' have been deleted successfully.")
-            
-            
-        except Exception as e:
-            print(f"Error clearing chunks for PDF '{pdf_name}': {str(e)}")
-            return jsonify({"error": f"Failed to remove chunks related to '{pdf_name}' from the database."}), 500
-
-        # Step 3: Get the updated list of PDFs after deletion
+        # Get updated list of PDFs
         pdf_files = pdf_manager.get_all_pdfs()
 
         return jsonify({
@@ -147,17 +159,26 @@ def delete_pdf(pdf_name: str):
             "updated_pdf_files": pdf_files
         }), 200
 
-    except subprocess.CalledProcessError as e:
-        print(f"Error during subprocess execution: {e}")
-        return jsonify({"error": "Failed to update the database."}), 500
     except Exception as e:
-        print(f"Unexpected error occurred: {str(e)}")
         return jsonify({"error": f"Failed to delete PDF and related chunks: {str(e)}"}), 500
-
 
 # Endpoint to list all PDF files
 @app.route('/list-pdfs', methods=['GET'])
 def list_pdfs():
+    """
+    Endpoint to list all PDF files stored in the 'data' directory.
+
+    Steps:
+    1. Retrieve the list of all PDF files using the PDFManager.
+    2. Return the list in a JSON response.
+    3. If no PDFs are found, return a message indicating so.
+
+    Returns:
+        JSON response containing:
+        - "pdf_files": List of PDF file names if found.
+        - "message": If no files are found.
+        - Error message if an exception occurs.
+    """
     try:
         # Get the list of all PDFs from PDFManager
         pdf_files = pdf_manager.get_all_pdfs()
@@ -171,7 +192,19 @@ def list_pdfs():
 # Endpoint to receive a URL for processing
 @app.route('/upload-url', methods=['POST'])
 def upload_url():
-    # Get the incoming JSON data from the request body
+    """
+    Endpoint to upload a URL for further processing.
+
+    Steps:
+    1. Accept JSON data from the request containing the "url" field.
+    2. Validate the presence of the "url" field.
+    3. Save the URL into a file named "URLs.txt" in the 'data' directory.
+
+    Returns:
+        JSON response:
+        - Success message on successful upload.
+        - Error message if validation fails or an exception occurs.
+    """
     data = request.get_json()
 
     # Ensure the URL field is present
@@ -193,13 +226,38 @@ def upload_url():
 
     return jsonify({"message": "URL uploaded and saved successfully."}), 200
 
+
 @app.route('/download/<filename>', methods=['GET'])
 def download_file(filename):
+    """
+    Endpoint to download a file from the 'data' directory.
+
+    Args:
+        filename (str): Name of the file to be downloaded.
+
+    Returns:
+        The requested file as an attachment.
+    """
     return send_from_directory("data", filename, as_attachment=True)
+
 
 # Endpoint to retrieve the results after processing
 @app.route('/get-results', methods=['GET'])
 def get_results():
+    """
+    Endpoint to retrieve processed results.
+
+    Steps:
+    1. Clear the responses file (RESPONSES_PATH) if it exists.
+    2. Run subprocesses to:
+        - Perform web scraping.
+        - Create a database.
+        - Query the model.
+    3. Read and return the results from RESPONSES_PATH.
+
+    Returns:
+        JSON response with serialized architectural data or error messages.
+    """
     try:
         # Clear directory
         if os.path.exists(RESPONSES_PATH):
@@ -225,9 +283,21 @@ def get_results():
         return jsonify({"error": "Response file not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
+
+
 @app.route('/get-results-without-retrieval', methods=['GET'])
 def get_results_without_retrieval():
+    """
+    Endpoint to retrieve results without performing retrieval.
+
+    Steps:
+    1. Clear the responses file (RESPONSES_PATH) if it exists.
+    2. Run the 'query.py' subprocess with a '--without_retrieval' flag.
+    3. Read and return the results from RESPONSES_PATH.
+
+    Returns:
+        JSON response with serialized architectural data or error messages.
+    """
     try:
         # Clear directory
         if os.path.exists(RESPONSES_PATH):
@@ -240,15 +310,21 @@ def get_results_without_retrieval():
         with open(RESPONSES_PATH, 'r') as json_file:
             responses = json.load(json_file)
 
-
         return serialize_architectural_data(responses), 200
     except FileNotFoundError:
         return jsonify({"error": "Response file not found"}), 404
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @app.route('/get-urls', methods=['GET'])
 def get_urls():
+    """
+    Endpoint to retrieve all stored URLs from the "URLs.txt" file.
+
+    Returns:
+        JSON response with a list of URLs or an error if the file is not found.
+    """
     url_file_path = os.path.join("data", "URLs.txt")
     
     if not os.path.exists(url_file_path):
@@ -262,9 +338,22 @@ def get_urls():
     except Exception as e:
         return jsonify({"error": f"Failed to read URLs file: {str(e)}"}), 500
 
+
 @app.route('/update-urls', methods=['POST'])
 def update_urls():
-    # Get the incoming JSON data from the request body
+    """
+    Endpoint to update the list of URLs in the "URLs.txt" file.
+
+    Steps:
+    1. Accept JSON data with a "urls" field containing a list of URLs.
+    2. Validate the presence of the "urls" field.
+    3. Overwrite the "URLs.txt" file with the new list of URLs.
+
+    Returns:
+        JSON response:
+        - Success message on successful update.
+        - Error message if validation fails or an exception occurs.
+    """
     data = request.get_json()
 
     # Ensure the URLs field is present
@@ -287,7 +376,17 @@ def update_urls():
 
     return jsonify({"message": "URLs updated successfully."}), 200
 
+
 def serialize_architectural_data(data):
+    """
+    Function to serialize architectural data in a specific order.
+
+    Args:
+        data (list): List of architectural data dictionaries.
+
+    Returns:
+        str: JSON string with the ordered data.
+    """
     def custom_sort(item):
         # Define the exact order of keys
         ordered_data = {
@@ -305,10 +404,20 @@ def serialize_architectural_data(data):
     ordered_data = [custom_sort(item) for item in data]
     return json.dumps(ordered_data, indent=2)
 
+
 @app.route('/get-pdfs', methods=['GET'])
 def get_pdfs():
+    """
+    Endpoint to retrieve a list of all PDFs using the PDFManager.
+
+    Returns:
+        JSON response containing:
+        - List of PDF files if found.
+        - Error message if an exception occurs.
+    """
     pdfs = pdf_manager.get_all_pdfs()
     return jsonify(pdfs), 200
+
 
 if __name__ == '__main__':
     app.run(debug=True)

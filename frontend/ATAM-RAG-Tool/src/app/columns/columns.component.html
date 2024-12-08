@@ -2,7 +2,7 @@
   <!-- Buttons Section -->
   <div class="col1">
     <!-- Add PDFs Button -->
-    <button class="button1" (click)="triggerPdfUpload()">Add PDFs</button>
+    <button class="button1" (click)="triggerPdfUpload()">Add PDFs to database</button>
     <input
       type="file"
       id="pdfUpload"
@@ -13,7 +13,7 @@
     />
 
     <!-- Add URLs Button -->
-    <button class="button2" (click)="addURL()">Add URLs</button>
+    <button class="button2" (click)="addURL()">Add URLs to database</button>
 
     <!-- List PDFs Button -->
     <button class="button12" (click)="listAllPdfs()">List all PDFs in the database</button>
@@ -23,11 +23,11 @@
     <div class="divider"></div>
 
     <!-- Upload Input Button -->
-    <button class="button3" (click)="uploadInputs()">Upload Input</button>
+    <button class="button3" (click)="uploadInputs()">Upload Input to server</button>
 
     <!-- Fetch Results Buttons -->
     <button class="button4" (click)="fetchResults()" [disabled]="loading">
-      Fetch Results
+      Fetch Results with RAG
     </button>
     <button class="button6" (click)="fetchResultsWithoutQuery()" [disabled]="loading">
       Fetch Results without RAG

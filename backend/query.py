@@ -17,31 +17,54 @@ db = Chroma(persist_directory=DATABASE_PATH, embedding_function=get_embedding_fu
 
 RESPONSES_PATH = "responses/responses.json"  # Path to store responses
 
-# Function: Load JSON data from a specified folder
-# - Initializes InputLoader to load JSON data from `folder_name`.
-# - Returns an `Inputs` object containing structured architecture data.
 def get_inputs(folder_name):
+    """
+    Loads JSON data from a specified folder and returns an `Inputs` object.
+    
+    This function initializes the `InputLoader` to load structured input data from the folder 
+    and returns it as an `Inputs` object for further processing.
+
+    Args:
+        folder_name (str): The name of the folder containing input data.
+
+    Returns:
+        Inputs: A structured object containing the architecture data loaded from JSON files.
+    """
     input_loader = InputLoader(folder_name)
     inputs = input_loader.load_inputs()
     return inputs
 
 
-# Helper Function: Format JSON data into a readable string
-#   - `data`: JSON data to be formatted as a readable string.
-#   - `indent`: Number of spaces for indentation in the formatted JSON string.
 def format_json(data, indent=2):
+    """
+    Converts the given data into a readable JSON string with proper indentation.
+
+    Args:
+        data (dict): The data to be formatted as a JSON string.
+        indent (int, optional): The number of spaces for indentation. Defaults to 2.
+
+    Returns:
+        str: A JSON-formatted string.
+    """
     return json.dumps(data, indent=indent)
 
 
-# Function: Create retrieval query from inputs, specialized for each (scenario, approach, decision) combination.
-#   - `inputs`: Structured input data containing architecture, approaches, decisions, and scenarios.
-#   - `approach`: The current architectural approach being analyzed.
-#   - `decision`: The current architectural decision being analyzed.
-#   - `scenario`: The current scenario being analyzed.
-# - Converts architecture description, scenario, approach, and decision into a formatted string.
-# - Uses `retrieval_model` to generate a specialized query for retrieval.
-# - Returns a string with key architectural information for similarity search.
 def create_specialized_retrieval_query(inputs, approach, decision, scenario):
+    """
+    Creates a specialized retrieval query based on the inputs, approach, decision, and scenario.
+
+    This function formats the architectural context, scenario, and decision information into 
+    a query string that will be used to retrieve relevant information from the database.
+
+    Args:
+        inputs (Inputs): The structured input data containing architecture context.
+        approach (dict): The current architectural approach being analyzed.
+        decision (str): The current architectural decision being evaluated.
+        scenario (dict): The scenario under consideration for the analysis.
+
+    Returns:
+        str: A formatted query string for retrieval.
+    """
     input_data_str = f"""
     Architecture Context: 
     {format_json(inputs.architecture_context)}
@@ -60,10 +83,19 @@ def create_specialized_retrieval_query(inputs, approach, decision, scenario):
     return summarized_query
 
 
-# Function: Perform retrieval query on the database specialized for the specific scenario, approach, and decision
-#   - `query_text`: The formatted query text used for similarity search.
-# - Searches the Chroma database and returns the top `k` relevant documents.
 def retrieval_query(query_text):
+    """
+    Performs a retrieval query on the database to find the top-k relevant documents.
+
+    This function uses the Chroma database to search for documents that match the provided query 
+    based on similarity scoring, returning the most relevant results.
+
+    Args:
+        query_text (str): The query text to be used for the retrieval search.
+
+    Returns:
+        list: A list of the top-k documents and their similarity scores.
+    """
     print("Retrieval Query:")
     top_k_results = db.similarity_search_with_score(query_text, k=7)
     for doc, score in top_k_results:
@@ -71,12 +103,24 @@ def retrieval_query(query_text):
     return top_k_results
 
 
-# Function: Generate analysis prompt for each architectural decision and scenario
-#   - `context_output`: Text containing the context retrieved from the database.
-#   - `approach`, `decision`, `scenario`: Specific data points for the current architectural decision and scenario.
-# - Formats the prompt for the model to evaluate architectural risks, tradeoffs, and sensitivity points.
-# - Returns the formatted prompt as a string.
 def generate_analysis_prompt(context_output, approach, decision, scenario, inputs):
+    """
+    Generates a formatted prompt for the model to analyze architectural risks, tradeoffs, and sensitivity points.
+
+    This function combines context from the database, user inputs, and the scenario to create 
+    a prompt that the model can use to provide an analysis of the architectural decision.
+
+    Args:
+        context_output (str): The context retrieved from the database for the current scenario.
+        approach (dict): The current architectural approach being analyzed.
+        decision (str): The architectural decision being evaluated.
+        scenario (dict): The scenario under consideration for the analysis.
+        inputs (Inputs): The structured input data containing architecture context and other relevant information.
+
+    Returns:
+        str: The formatted prompt that will be sent to the model for analysis.
+    """
+    
     template = """
     <CONTEXT>
     Use the context and your own knowledge to fulfill the task: 
@@ -101,8 +145,8 @@ def generate_analysis_prompt(context_output, approach, decision, scenario, input
 
     Task:
     Provide the risks, tradeoffs, and sensitivity points regarding the scenario in the architectural decision: {decision}.
-    Use the input data provided, marking any external knowledge as [LLM KNOWLEDGE] and other sources as [DATABASE SOURCE] from the database.
-    For each risk/tradeoff/sensitivity point, provide a point for each view (3 in total).
+    Use the input data provided, marking any external knowledge as [LLM KNOWLEDGE] and sources from the context section as [DATABASE SOURCE].
+    For each risk/tradeoff/sensitivity point, provide a point for each architectural 1view (3 in total).
     Consider the technical constraints from the architecture context.
     </TASK>
 
@@ -137,7 +181,6 @@ def generate_analysis_prompt(context_output, approach, decision, scenario, input
     }}
 
     """
-
     return template.format(
         context=context_output,
         architecture_context=format_json(inputs.architecture_context),
@@ -152,13 +195,23 @@ def generate_analysis_prompt(context_output, approach, decision, scenario, input
     )
 
 
-# Function: Process multiple architectural approaches, decisions, and scenarios.
-#   - `inputs`: Structured input data containing architecture, approaches, decisions, and scenarios.
-# - For each combination of approach, decision, and scenario, generate a retrieval query, perform the retrieval, 
-#   and then generate a prompt for the model.
-# - Appends the response with context and sources to a list.
-# - Finally, stores the responses in a JSON file.
-def query_specialized_for_each(inputs):
+def query_specialized_for_each(inputs, without_retrieval=False):
+    """
+    Processes multiple architectural approaches, decisions, and scenarios, 
+    querying the database and generating analysis prompts for each combination.
+
+    This function iterates over all architectural approaches, decisions, and scenarios, 
+    performs retrieval for each, and generates a prompt for analysis. The results are 
+    collected and stored in a JSON file.
+
+    Args:
+        inputs (Inputs): The structured input data containing architecture context, 
+                         approaches, decisions, and scenarios.
+        without_retrieval (bool): Flag to skip retrieval and directly query the LLM.
+
+    Returns:
+        list: A list of responses containing the analysis results for each combination.
+    """
     responses = []  # Initialize an empty list to store responses
 
     for approach in inputs.architectural_approaches['architecturalApproaches']:
@@ -166,14 +219,17 @@ def query_specialized_for_each(inputs):
             for scenario in inputs.scenarios['scenarios']:
                 print(f"\n\nAnalyzing: {approach['approach']} - Decision: {decision} - Scenario: {scenario['scenario']}")  # For debugging
                 
-                # Create specialized retrieval query for this (approach, decision, scenario)
-                retrieval_query_text = create_specialized_retrieval_query(inputs, approach, decision, scenario)
-                
-                # Perform retrieval based on the specialized query
-                top_k_results = retrieval_query(retrieval_query_text)
-                
-                # Convert top-k results into context text
-                context_output = "\n\n---\n\n".join([doc.page_content for doc, _ in top_k_results])
+                if without_retrieval:
+                    context_output = ""  # No retrieval, so no context from the database
+                else:
+                    # Create specialized retrieval query for this (approach, decision, scenario)
+                    retrieval_query_text = create_specialized_retrieval_query(inputs, approach, decision, scenario)
+                    
+                    # Perform retrieval based on the specialized query
+                    top_k_results = retrieval_query(retrieval_query_text)
+                    
+                    # Convert top-k results into context text
+                    context_output = "\n\n---\n\n".join([doc.page_content for doc, _ in top_k_results])
 
                 # Generate the prompt for the model
                 formatted_prompt = generate_analysis_prompt(context_output, approach, decision, scenario, inputs)
@@ -190,7 +246,7 @@ def query_specialized_for_each(inputs):
                         response_dict = json.loads(response_text)
                         
                         # Add sources to the response dictionary
-                        sources = [doc.metadata.get("id") for doc, _ in top_k_results]
+                        sources = [] if without_retrieval else [doc.metadata.get("id") for doc, _ in top_k_results]
                         response_dict['sources'] = sources
                         
                         # Append the response dictionary to the list of responses
@@ -238,12 +294,11 @@ if __name__ == "__main__":
     # Argument parsing
     parser = argparse.ArgumentParser(description="Query and analyze architecture.")
     parser.add_argument("folder_name", type=str, help="Folder name to load inputs.")
+    parser.add_argument("--without_retrieval", action="store_true", help="Skip the retrieval process.")
     args = parser.parse_args()
 
     # Load input data
     inputs = get_inputs(args.folder_name)
 
-    # Query specialized for each approach, decision, and scenario combination
-    responses = query_specialized_for_each(inputs)
-
-    print("Responses saved in:", RESPONSES_PATH)
+    # Run the analysis
+    query_specialized_for_each(inputs, without_retrieval=args.without_retrieval)
