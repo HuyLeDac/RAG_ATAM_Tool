@@ -1,3 +1,4 @@
+from chromadb import Client
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from langchain_chroma import Chroma  # For communication with Angular
@@ -5,11 +6,13 @@ from get_embedding_function import get_embedding_function
 from create_database import DATABASE_PATH
 from query import RESPONSES_PATH
 from data_manager import PDFManager
+from text_splitter import get_chunks
 import os
 import json
 import subprocess
 import shutil
 import urllib
+
 
 app = Flask(__name__)
 CORS(app)
@@ -97,46 +100,60 @@ def delete_pdf(pdf_name: str):
         pdf_path_fixed = urllib.parse.unquote(pdf_path)
         
         if os.path.exists(pdf_path_fixed):
-            os.remove(pdf_path_fixed)
+            pdf_manager.delete_pdf(pdf_path_fixed)
             print(f"PDF '{pdf_name}' deleted.")
         else:
             print(f"Error: PDF '{pdf_name}' not found.")
             return jsonify({"error": f"PDF '{pdf_name}' not found."}), 404
 
-        # Step 2: Clear the Chroma database
-        # TODO: optimize this process
-        directory_path = DATABASE_PATH
+        # Step 2: Clear all chunks related to the PDF in the database
         try:
-            if os.path.exists(directory_path):
-                # Remove all files and subdirectories in the directory
-                shutil.rmtree(directory_path)
-                # Recreate the directory after removing it
-                os.makedirs(directory_path)
-                print(f"Successfully cleared the contents of {directory_path}.")
-            else:
-                print(f"Directory {directory_path} does not exist.")
+
+            db = Chroma(
+                persist_directory=DATABASE_PATH,
+                embedding_function=get_embedding_function()
+            )
+
+            print(f"Clearing chunks related to '{pdf_name}' from the database...")
+
+            # TODO: Implement the deletion of chunks related to the PDF
+            # Assume 'results' contains the output of db.get(include=["metadatas"])
+            results = db.get(include=["metadatas"])
+
+            # Extract the 'metadatas' field
+            metadatas = results.get("metadatas", [])
+
+            # Print the sources
+            filtered_metadatas = [metadata for metadata in metadatas if str(metadata.get("source")) == "data/" + pdf_name]
+            print(f"Filtered metadatas: {filtered_metadatas}")
+
+            # Delete the chunks related to the filtered metadatas
+            for metadata in filtered_metadatas:
+                db.delete(metadata.get("id"))
+            
+            print(f"Number of filtered metadatas: {len(filtered_metadatas)}")
+            print(f"Chunks related to '{pdf_name}' have been deleted successfully.")
+            
+            
         except Exception as e:
-            print(f"Error clearing directory {directory_path}: {str(e)}")
+            print(f"Error clearing chunks for PDF '{pdf_name}': {str(e)}")
+            return jsonify({"error": f"Failed to remove chunks related to '{pdf_name}' from the database."}), 500
 
-        # Step 3: Recreate the database
-        print("Recreating the database...")
-        subprocess.run(['python', 'web_scraper.py'], check=True)
-        subprocess.run(['python', 'create_database.py', 'data/inputs'], check=True)
-
-        # Step 4: Get the updated list of PDFs after deletion
+        # Step 3: Get the updated list of PDFs after deletion
         pdf_files = pdf_manager.get_all_pdfs()
 
         return jsonify({
-            "message": "PDF and chunks deleted, and the database has been recreated successfully.",
+            "message": "PDF and chunks deleted, and the database has been updated successfully.",
             "updated_pdf_files": pdf_files
         }), 200
 
     except subprocess.CalledProcessError as e:
         print(f"Error during subprocess execution: {e}")
-        return jsonify({"error": "Failed to recreate the database."}), 500
+        return jsonify({"error": "Failed to update the database."}), 500
     except Exception as e:
         print(f"Unexpected error occurred: {str(e)}")
-        return jsonify({"error": f"Failed to clear the database: {str(e)}"}), 500
+        return jsonify({"error": f"Failed to delete PDF and related chunks: {str(e)}"}), 500
+
 
 # Endpoint to list all PDF files
 @app.route('/list-pdfs', methods=['GET'])
