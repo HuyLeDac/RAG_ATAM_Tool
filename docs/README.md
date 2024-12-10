@@ -101,7 +101,9 @@ chmod +x run.sh
     - **"Fetch Results":**  This button starts the analysis. The response will then be added to the Footer when finished.
         - You can also fetch results without using the RAG database with **"Fetch results without RAG"**
 
-1. After some while, the results at the footer as toggable tables. <br>
+1. After some while, the results at the footer as toggable tables. 
+
+<br>
 
 <details>
   <summary><b>Example inputs</b></summary>
@@ -266,7 +268,7 @@ chmod +x run.sh
             "attribute": "Availability",
             "questions": [
                 {
-                    "question": "What failover and backup mechanisms are in place to ensure system availability, especially in the event of a primary system failure?"
+                    "question": "What failover and backup mechanisms are in place to ensure system availability, imageespecially in the event of a primary system failure?"
                 },
                 {
                     "question": "How frequently are backup systems tested to ensure they will function effectively in a real emergency?"
@@ -368,7 +370,16 @@ chmod +x run.sh
 </details>
 
 <details>
+<summary><b>Example Output</b></summary>
+Display of the results with a category (risk, sensitivity point, tradeoff), a qualitative description, and the type of source which gets used for argumentation
+
+![results_fig](readme_figures/results_example.png)
+
+</details>
+
+<details>
 <summary><b>For developers</b></summary>
+
 ## Requirements (For developers)
 
 ### Objectives

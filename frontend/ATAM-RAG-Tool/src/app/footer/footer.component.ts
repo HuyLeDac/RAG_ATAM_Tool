@@ -31,4 +31,6 @@ export class FooterComponent implements OnInit {
   toggleTable(index: number): void {
     this.expandedTables[index] = !this.expandedTables[index];
   }
+
+  
 }

@@ -1,18 +1,17 @@
 import json
 import os
 import argparse  # Import argparse for command-line arguments
-from inputs import InputLoader, Inputs
+from inputs import InputLoader
 from get_embedding_function import get_embedding_function
 from langchain_chroma import Chroma
 from create_database import DATABASE_PATH  
-from langchain.prompts import ChatPromptTemplate
 from langchain_ollama import OllamaLLM
 import time  # For adding a delay between retries
 
 
 # Initialize the models and embedding function once to optimize performance
 model = OllamaLLM(model="nemotron")  # Main model used for querying decisions and scenarios
-retrieval_model = OllamaLLM(model="mistral")  # Model for summarizing inputs for retrieval from database
+summarize_model = OllamaLLM(model="mistral")  # Model for summarizing inputs for retrieval from database
 db = Chroma(persist_directory=DATABASE_PATH, embedding_function=get_embedding_function())  # Database for document retrieval
 
 RESPONSES_PATH = "responses/responses.json"  # Path to store responses
@@ -76,7 +75,7 @@ def create_specialized_retrieval_query(inputs, approach, decision, scenario):
     """
 
     # Generate a specialized retrieval query for database search
-    summarized_query = retrieval_model.invoke(
+    summarized_query = summarize_model.invoke(
         "Summarize the most important keywords points of the architecture, decision, and scenario. "
         "Add the keywords risks, tradeoffs, and sensitivity points under the summary:\n" + input_data_str
     )
