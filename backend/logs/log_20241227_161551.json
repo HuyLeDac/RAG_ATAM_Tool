@@ -1,0 +1,17 @@
+[
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Use API Gateway for routing requests to microservices.",
+    "scenario": "User Authentication",
+    "time_taken_seconds": 46.313029050827026
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Implement service discovery for dynamic service registration.",
+    "scenario": "User Authentication",
+    "time_taken_seconds": 45.62781095504761
+  },
+  {
+    "total_time_taken_seconds": 91.94142150878906
+  }
+]

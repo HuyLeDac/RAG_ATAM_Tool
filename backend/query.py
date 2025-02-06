@@ -1,20 +1,22 @@
 import json
 import os
-import argparse  # Import argparse for command-line arguments
+import argparse 
 from inputs import InputLoader
 from get_embedding_function import get_embedding_function
 from langchain_chroma import Chroma
 from create_database import DATABASE_PATH  
 from langchain_ollama import OllamaLLM
-import time  # For adding a delay between retries
+import time 
+from datetime import datetime
+import re
 
 
 # Initialize the models and embedding function once to optimize performance
-model = OllamaLLM(model="nemotron")  # Main model used for querying decisions and scenarios
-summarize_model = OllamaLLM(model="mistral")  # Model for summarizing inputs for retrieval from database
+model = OllamaLLM(model="deepseek-r1:70b")  # Main model used for querying decisions and scenarios
+summarize_model = OllamaLLM(model="mistral:latest")  # Model for summarizing inputs for retrieval from database
 db = Chroma(persist_directory=DATABASE_PATH, embedding_function=get_embedding_function())  # Database for document retrieval
-
 RESPONSES_PATH = "responses/responses.json"  # Path to store responses
+LOGS_DIR = "logs"  # Directory for logs
 
 def get_inputs(folder_name):
     """
@@ -76,7 +78,7 @@ def create_specialized_retrieval_query(inputs, approach, decision, scenario):
 
     # Generate a specialized retrieval query for database search
     summarized_query = summarize_model.invoke(
-        "Summarize the most important keywords points of the architecture, decision, and scenario. "
+        "Summarize the most important keywords points of the architecture, decision, and scenario. It should be ideal for Retrieval Augmented Generation Procedures. "
         "Add the keywords risks, tradeoffs, and sensitivity points under the summary:\n" + input_data_str
     )
     return summarized_query
@@ -96,7 +98,7 @@ def retrieval_query(query_text):
         list: A list of the top-k documents and their similarity scores.
     """
     print("Retrieval Query:")
-    top_k_results = db.similarity_search_with_score(query_text, k=7)
+    top_k_results = db.similarity_search_with_score(query_text, k=4)
     for doc, score in top_k_results:
         print(f"Document ID: {doc.metadata.get('id')} - Score: {score}")
     return top_k_results
@@ -121,36 +123,40 @@ def generate_analysis_prompt(context_output, approach, decision, scenario, input
     """
     
     template = """
-    <CONTEXT>
-    Use the context and your own knowledge to fulfill the task: 
-    {context}
-    </CONTEXT>
+    <TASK>
+    We are conducting a qualitative analysis of architectural decisions against scenrios based on the Architecture Tradeoff Analysis Method (ATAM). 
+
+    Task:
+    Provide the risks, tradeoffs, and sensitivity points regarding the scenario in the architectural decision: {decision}.
+    If you think the decision does not have anything to do with the scenario, you can state [NO RELATIONSHIP].
+
+    Use the input data provided (USER INPUT and CONTEXT from a database), marking your own knowledge as '[LLM KNOWLEDGE]' and sources from the '<CONTEXT>' section as '[DATABASE SOURCE]'.
+
+    For each risk/tradeoff/sensitivity point, provide a point for each architectural view from <USER INPUT> (development view, process view, physical view).
+    You are given multiple architectural view in PlantUML format.
+
+    Consider the technical constraints from the architecture context and try to analyze the architectures using the '<CONTEXT>' section.
+    </TASK>
 
     -----
 
-    <INPUT>
-    User's input data:
+    <USER INPUT>
+    User query:
     Architecture Context: \n{architecture_context}
     Architectural Approach Description: \n{approach_description}
     Architectural Views: \n{architectural_views}
     Quality Criteria: \n{quality_criteria}
     Scenario: \n{scenario}
-    </INPUT>
+    </USER INPUT>
 
     -----
 
-    <TASK>
-    We are conducting a qualitative analysis based on ATAM. You are given multiple architectural view in PlantUML format.
-
-    Task:
-    Provide the risks, tradeoffs, and sensitivity points regarding the scenario in the architectural decision: {decision}.
-    Use the input data provided, marking any external knowledge as [LLM KNOWLEDGE] and sources from the context section as [DATABASE SOURCE].
-    For each risk/tradeoff/sensitivity point, provide a point for each architectural 1view (3 in total).
-    Consider the technical constraints from the architecture context.
-    </TASK>
+    <CONTEXT> 
+    {context}
+    </CONTEXT>
 
     -----
-    Format response as json format. Don't use any other formats and especially don't add any additional characters or spaces:
+    Format response as json format. Only use the format below and DO NOT ADD ADDITIONAL CHARACTERS:
     
     {{
      "architecturalApproach": "{current_approach}",
@@ -161,19 +167,19 @@ def generate_analysis_prompt(context_output, approach, decision, scenario, input
      "architecturalDecision": "{decision}",
      "risks": [
          {{
-         "source": "[LLM KNOWLEDGE/DATABASE SOURCE]",
+         "source": "[LLM KNOWLEDGE] or [DATABASE SOURCE] or [NO RELATIONSHIP]",
          "details": "(enter risks)"
          }}
      ],
      "tradeoffs": [
          {{
-         "source": "[LLM KNOWLEDGE/DATABASE SOURCE]",
+         "source": "[LLM KNOWLEDGE] or [DATABASE SOURCE] or [NO RELATIONSHIP]",
          "details": "(enter tradeoffs)"
          }}
      ],
      "sensitivityPoints": [
          {{
-         "source": "[LLM KNOWLEDGE/DATABASE SOURCE]",
+         "source": "[LLM KNOWLEDGE] or [DATABASE SOURCE] or [NO RELATIONSHIP]",
          "details": "(enter sensitivity points)"
          }}
      ]
@@ -213,10 +219,15 @@ def query_specialized_for_each(inputs, without_retrieval=False):
     """
     responses = []  # Initialize an empty list to store responses
 
+    total_start_time = time.time()  # Start total time measurement
+    log_data = []
+
     for approach in inputs.architectural_approaches['architecturalApproaches']:
         for decision in approach['architectural decisions']:
             for scenario in inputs.scenarios['scenarios']:
                 print(f"\n\nAnalyzing: {approach['approach']} - Decision: {decision} - Scenario: {scenario['scenario']}")  # For debugging
+
+                tuple_start_time = time.time()  # Measure time for each tuple
                 
                 if without_retrieval:
                     context_output = ""  # No retrieval, so no context from the database
@@ -233,7 +244,7 @@ def query_specialized_for_each(inputs, without_retrieval=False):
                 # Generate the prompt for the model
                 formatted_prompt = generate_analysis_prompt(context_output, approach, decision, scenario, inputs)
 
-                max_retries = 3  # Number of retries
+                max_retries = 3  # Number of retries in case the LLM response is invalid
                 retry_count = 0
 
                 while retry_count < max_retries:
@@ -241,13 +252,43 @@ def query_specialized_for_each(inputs, without_retrieval=False):
                         # Get the model's response
                         response_text = model.invoke(formatted_prompt)
 
-                        # Attempt to parse the response as JSON
-                        response_dict = json.loads(response_text)
-                        
+                        # Extract <think> section
+                        think_match = re.search(r"<think>(.*?)</think>", response_text, re.DOTALL)
+                        think_text = think_match.group(1).strip() if think_match else ""
+
+                        # Remove <think> section from response_text
+                        cleaned_response_text = re.sub(r"<think>.*?</think>", "", response_text, flags=re.DOTALL).strip()
+
+                        # Remove any Markdown-style code blocks containing "json"
+                        cleaned_response_text = re.sub(r"```json\s*", "", cleaned_response_text)
+                        cleaned_response_text = re.sub(r"```$", "", cleaned_response_text)
+
+                        # Ensure no trailing/leading whitespace
+                        cleaned_response_text = cleaned_response_text.strip()
+
+                        # Attempt to parse the cleaned response as JSON
+                        response_dict = json.loads(cleaned_response_text)
+
+                        # Add the extracted <think> section separately
+                        response_dict["thoughts"] = think_text  # Store the extracted section
+
                         # Add sources to the response dictionary
                         sources = [] if without_retrieval else [doc.metadata.get("id") for doc, _ in top_k_results]
                         response_dict['sources'] = sources
-                        
+
+                        # Track processing time
+                        tuple_end_time = time.time()
+                        tuple_time_taken = tuple_end_time - tuple_start_time
+                        log_data.append({
+                            "approach": approach['approach'],
+                            "decision": decision,
+                            "scenario": scenario['scenario'],
+                            "time_taken_seconds": tuple_time_taken
+                        })
+
+                        # Append response
+                        response_dict['time_taken_seconds'] = tuple_time_taken
+
                         # Append the response dictionary to the list of responses
                         responses.append(response_dict)
 
@@ -257,7 +298,7 @@ def query_specialized_for_each(inputs, without_retrieval=False):
                         print(json.dumps(response_dict, indent=2))  # Print formatted JSON for clarity
                         print("\nEND OF RESPONSE")
                         print("---------------------------------------------------------")
-                        
+
                         # Break out of the retry loop on success
                         break
                     except json.JSONDecodeError as e:
@@ -278,8 +319,24 @@ def query_specialized_for_each(inputs, without_retrieval=False):
                             responses.append(response_dict)
                             break
 
+
+                                
+
     # Ensure the directory exists
     os.makedirs(os.path.dirname(RESPONSES_PATH), exist_ok=True)
+
+    # Measure total time
+    total_end_time = time.time()
+    total_time_taken = total_end_time - total_start_time
+    log_data.append({"total_time_taken_seconds": total_time_taken})
+
+    # Save logs
+    os.makedirs(LOGS_DIR, exist_ok=True)
+    log_filename = os.path.join(LOGS_DIR, f"log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json")
+    with open(log_filename, 'w') as log_file:
+        json.dump(log_data, log_file, indent=2)
+
+    print(f"Logs saved to {log_filename}")
 
     # After all responses are generated, store them in a JSON file
     with open(RESPONSES_PATH, 'w') as json_file:

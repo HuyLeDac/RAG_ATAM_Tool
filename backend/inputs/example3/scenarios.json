@@ -20,34 +20,6 @@
             "environment": "Traffic Signal System",
             "stimulus": "A pedestrian presses the button to request crossing at an intersection.",
             "response": "The system processes the pedestrian request and adjusts the signal to allow safe crossing, ensuring the pedestrian's request is handled promptly."
-        },
-        {
-            "scenario": "Adaptive Traffic Signal Control",
-            "attribute": "Scalability",
-            "environment": "Traffic Signal System",
-            "stimulus": "Traffic conditions change, with high congestion in one direction and light traffic in another.",
-            "response": "The system dynamically adjusts the signal timing based on real-time traffic data, allowing it to prioritize high-traffic directions and reduce congestion."
-        },
-        {
-            "scenario": "Signal Malfunction Detection",
-            "attribute": "Reliability",
-            "environment": "Traffic Signal System",
-            "stimulus": "A traffic signal malfunctions and does not change to the correct state.",
-            "response": "The system detects the malfunction and notifies the traffic control center, triggering a manual override or backup signal cycle until the issue is resolved."
-        },
-        {
-            "scenario": "System Recovery from Power Outage",
-            "attribute": "Availability",
-            "environment": "Traffic Signal System",
-            "stimulus": "The traffic signal system experiences a power outage.",
-            "response": "The backup power system kicks in immediately, restoring normal traffic signal operations with minimal disruption."
-        },
-        {
-            "scenario": "Traffic Flow Optimization During Peak Hours",
-            "attribute": "Performance",
-            "environment": "Traffic Signal System",
-            "stimulus": "Peak traffic hours result in congestion at key intersections.",
-            "response": "The system adjusts the signal cycles to optimize traffic flow, providing longer green lights during peak periods while minimizing waiting times."
         }
     ]
 }

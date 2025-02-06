@@ -397,6 +397,8 @@ def serialize_architectural_data(data):
             "tradeoffs": item.get("tradeoffs"),
             "sensitivityPoints": item.get("sensitivityPoints"),
             "sources": item.get("sources"),
+            "time_taken_seconds": item.get("time_taken_seconds"),
+            "thoughts": item.get("thoughts")
         }
         return ordered_data
     

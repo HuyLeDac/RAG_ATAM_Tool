@@ -11,6 +11,11 @@
           <b>Scenario:</b> {{ result.scenario.name }} 
           (<b>Quality attribute:</b> {{ result.scenario.qualityAttribute }}) - 
           <b>Decision:</b> {{ result.architecturalDecision }} 
+          <br>
+          <!-- Display time taken -->
+          <small class="text-muted">
+            Time Taken: {{ result.time_taken_seconds | number:'1.2-2' }} seconds
+          </small>
         </button>
         <div *ngIf="expandedTables[i]" class="table-container">
           <table class="table table-striped">
@@ -43,6 +48,21 @@
                   <td>{{ sensitivity.source }}</td>
                 </tr>
               </ng-container>
+            </tbody>
+          </table>
+          <br>
+          <!-- Thoughts Section (Fixed) -->
+          <h4>Thoughts</h4>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Thoughts</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>{{ result.thoughts }}</td>  <!-- FIX: Directly use thoughts as a single text block -->
+              </tr>
             </tbody>
           </table>
           <br>

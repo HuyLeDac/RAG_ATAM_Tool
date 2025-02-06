@@ -13,8 +13,7 @@ def get_embedding_function():
     """
     # Initialize the OllamaEmbeddings with the "nomic-embed-text" model
     embeddings = OllamaEmbeddings(
-        model="nomic-embed-text",  # Specify the model to be used for embeddings
+        model="nomic-embed-text", 
     )
     
-    # Return the embedding function (model)
     return embeddings
