@@ -27,10 +27,10 @@
 
     <!-- Fetch Results Buttons -->
     <button class="button4" (click)="fetchResults()" [disabled]="loading">
-      Fetch Results with RAG
+      Fetch Results using RAG
     </button>
     <button class="button6" (click)="fetchResultsWithoutQuery()" [disabled]="loading">
-      Fetch Results without RAG
+      Fetch Results without using RAG
     </button>
     <div class="divider"></div>
 
@@ -48,10 +48,10 @@
 
   <!-- Architecture Context Section -->
   <div class="col2">
-    <h3 class="title1">Architecture Context</h3>
+    <h3 class="title1">System Description</h3>
 
     <!-- System Purpose Input -->
-    <label for="system-purpose">Briefly describe the purpose of the system:</label>
+    <label for="system-purpose">Briefly describe the purpose of the system and its main functionality:</label>
     <textarea
       id="system-purpose"
       class="input-field"
@@ -73,7 +73,7 @@
     <br /><br />
 
     <!-- System Interactions Input -->
-    <label for="system-interactions">Describe how the system should interact:</label>
+    <label for="system-interactions">Describe how the system components should interact:</label>
     <textarea
       id="system-interactions"
       class="input-field"

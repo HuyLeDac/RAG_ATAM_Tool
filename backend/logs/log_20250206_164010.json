@@ -1,0 +1,29 @@
+[
+  {
+    "approach": "Monolithic Architecture",
+    "decision": "Scalability and Security: Configure autoscaling to dynamically adjust resources based on traffic patterns, ensuring consistent performance during surges. Enforce HTTPS for all communication, implement role-based access control (RBAC) for authorization, and secure sensitive data using encryption both invtransit and at rest. Use monitoring tools (e.g., AWS CloudWatch, Datadog) to track system performance and detect anomalies early.",
+    "scenario": "User Authentication Reliability",
+    "time_taken_seconds": 58.459104776382446
+  },
+  {
+    "approach": "Monolithic Architecture",
+    "decision": "Scalability and Security: Configure autoscaling to dynamically adjust resources based on traffic patterns, ensuring consistent performance during surges. Enforce HTTPS for all communication, implement role-based access control (RBAC) for authorization, and secure sensitive data using encryption both invtransit and at rest. Use monitoring tools (e.g., AWS CloudWatch, Datadog) to track system performance and detect anomalies early.",
+    "scenario": "Scaling Under Peak Load",
+    "time_taken_seconds": 61.16177988052368
+  },
+  {
+    "approach": "Monolithic Architecture",
+    "decision": "Unified Codebase and Deployment: Develop the application as a single project using React for the front end and Spring Boot for the back end. Enable horizontal scaling with a load balancer (e.g., AWS Elastic Load Balancer) to distribute traffic during high-demand periods such as Black Friday",
+    "scenario": "User Authentication Reliability",
+    "time_taken_seconds": 62.047746896743774
+  },
+  {
+    "approach": "Monolithic Architecture",
+    "decision": "Unified Codebase and Deployment: Develop the application as a single project using React for the front end and Spring Boot for the back end. Enable horizontal scaling with a load balancer (e.g., AWS Elastic Load Balancer) to distribute traffic during high-demand periods such as Black Friday",
+    "scenario": "Scaling Under Peak Load",
+    "time_taken_seconds": 51.895580768585205
+  },
+  {
+    "total_time_taken_seconds": 233.56531739234924
+  }
+]

@@ -12,7 +12,14 @@ import re
 
 
 # Initialize the models and embedding function once to optimize performance
-model = OllamaLLM(model="deepseek-r1:70b")  # Main model used for querying decisions and scenarios
+model = OllamaLLM(
+    model="deepseek-r1:70b",
+    temperature=0.2,  # Lower temperature for deterministic responses
+    top_p=0.7,  # Keep responses focused, avoiding excessive randomness
+    top_k=50,  # Select high-quality tokens for structured output
+    repeat_penalty=1.1,  # Prevent redundant phrasing
+    num_ctx=8192  # Longer context for handling architecture documentation
+) # Main model used for querying decisions and scenarios
 summarize_model = OllamaLLM(model="mistral:latest")  # Model for summarizing inputs for retrieval from database
 db = Chroma(persist_directory=DATABASE_PATH, embedding_function=get_embedding_function())  # Database for document retrieval
 RESPONSES_PATH = "responses/responses.json"  # Path to store responses
@@ -67,9 +74,6 @@ def create_specialized_retrieval_query(inputs, approach, decision, scenario):
         str: A formatted query string for retrieval.
     """
     input_data_str = f"""
-    Architecture Context: 
-    {format_json(inputs.architecture_context)}
-
     Scenario: {format_json(scenario)}
 
     Architectural Approach: {approach['approach']}
@@ -124,13 +128,19 @@ def generate_analysis_prompt(context_output, approach, decision, scenario, input
     
     template = """
     <TASK>
-    We are conducting a qualitative analysis of architectural decisions against scenrios based on the Architecture Tradeoff Analysis Method (ATAM). 
+    You are an expert analyst for software architecture. We are conducting a qualitative analysis of architectural decisions against quality attribute scenrios based on the Architecture Tradeoff Analysis Method (ATAM). 
+
+    You are given a user input of the approach: {current_approach}
 
     Task:
-    Provide the risks, tradeoffs, and sensitivity points regarding the scenario in the architectural decision: {decision}.
+    Provide the risks, tradeoffs, and sensitivity points regarding the quality attribute scenario in the architectural decision: {decision}.
     If you think the decision does not have anything to do with the scenario, you can state [NO RELATIONSHIP].
 
-    Use the input data provided (USER INPUT and CONTEXT from a database), marking your own knowledge as '[LLM KNOWLEDGE]' and sources from the '<CONTEXT>' section as '[DATABASE SOURCE]'.
+    We provided you some chunks from scientific articles which could be relevant to the architecture. 
+    They are provided in the '<SNIPPETS FROM ARTICLES>' section.
+    Use the input data provided (USER INPUT and CONTEXT from a database).
+    If you use knowledge from '<SNIPPETS FROM ARTICLES>', mark them as '[DATABASE SOURCE]'.   
+    When you use your own knowledge for analysis, mark them as '[LLM KNOWLEDGE]'.
 
     For each risk/tradeoff/sensitivity point, provide a point for each architectural view from <USER INPUT> (development view, process view, physical view).
     You are given multiple architectural view in PlantUML format.
@@ -142,18 +152,18 @@ def generate_analysis_prompt(context_output, approach, decision, scenario, input
 
     <USER INPUT>
     User query:
-    Architecture Context: \n{architecture_context}
-    Architectural Approach Description: \n{approach_description}
-    Architectural Views: \n{architectural_views}
-    Quality Criteria: \n{quality_criteria}
-    Scenario: \n{scenario}
+    Architecture Context: \n{architecture_context}\n
+    Architectural Approach Description: \n{approach_description}\n
+    Architectural Views (PlantUML): \n{architectural_views}\n
+    Quality Criteria: \n{quality_criteria}\n
+    Scenario: \n{scenario}\n
     </USER INPUT>
 
     -----
 
-    <CONTEXT> 
+    <SNIPPETS FROM ARTICLES> 
     {context}
-    </CONTEXT>
+    </SNIPPETS FROM ARTICLES>
 
     -----
     Format response as json format. Only use the format below and DO NOT ADD ADDITIONAL CHARACTERS:
@@ -168,19 +178,19 @@ def generate_analysis_prompt(context_output, approach, decision, scenario, input
      "risks": [
          {{
          "source": "[LLM KNOWLEDGE] or [DATABASE SOURCE] or [NO RELATIONSHIP]",
-         "details": "(enter risks)"
+         "details": "(enter risks here)"
          }}
      ],
      "tradeoffs": [
          {{
          "source": "[LLM KNOWLEDGE] or [DATABASE SOURCE] or [NO RELATIONSHIP]",
-         "details": "(enter tradeoffs)"
+         "details": "(enter tradeoffs here)"
          }}
      ],
      "sensitivityPoints": [
          {{
          "source": "[LLM KNOWLEDGE] or [DATABASE SOURCE] or [NO RELATIONSHIP]",
-         "details": "(enter sensitivity points)"
+         "details": "(enter sensitivity points here)"
          }}
      ]
     }}
@@ -272,6 +282,8 @@ def query_specialized_for_each(inputs, without_retrieval=False):
                         # Add the extracted <think> section separately
                         response_dict["thoughts"] = think_text  # Store the extracted section
 
+                        response_dict["architecturalApproach"] = approach['approach']
+
                         # Add sources to the response dictionary
                         sources = [] if without_retrieval else [doc.metadata.get("id") for doc, _ in top_k_results]
                         response_dict['sources'] = sources
@@ -336,7 +348,8 @@ def query_specialized_for_each(inputs, without_retrieval=False):
     with open(log_filename, 'w') as log_file:
         json.dump(log_data, log_file, indent=2)
 
-    print(f"Logs saved to {log_filename}")
+    # For debugging
+    print(f"Logs saved to {log_filename}") 
 
     # After all responses are generated, store them in a JSON file
     with open(RESPONSES_PATH, 'w') as json_file:

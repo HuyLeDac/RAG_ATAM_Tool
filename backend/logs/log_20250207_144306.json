@@ -1,0 +1,11 @@
+[
+  {
+    "approach": "Monolithic approach",
+    "decision": "Unified Codebase and Deployment:Develop the application as a single project using React for the front end and Spring Boot for the back end.Enable horizontal scaling with a load balancer (e.g., AWS Elastic Loadcer) to distribute traffic during high-demand periods such as Black Friday.",
+    "scenario": "User Authentication Reliability",
+    "time_taken_seconds": 61.60305714607239
+  },
+  {
+    "total_time_taken_seconds": 61.60330128669739
+  }
+]

@@ -1,0 +1,77 @@
+[
+  {
+    "approach": "Monolithic Architecture",
+    "decision": "Unified Codebase and Deployment: Develop the application as a single project using React (front end) and Spring Boot (back end), with AWS Elastic Load Balancer enabling horizontal scaling to handle peak traffic like Black Friday.",
+    "scenario": "User Authentication Reliability",
+    "time_taken_seconds": 79.17677402496338
+  },
+  {
+    "approach": "Monolithic Architecture",
+    "decision": "Unified Codebase and Deployment: Develop the application as a single project using React (front end) and Spring Boot (back end), with AWS Elastic Load Balancer enabling horizontal scaling to handle peak traffic like Black Friday.",
+    "scenario": "Scaling Under Peak Load",
+    "time_taken_seconds": 85.35353779792786
+  },
+  {
+    "approach": "Monolithic Architecture",
+    "decision": "Unified Codebase and Deployment: Develop the application as a single project using React (front end) and Spring Boot (back end), with AWS Elastic Load Balancer enabling horizontal scaling to handle peak traffic like Black Friday.",
+    "scenario": "Order Placement Consistency",
+    "time_taken_seconds": 84.14775252342224
+  },
+  {
+    "approach": "Monolithic Architecture",
+    "decision": "Database Management: Use a centralized relational database (PostgreSQL/MySQL) with read replicas for high-read workloads and Redis caching for frequently accessed data like product listings and user profiles.",
+    "scenario": "User Authentication Reliability",
+    "time_taken_seconds": 79.92092418670654
+  },
+  {
+    "approach": "Monolithic Architecture",
+    "decision": "Database Management: Use a centralized relational database (PostgreSQL/MySQL) with read replicas for high-read workloads and Redis caching for frequently accessed data like product listings and user profiles.",
+    "scenario": "Scaling Under Peak Load",
+    "time_taken_seconds": 81.17850470542908
+  },
+  {
+    "approach": "Monolithic Architecture",
+    "decision": "Database Management: Use a centralized relational database (PostgreSQL/MySQL) with read replicas for high-read workloads and Redis caching for frequently accessed data like product listings and user profiles.",
+    "scenario": "Order Placement Consistency",
+    "time_taken_seconds": 74.09365272521973
+  },
+  {
+    "approach": "Monolithic Architecture",
+    "decision": "External Integrations: Connect to external inventory systems via APIs for real-time stock updates and integrate Stripe/PayPal for secure payments, ensuring PCI-DSS compliance.",
+    "scenario": "User Authentication Reliability",
+    "time_taken_seconds": 100.03661513328552
+  },
+  {
+    "approach": "Monolithic Architecture",
+    "decision": "External Integrations: Connect to external inventory systems via APIs for real-time stock updates and integrate Stripe/PayPal for secure payments, ensuring PCI-DSS compliance.",
+    "scenario": "Scaling Under Peak Load",
+    "time_taken_seconds": 77.55201506614685
+  },
+  {
+    "approach": "Monolithic Architecture",
+    "decision": "External Integrations: Connect to external inventory systems via APIs for real-time stock updates and integrate Stripe/PayPal for secure payments, ensuring PCI-DSS compliance.",
+    "scenario": "Order Placement Consistency",
+    "time_taken_seconds": 76.56342005729675
+  },
+  {
+    "approach": "Monolithic Architecture",
+    "decision": "Scalability and Security: Implement autoscaling, enforce HTTPS and RBAC, encrypt sensitive data, and use monitoring tools (AWS CloudWatch, Datadog) to track performance and detect issues early.",
+    "scenario": "User Authentication Reliability",
+    "time_taken_seconds": 81.17715287208557
+  },
+  {
+    "approach": "Monolithic Architecture",
+    "decision": "Scalability and Security: Implement autoscaling, enforce HTTPS and RBAC, encrypt sensitive data, and use monitoring tools (AWS CloudWatch, Datadog) to track performance and detect issues early.",
+    "scenario": "Scaling Under Peak Load",
+    "time_taken_seconds": 101.02719235420227
+  },
+  {
+    "approach": "Monolithic Architecture",
+    "decision": "Scalability and Security: Implement autoscaling, enforce HTTPS and RBAC, encrypt sensitive data, and use monitoring tools (AWS CloudWatch, Datadog) to track performance and detect issues early.",
+    "scenario": "Order Placement Consistency",
+    "time_taken_seconds": 88.2737967967987
+  },
+  {
+    "total_time_taken_seconds": 1008.5033051967621
+  }
+]
