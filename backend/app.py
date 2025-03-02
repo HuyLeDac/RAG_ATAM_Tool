@@ -5,7 +5,7 @@ from langchain_chroma import Chroma  # For communication with Angular
 from get_embedding_function import get_embedding_function
 from create_database import DATABASE_PATH
 from query import RESPONSES_PATH
-from data_manager import PDFManager
+from backend.pdf_manager import PDFManager
 import os
 import json
 import subprocess

@@ -1,0 +1,77 @@
+[
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Service Separation and Responsibilities: The system is divided into specialized microservices, including User Service for authentication and profiles, Product Service for catalog management, Order Service for cart and order tracking, Payment Service for processing transactions via Stripe/PayPal, and Inventory Service for stock tracking and updates.",
+    "scenario": "User Authentication Reliability",
+    "time_taken_seconds": 227.93597865104675
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Service Separation and Responsibilities: The system is divided into specialized microservices, including User Service for authentication and profiles, Product Service for catalog management, Order Service for cart and order tracking, Payment Service for processing transactions via Stripe/PayPal, and Inventory Service for stock tracking and updates.",
+    "scenario": "Scaling Under Peak Load",
+    "time_taken_seconds": 234.67758107185364
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Service Separation and Responsibilities: The system is divided into specialized microservices, including User Service for authentication and profiles, Product Service for catalog management, Order Service for cart and order tracking, Payment Service for processing transactions via Stripe/PayPal, and Inventory Service for stock tracking and updates.",
+    "scenario": "Order Placement Consistency",
+    "time_taken_seconds": 212.66589045524597
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "nfrastructure and Deployment: Each microservice runs in a Docker container for consistency, orchestrated by Kubernetes (K8s) to ensure scalability, self-healing, and load balancing, with an API Gateway managing client request routing.",
+    "scenario": "User Authentication Reliability",
+    "time_taken_seconds": 225.88357210159302
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "nfrastructure and Deployment: Each microservice runs in a Docker container for consistency, orchestrated by Kubernetes (K8s) to ensure scalability, self-healing, and load balancing, with an API Gateway managing client request routing.",
+    "scenario": "Scaling Under Peak Load",
+    "time_taken_seconds": 251.2873158454895
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "nfrastructure and Deployment: Each microservice runs in a Docker container for consistency, orchestrated by Kubernetes (K8s) to ensure scalability, self-healing, and load balancing, with an API Gateway managing client request routing.",
+    "scenario": "Order Placement Consistency",
+    "time_taken_seconds": 186.64526271820068
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Communication and Integration: REST APIs handle synchronous client interactions, while Apache Kafka supports asynchronous, event-driven communication for order processing and inventory updates, with each service maintaining its own dedicated database (PostgreSQL/MySQL for relational data, MongoDB for NoSQL).",
+    "scenario": "User Authentication Reliability",
+    "time_taken_seconds": 217.56958675384521
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Communication and Integration: REST APIs handle synchronous client interactions, while Apache Kafka supports asynchronous, event-driven communication for order processing and inventory updates, with each service maintaining its own dedicated database (PostgreSQL/MySQL for relational data, MongoDB for NoSQL).",
+    "scenario": "Scaling Under Peak Load",
+    "time_taken_seconds": 211.87060523033142
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Communication and Integration: REST APIs handle synchronous client interactions, while Apache Kafka supports asynchronous, event-driven communication for order processing and inventory updates, with each service maintaining its own dedicated database (PostgreSQL/MySQL for relational data, MongoDB for NoSQL).",
+    "scenario": "Order Placement Consistency",
+    "time_taken_seconds": 228.66587924957275
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Scalability and Security: Services scale independently using horizontal scaling, APIs are secured with OAuth 2.0 and RBAC, and Istio service mesh provides observability, traffic management, and enhanced security",
+    "scenario": "User Authentication Reliability",
+    "time_taken_seconds": 217.2600085735321
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Scalability and Security: Services scale independently using horizontal scaling, APIs are secured with OAuth 2.0 and RBAC, and Istio service mesh provides observability, traffic management, and enhanced security",
+    "scenario": "Scaling Under Peak Load",
+    "time_taken_seconds": 236.74027585983276
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Scalability and Security: Services scale independently using horizontal scaling, APIs are secured with OAuth 2.0 and RBAC, and Istio service mesh provides observability, traffic management, and enhanced security",
+    "scenario": "Order Placement Consistency",
+    "time_taken_seconds": 196.33145594596863
+  },
+  {
+    "total_time_taken_seconds": 2647.5356154441833
+  }
+]

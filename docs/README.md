@@ -55,6 +55,10 @@ The tool focuses on the analysis steps of ATAM using given inputs by the user to
 
 ## Usage
 
+Open repo directory in the terminal.
+
+Start the venv. 
+
 Run and open [localhost website](http://localhost:4200/) on port 4200 with
 
 ```bash

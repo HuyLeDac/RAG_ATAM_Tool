@@ -1,0 +1,77 @@
+[
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Service Separation: Each microservice is responsible for a distinct domain, such as user management, product catalog, order processing, payment handling, and inventory tracking, ensuring modularity and maintainability.",
+    "scenario": "User Authentication Reliability",
+    "time_taken_seconds": 67.94925022125244
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Service Separation: Each microservice is responsible for a distinct domain, such as user management, product catalog, order processing, payment handling, and inventory tracking, ensuring modularity and maintainability.",
+    "scenario": "Scaling Under Peak Load",
+    "time_taken_seconds": 69.2222228050232
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Service Separation: Each microservice is responsible for a distinct domain, such as user management, product catalog, order processing, payment handling, and inventory tracking, ensuring modularity and maintainability.",
+    "scenario": "Order Placement Consistency",
+    "time_taken_seconds": 67.37808680534363
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Infrastructure & Deployment: Services are containerized with Docker and orchestrated using Kubernetes (K8s) for scalability, self-healing, and load balancing, with an API Gateway managing request routing.",
+    "scenario": "User Authentication Reliability",
+    "time_taken_seconds": 64.29545736312866
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Infrastructure & Deployment: Services are containerized with Docker and orchestrated using Kubernetes (K8s) for scalability, self-healing, and load balancing, with an API Gateway managing request routing.",
+    "scenario": "Scaling Under Peak Load",
+    "time_taken_seconds": 77.5679407119751
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Infrastructure & Deployment: Services are containerized with Docker and orchestrated using Kubernetes (K8s) for scalability, self-healing, and load balancing, with an API Gateway managing request routing.",
+    "scenario": "Order Placement Consistency",
+    "time_taken_seconds": 72.68066787719727
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Communication & Integration: REST APIs handle synchronous client interactions, while Apache Kafka enables asynchronous event-driven messaging, and each service maintains its own dedicated database for autonomy.",
+    "scenario": "User Authentication Reliability",
+    "time_taken_seconds": 69.17619061470032
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Communication & Integration: REST APIs handle synchronous client interactions, while Apache Kafka enables asynchronous event-driven messaging, and each service maintains its own dedicated database for autonomy.",
+    "scenario": "Scaling Under Peak Load",
+    "time_taken_seconds": 75.10860991477966
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Communication & Integration: REST APIs handle synchronous client interactions, while Apache Kafka enables asynchronous event-driven messaging, and each service maintains its own dedicated database for autonomy.",
+    "scenario": "Order Placement Consistency",
+    "time_taken_seconds": 84.74074506759644
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Scalability & Security: Horizontal scaling allows services to scale independently, OAuth 2.0 and RBAC secure APIs, and a service mesh (Istio) enhances observability, traffic control, and security enforcement.",
+    "scenario": "User Authentication Reliability",
+    "time_taken_seconds": 80.78783750534058
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Scalability & Security: Horizontal scaling allows services to scale independently, OAuth 2.0 and RBAC secure APIs, and a service mesh (Istio) enhances observability, traffic control, and security enforcement.",
+    "scenario": "Scaling Under Peak Load",
+    "time_taken_seconds": 68.9159505367279
+  },
+  {
+    "approach": "Microservices Architecture",
+    "decision": "Scalability & Security: Horizontal scaling allows services to scale independently, OAuth 2.0 and RBAC secure APIs, and a service mesh (Istio) enhances observability, traffic control, and security enforcement.",
+    "scenario": "Order Placement Consistency",
+    "time_taken_seconds": 87.73151588439941
+  },
+  {
+    "total_time_taken_seconds": 885.5566513538361
+  }
+]
