@@ -138,20 +138,7 @@ def delete_pdf(pdf_name: str):
         else:
             return jsonify({"error": f"PDF '{pdf_name}' not found."}), 404
 
-        # Remove chunks from the database
-        db = Chroma(
-            persist_directory=DATABASE_PATH,
-            embedding_function=get_embedding_function()
-        )
-        results = db.get(include=["metadatas"])
-        filtered_metadatas = [
-            metadata for metadata in results.get("metadatas", [])
-            if str(metadata.get("source")) == "data/" + pdf_name
-        ]
-        for metadata in filtered_metadatas:
-            db.delete(metadata.get("id"))
-
-        # Get updated list of PDFs
+        # Get the updated list of PDFs
         pdf_files = pdf_manager.get_all_pdfs()
 
         return jsonify({
@@ -238,14 +225,13 @@ def download_file(filename):
     Returns:
         The requested file as an attachment.
     """
-    return send_from_directory("data", filename, as_attachment=True)
+    return pdf_manager.download_pdf(filename)
 
 
-# Endpoint to retrieve the results after processing
 @app.route('/get-results', methods=['GET'])
 def get_results():
     """
-    Endpoint to retrieve processed results.
+    Endpoint to start the architectural analysis process in form of a RAG pipeline.
 
     Steps:
     1. Clear the responses file (RESPONSES_PATH) if it exists.

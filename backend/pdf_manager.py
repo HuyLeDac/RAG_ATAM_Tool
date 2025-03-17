@@ -1,4 +1,8 @@
 import os
+from langchain_chroma import Chroma  # For communication with Angular
+from get_embedding_function import get_embedding_function
+from create_database import DATABASE_PATH
+from flask import send_from_directory
 
 class PDFManager:
     """
@@ -34,7 +38,7 @@ class PDFManager:
         with open(pdf_path, 'wb') as pdf_file:
             pdf_file.write(pdf_content)
 
-    def delete_pdf(self, pdf_name):
+    def delete_pdf(self, db, pdf_name):
         """
         Deletes a PDF file from the data directory if it exists.
 
@@ -46,6 +50,18 @@ class PDFManager:
         # Remove the PDF file if it exists
         if os.path.exists(pdf_path):
             os.remove(pdf_path)
+        # Remove chunks from the database
+        db = Chroma(
+            persist_directory=DATABASE_PATH,
+            embedding_function=get_embedding_function()
+        )
+        results = db.get(include=["metadatas"])
+        filtered_metadatas = [
+            metadata for metadata in results.get("metadatas", [])
+            if str(metadata.get("source")) == "data/" + pdf_name
+        ]
+        for metadata in filtered_metadatas:
+            db.delete(metadata.get("id"))
 
     def get_all_pdfs(self):
         """
@@ -74,3 +90,15 @@ class PDFManager:
             with open(pdf_path, 'rb') as pdf_file:
                 return pdf_file.read()
         return None
+
+    def download_pdf(self, filename):
+        """
+        Downloads a specific PDF file from the data directory.
+
+        Args:
+            pdf_name (str): The name of the PDF file to download.
+
+        Returns:
+            bytes: The binary content of the PDF file, or None if the file doesn't exist.
+        """
+        return send_from_directory("data", filename, as_attachment=True)
