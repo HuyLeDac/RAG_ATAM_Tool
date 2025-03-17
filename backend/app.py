@@ -5,7 +5,7 @@ from langchain_chroma import Chroma  # For communication with Angular
 from get_embedding_function import get_embedding_function
 from create_database import DATABASE_PATH
 from query import RESPONSES_PATH
-from backend.pdf_manager import PDFManager
+from pdf_manager import PDFManager
 import os
 import json
 import subprocess
@@ -130,14 +130,7 @@ def delete_pdf(pdf_name: str):
     """
     try:
         # Delete PDF from the filesystem
-        pdf_path = os.path.join(os.path.dirname(__file__), 'data', pdf_name)
-        pdf_path_fixed = urllib.parse.unquote(pdf_path)
-        
-        if os.path.exists(pdf_path_fixed):
-            pdf_manager.delete_pdf(pdf_path_fixed)
-        else:
-            return jsonify({"error": f"PDF '{pdf_name}' not found."}), 404
-
+        pdf_manager.delete_pdf(pdf_name)
         # Get the updated list of PDFs
         pdf_files = pdf_manager.get_all_pdfs()
 

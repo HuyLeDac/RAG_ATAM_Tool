@@ -3,6 +3,9 @@ from langchain_chroma import Chroma  # For communication with Angular
 from get_embedding_function import get_embedding_function
 from create_database import DATABASE_PATH
 from flask import send_from_directory
+import urllib
+from flask import Flask, request, jsonify
+
 
 class PDFManager:
     """
@@ -38,18 +41,22 @@ class PDFManager:
         with open(pdf_path, 'wb') as pdf_file:
             pdf_file.write(pdf_content)
 
-    def delete_pdf(self, db, pdf_name):
+    def delete_pdf(self, pdf_path_fixed, pdf_name):
         """
         Deletes a PDF file from the data directory if it exists.
 
         Args:
             pdf_name (str): The name of the PDF file to delete.
         """
-        pdf_path = os.path.join(self.data_directory, pdf_name)
-
-        # Remove the PDF file if it exists
-        if os.path.exists(pdf_path):
-            os.remove(pdf_path)
+        # Delete PDF from the filesystem
+        pdf_path = os.path.join(os.path.dirname(__file__), 'data', pdf_name)
+        pdf_path_fixed = urllib.parse.unquote(pdf_path)
+        
+        if os.path.exists(pdf_path_fixed):
+            os.remove(pdf_path_fixed)
+        else:
+            return jsonify({"error": "File not found"}), 404
+        
         # Remove chunks from the database
         db = Chroma(
             persist_directory=DATABASE_PATH,
@@ -62,6 +69,7 @@ class PDFManager:
         ]
         for metadata in filtered_metadatas:
             db.delete(metadata.get("id"))
+
 
     def get_all_pdfs(self):
         """
