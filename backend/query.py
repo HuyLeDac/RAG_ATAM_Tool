@@ -266,7 +266,7 @@ def query_specialized_for_each(inputs, without_retrieval=False):
                         think_match = re.search(r"<think>(.*?)</think>", response_text, re.DOTALL)
                         think_text = think_match.group(1).strip() if think_match else ""
 
-                        # Remove <think> section from response_text
+                        # Remove <think> section from response_text (relevant for deepseek-r1:70b model)
                         cleaned_response_text = re.sub(r"<think>.*?</think>", "", response_text, flags=re.DOTALL).strip()
 
                         # Remove any Markdown-style code blocks containing "json"
