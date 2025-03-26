@@ -13,7 +13,7 @@ import re
 
 # Initialize the models and embedding function once to optimize performance
 model = OllamaLLM(
-    model="deepseek-r1:70b",
+    model="llama3:70b", # or deepseek-r1:70b
     temperature=0.2,  # Lower temperature for deterministic responses
     top_p=0.7,  # Keep responses focused, avoiding excessive randomness
     top_k=50,  # Select high-quality tokens for structured output

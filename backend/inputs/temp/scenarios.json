@@ -1,1 +1,1 @@
-{"scenarios": [{"scenario": "User Authentication", "attribute": "Security", "environment": "Web Application", "stimulus": "User enters valid login credentials.", "response": "User is authenticated and granted access to the system."}]}
+{"scenarios": []}

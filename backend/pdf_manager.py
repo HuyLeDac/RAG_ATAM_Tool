@@ -41,7 +41,7 @@ class PDFManager:
         with open(pdf_path, 'wb') as pdf_file:
             pdf_file.write(pdf_content)
 
-    def delete_pdf(self, pdf_path_fixed, pdf_name):
+    def delete_pdf(self, pdf_name):
         """
         Deletes a PDF file from the data directory if it exists.
 

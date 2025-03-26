@@ -107,12 +107,10 @@ def upload_pdf():
     if not file.filename.endswith('.pdf'):
         return jsonify({"error": "Invalid file type, only PDF files are allowed."}), 400
 
-    try:
-        pdf_manager.add_pdf(file.filename, file.read())
-        return jsonify({"message": f"PDF uploaded successfully and saved as {file.filename}."}), 200
-    except Exception as e:
-        return jsonify({"error": f"Failed to upload PDF: {str(e)}"}), 500
-
+    
+    pdf_manager.add_pdf(file.filename, file.read())
+    return jsonify({"message": f"PDF uploaded successfully and saved as {file.filename}."}), 200
+  
 @app.route('/delete-pdf/<pdf_name>', methods=['POST'])
 def delete_pdf(pdf_name: str):
     """
@@ -238,24 +236,7 @@ def get_results():
         JSON response with serialized architectural data or error messages.
     """
     try:
-        # Clear directory
-        if os.path.exists(RESPONSES_PATH):
-            os.remove(RESPONSES_PATH)
-
-        # Web scraping process
-        subprocess.run(['python', 'web_scraper.py'], check=True)
-
-        # Create database
-        subprocess.run(['python', 'create_database.py', INPUT_DIR], check=True)
-
-        # Query the model
-        subprocess.run(['python', 'query.py', os.path.basename(INPUT_DIR)], check=True)
-
-        # Read and return the responses
-        with open(RESPONSES_PATH, 'r') as json_file:
-            responses = json.load(json_file)
-
-        return serialize_architectural_data(responses), 200
+        return start_rag_pipeline()
     except subprocess.CalledProcessError as e:
         return jsonify({"error": f"Subprocess error: {str(e)}"}), 500
     except FileNotFoundError:
@@ -263,6 +244,24 @@ def get_results():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+def start_rag_pipeline():
+    if os.path.exists(RESPONSES_PATH):
+            os.remove(RESPONSES_PATH)
+
+    # Web scraping process
+    subprocess.run(['python', 'web_scraper.py'], check=True)
+
+    # Create database
+    subprocess.run(['python', 'create_database.py', INPUT_DIR], check=True)
+
+    # Query the model
+    subprocess.run(['python', 'query.py', os.path.basename(INPUT_DIR)], check=True)
+
+    # Read and return the responses
+    with open(RESPONSES_PATH, 'r') as json_file:
+        responses = json.load(json_file)
+
+    return serialize_architectural_data(responses), 200
 
 @app.route('/get-results-without-retrieval', methods=['GET'])
 def get_results_without_retrieval():
